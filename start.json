@@ -21,7 +21,7 @@
           "layout": "0,0,5,1",
           "image": "http://lampa.stream/msx-logo.png",
           "label": "Lampa",
-          "action": "link:http://lampa.stream",
+          "action": "link:https://kivi-app.onrender.com/",
           "selection": {
             "important": true,
             "action": "update:content:description",
