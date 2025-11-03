@@ -35,9 +35,9 @@
         {
           "type": "control",
           "layout": "0,1,5,1",
-          "image": "http://msx.benzac.de/img/icon_raw.png",
-          "label": "Test",
-          "action": "execute:http://msxplayer.ru/msx/get-start-action",
+          "image": "https://music.youtube.com/img/favicon_32.png",
+          "label": "YouTube Music",
+          "action": "execute:https://music.youtube.com",
           "selection": {
             "important": true,
             "action": "update:content:description",
