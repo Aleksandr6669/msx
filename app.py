@@ -39,5 +39,4 @@ def serve_msx_config():
 
 # Flask автоматически обрабатывает запросы к папке /static
 # (для изображений, если они есть в JSON)
-
- app.run(host='0.0.0.0')
+app.run(host='0.0.0.0')
