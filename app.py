@@ -15,7 +15,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@app.route('/max/start.json')
+@app.route('/msx/start.json')
 def serve_msx_config():
     """
     Обрабатывает запрос на корневой адрес (/) и отдает JSON-файл.
