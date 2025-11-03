@@ -1,7 +1,7 @@
 from flask import Flask, send_from_directory, jsonify, make_response
 import os
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # Имя вашего JSON-файла
 JSON_FILENAME = "start.json"
