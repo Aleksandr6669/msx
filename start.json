@@ -36,8 +36,8 @@
           "type": "control",
           "layout": "0,1,5,1",
           "image": "https://music.youtube.com/img/favicon_32.png",
-          "label": "YouTube Music",
-          "action": "execute:https://music.youtube.com",
+          "label": "Gemini",
+          "action": "execute:https://gemini.google.com/app",
           "selection": {
             "important": true,
             "action": "update:content:description",
