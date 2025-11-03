@@ -19,7 +19,7 @@
         {
           "type": "control",
           "layout": "0,0,5,1",
-          "image": "",
+          "image": "https://kivi-app.onrender.com/favicon.png",
           "label": "Kivi Dev",
           "action": "link:https://kivi-app.onrender.com/",
           "selection": {
