@@ -19,8 +19,8 @@
         {
           "type": "control",
           "layout": "0,0,5,1",
-          "image": "http://lampa.stream/msx-logo.png",
-          "label": "Lampa",
+          "image": "",
+          "label": "Kivi Dev",
           "action": "link:https://kivi-app.onrender.com/",
           "selection": {
             "important": true,
@@ -36,7 +36,7 @@
           "type": "control",
           "layout": "0,1,5,1",
           "image": "http://msx.benzac.de/img/icon_raw.png",
-          "label": "FXMLPlayer",
+          "label": "Test",
           "action": "execute:http://msxplayer.ru/msx/get-start-action",
           "selection": {
             "important": true,
@@ -55,7 +55,7 @@
           "type": "control",
           "layout": "0,2,5,1",
           "image": "http://static.tempdata.forkplayer.tv/staticfiles/fimg/forkicon.png",
-          "label": "ForkPlayer",
+          "label": "Teat2",
           "action": "link:http://msx.lnka.ru/msx/distributive_forkplayer",
           "selection": {
             "important": true,
