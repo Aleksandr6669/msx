@@ -12,10 +12,9 @@
    },
 "items": [
       {
-	"tag": "vip",
-	"title": " Магазин приложений ",
-         "image": "http://msx.lh1.in/msx/pic/dstorev4.jpg",
-         "action": "link:http://salita.pluton-host.ru/tv/vip.php"
+	"title": " Магазин приложений",
+         "image": "",
+         "action": "link:https://fef48345-b944-4940-9e77-81dd10a15410-00-o9m1ykhpx0c0.worf.replit.dev/12345678"
           
       },
       {
