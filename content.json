@@ -17,6 +17,224 @@
          "image": "http://msx.lh1.in/msx/pic/dstorev4.jpg",
          "action": "link:http://salita.pluton-host.ru/tv/vip.php"
           
+      },
+      {
+	"tag": "1",
+	"title": " Магазин приложений ",
+        "image": "http://msx.lh1.in/msx/pic/dstore-2.jpg",
+        "action": "link:http://z91926l2.beget.tech/tv/index.php"
+       },
+      {
+	"tag": "2",
+       	"title": " Магазин приложений ",
+        "image": "http://msx.lh1.in/msx/pic/dstore-1.png",
+        "action": "link:http://x920083t.beget.tech/tv/indexv.php"
       }
-	]
+
+,
+{
+          "tag": "Web",
+          "title": "THVP торрнет",
+    "image": "http://msx.lh1.in/msx/thvp.png",
+    "action": "link:window:http://torrents.thvp.ru/"
+
+}
+,
+
+{
+		"title":"DS",
+         "image": "http://lampa.rf.gd/img/ds.png",
+         "action": "link:http://dstore11.ydns.eu/lampa"
+      },
+
+{
+	
+         "title": "РадиоПоток",
+    "image": "http://msx.lh1.in/arhiv2/radiopotok/picsys/logo.jpg",
+    "action": "link:http://dstore.byethost4.com/arhiv2/radiopotok/start.php"
+
+
+}
+,
+      {
+		"title":"MyRadio24",
+         "image": "http://msx.lh1.in/msx/pic/myradio.jpg",
+         "action": "link:http://z91926l2.beget.tech/arhiv/radio/start.php"
+      }
+
+,
+
+{
+	
+         "title": "Радио 101",
+    "image": "http://msx.lh1.in/arhiv6/radio101/picsys/logo.jpg",
+    "action": "link:http://dstore.byethost4.com/arhiv6/radio101/zanr.php?link=http%3A%2F%2F101.ru%2Fradio-top&p=0&t001=%20-%3E%D0%A0%D0%B0%D0%B4%D0%B8%D0%BE%20%D0%BF%D0%BE%20%D0%B6%D0%B0%D0%BD%D1%80%D0%B0%D0%BC&base=http%3A%2F%2F101.ru&code=0"
+
+}
+
+,
+
+{
+	
+         "title": "ТВ и Фильмы",
+    "image": "http://msx.lh1.in/msx/pic/xsmart.png",
+    "action": "link:http://app.xsmart.tv/?seller=dstore"
+
+}
+
+
+,
+
+
+{
+	
+         "title": "GetsTV 3.0",
+    "image": "http://msx.lh1.in/msx/pic/getstv3.jpg",
+    "action": "link:http://getstv.com/app/"
+
+}
+,
+
+{
+	
+         "title": "Форкплеер (su)",
+    "image": "http://msx.lh1.in/msx/pic/forkd.png",
+    "action": "link:http://browser.appinfo.su/"
+
+
+}
+
+,
+{
+	
+         "title": "Youtube",
+    "image": "http://msx.lh1.in/picsys/youtube.jpg",
+    "action": "link:https://www.youtube.com/tv#/"
+
+}
+,
+
+{
+	
+         "title": "Телеканалы",
+    "image": "http://msx.lh1.in/picsys/peers.jpg",
+    "action": "link:http://smarttv.peers.tv/operatv/1.2.0/index.html"
+
+}
+,
+
+
+{
+	
+         "title": "Смотрим",
+    "image": "https://prim.news/wp-content/uploads/2020/11/%D0%A1%D0%BC%D0%BE%D1%82%D1%80%D0%B8%D0%BC-375x250.jpg",
+    "action": "link:https://tv.smotrim.ru/"
+
+}
+
+,
+{
+	
+         "title": "Плеер IPTV",
+    "image": "http://msx.lh1.in/msx/pic/ssiptv.png",
+    "action": "link:http://app.ss-iptv.com/?group=LG&version=r_beta"
+
+}
+
+,
+
+{
+	
+    "title": "Яндекс видео",
+    "image": "http://msx.appfxml.com/msx/icons/msxmsx_img_yandex.jpg",
+    "action": "link:http://yandex.ru/video/tvapp/"
+
+}
+,
+
+
+{
+	
+         "title": "Яндекс диск",
+    "image": "http://msx.lh1.in/msx/pic/yandexd.jpg",
+    "action": "link:http://3847237441.app.fxmconnect.com/#initPassword"
+
+}
+
+,
+
+
+{
+	
+     "title": "Старое кино",
+    "image": "https://file2fxm.azureedge.net/files/images/app_icons/Images_180x119_angled/classicmovies.jpg",
+    "action": "link:http://2019043015.am-live-6.fxmconnect.com/#/home"
+
+}
+
+,
+
+
+{
+	
+         "title": "Радио",
+    "image": "http://msx.lh1.in/picsys/mytune.jpg",
+    "action": "link:https://devices.mytuner.mobi/?utm_source=zeasn"
+
+}
+,
+
+  {
+		"title":"ForkPlayer (COM)",
+         "image": "http://msx.lh1.in/picsys/forknew.png",
+         "action": "link:http://browser.appfxml.com/"
+      }
+,
+
+{
+	
+         "title": "Новости  Dstore",
+    "image": "http://msx.lh1.in/msx/logonews5.png",
+    "action": "link:http://dstore2.onlinewebshop.net/lk/info/index.php"
+
+}
+,
+
+{
+	
+         "title": "Матч!",
+    "image": "http://msx.lh1.in/msx/match.jpg",
+    "action": "link:https://smart-tv.match-club.ru"
+
+}
+
+,
+
+{
+	
+         "title": "Диафильм 2.0",
+    "image": "https://fandub.wiki/images/thumb/c/ce/DeeAFilm_Studio.jpeg/200px-DeeAFilm_Studio.jpeg",
+    "action": "link:https://dstore.lh1.in/libs/balans/rutube/dia.php?time=up&p=1"
+
+}
+
+,
+      {
+		"title":"Webvideocaster",
+         "image": "http://msx.lh1.in/msx/pic/Webvideocaster.png",
+          "action": "link:http://vewd.webvideocaster.com/"
+      }
+,
+      {
+		"title":"KinoBoom",
+         "image": "http://msx.lh1.in/picsys/kb_msx_logo.png",
+         "action": "content:http://kb-team.club/msx/enter.php?welcome"
+      },
+
+      {
+		"title":"HDGO",
+         "image": "http://msx.lh1.in/picsys/hdgo.png",
+          "action": "link:http://hdgo.me"
+      }
+   ]
 }
