@@ -3,5 +3,6 @@
   "version": "1.0",
   "comment": "Прямой запуск Flutter-приложения",
   "action": "content:request:interaction:menu@https://msx-92f1.onrender.com/",
+  "parameter": "content:request:interaction:menu@https://msx-92f1.onrender.com/",
   "type": "start"
 }
