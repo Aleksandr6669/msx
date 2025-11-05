@@ -3,7 +3,7 @@
   "headline": "Загрузчик приложений",
   "extension": "Версия MSX: 1.0.0",
   "version": "1.0.0",
-  "parameter": "content:https://msx-92f1.onrender.com/",
+  "parameter": "content:https://msx-92f1.onrender.com/msx/start.json",
   "note": "For this service, Media Station X 0.1.120 or higher is needed",
   "action": "[settings:validate_links:0|home]",
   "dictionary": "http://lampa.stream/msx/lang/ru.json",
