@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "parameter": "content:https://msx-92f1.onrender.com/msx/start.json",
   "note": "For this service, Media Station X 0.1.120 or higher is needed",
-  "action": "[settings:validate_links:0|home]",
+  "action": "content:request:interaction:menu@https://msx-92f1.onrender.com",
   "dictionary": "http://lampa.stream/msx/lang/ru.json",
   "pages": [
     {
