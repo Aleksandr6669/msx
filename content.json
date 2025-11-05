@@ -12,7 +12,8 @@
    },
 "items": [
       {
-	"title": " Магазин приложений",
+	"tag": "Web",
+	"title": "worf.replit.dev",
          "image": "",
          "action": "link:https://fef48345-b944-4940-9e77-81dd10a15410-00-o9m1ykhpx0c0.worf.replit.dev/12345678"
           
