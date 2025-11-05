@@ -1,8 +1,6 @@
 {
-  "name": "Заставка - Прямой Запуск",
-  "version": "1.0",
-  "comment": "Прямой запуск Flutter-приложения",
-  "action": "content:request:interaction:menu@https://msx-92f1.onrender.com/",
-  "parameter": "content:request:interaction:menu@https://msx-92f1.onrender.com/",
-  "type": "start"
+    "name": "Dstore-2",
+    "version": "0.0.2",
+    "parameter": "content:https://msx-92f1.onrender.com/msx/content.json",
+    "dictionary": "http://fxml.ru/msx/lang/ru.json"
 }
