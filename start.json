@@ -20,7 +20,7 @@
           "type": "control",
           "layout": "0,0,5,1",
           "image": "https://screen-tv.onrender.com/favicon.png",
-          "label": "Kivi Dev",
+          "label": "Screen TV",
           "action": "link:https://screen-tv.onrender.com/12345678",
           "selection": {
             "important": true,
