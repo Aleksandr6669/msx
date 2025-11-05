@@ -1,0 +1,22 @@
+{
+   "name": "Dstore",
+   "type": "pages",
+   "headline": "Dstore-vip",
+  "dictionary": "http://msx.lh1.in/msx/lang/ru.json",
+
+   "template": {
+      "type": "separate",
+      "layout": "0,0,2,3",
+      "alignment":"title-center",
+      "color": "msx-glass"
+   },
+"items": [
+      {
+	"tag": "vip",
+	"title": " Магазин приложений ",
+         "image": "http://msx.lh1.in/msx/pic/dstorev4.jpg",
+         "action": "link:http://salita.pluton-host.ru/tv/vip.php"
+          
+      },
+]
+}
