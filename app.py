@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 # Имя вашего JSON-файла
 JSON_FILENAME = "start.json"
+JSON_FILENAME2 = "content.json"
 
 @app.after_request
 def after_request(response):
@@ -22,7 +23,7 @@ def content():
     """
     try:
         # Пытаемся открыть и прочитать ваш JSON-файл
-        with open(JSON_FILENAME, 'r', encoding='utf-8') as f:
+        with open(JSON_FILENAME2, 'r', encoding='utf-8') as f:
             data = f.read()
         
         # Создаем ответ
