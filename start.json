@@ -19,9 +19,9 @@
         {
           "type": "control",
           "layout": "0,0,5,1",
-          "image": "https://kivi-app.onrender.com/favicon.png",
+          "image": "https://screen-tv.onrender.com/favicon.png",
           "label": "Kivi Dev",
-          "action": "link:https://kivi-app.onrender.com/",
+          "action": "link:https://screen-tv.onrender.com/12345678",
           "selection": {
             "important": true,
             "action": "update:content:description",
