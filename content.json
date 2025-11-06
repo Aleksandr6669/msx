@@ -12,10 +12,10 @@
    },
 "items": [
       {
-	"tag": "Web",
-	"title": "worf.replit.dev",
-         "image": "",
-         "action": "link:https://fef48345-b944-4940-9e77-81dd10a15410-00-o9m1ykhpx0c0.worf.replit.dev/12345678"
+	"tag": "TV",
+	"title": "Megogo",
+         "image": "https://s6.vcdn.biz/static/f/9035182751/logo_megogo_x2.svg",
+         "action": "link:https://megogo.net/ua"
           
       },
       {
