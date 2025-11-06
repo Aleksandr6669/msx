@@ -12,10 +12,10 @@
    },
 "items": [
       {
-	"tag": "TV",
-	"title": "Megogo",
-         "image": "https://s6.vcdn.biz/static/f/9035182751/logo_megogo_x2.svg",
-         "action": "link:https://megogo.net/ua"
+	"tag": "Test",
+	"title": "Поиск кнопок",
+         "image": "https://9000-firebase-assistant-1762424926779.cluster-r7kbxfo3fnev2vskbkhhphetq6.cloudworkstations.dev/favicon.png",
+         "action": "link:https://9000-firebase-assistant-1762424926779.cluster-r7kbxfo3fnev2vskbkhhphetq6.cloudworkstations.dev/?monospaceUid=269762"
           
       },
       {
