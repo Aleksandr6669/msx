@@ -1,5 +1,5 @@
 {
-    "name": "Dstore-2",
+    "name": "Apps PWA",
     "version": "0.0.2",
     "parameter": "content:https://msx-92f1.onrender.com/content.json",
     "dictionary": "http://fxml.ru/msx/lang/ru.json"
