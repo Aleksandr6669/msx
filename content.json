@@ -22,7 +22,7 @@
 	"tag": "screen",
 	"title": " Заставка",
         "image": "http://msx.lh1.in/msx/pic/dstore-2.jpg",
-        "action": "link:https://screen-tv.onrender.com"
+        "action": "link:https://screen-tv.onrender.com/12345678"
        },
       {
 	"tag": "2",
