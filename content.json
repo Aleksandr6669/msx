@@ -19,10 +19,10 @@
           
       },
       {
-	"tag": "1",
-	"title": " Магазин приложений ",
+	"tag": "screen",
+	"title": " Заставка",
         "image": "http://msx.lh1.in/msx/pic/dstore-2.jpg",
-        "action": "link:http://z91926l2.beget.tech/tv/index.php"
+        "action": "link:https://screen-tv.onrender.com"
        },
       {
 	"tag": "2",
