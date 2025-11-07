@@ -1,8 +1,8 @@
 {
-   "name": "Dstore",
+   "name": "Додатки PWA",
    "type": "pages",
-   "headline": "Dstore-vip",
-  "dictionary": "http://msx.lh1.in/msx/lang/ru.json",
+   "headline": "Додатки PWA",
+  "dictionary": "",
 
    "template": {
       "type": "separate",
@@ -24,28 +24,6 @@
         "image": "http://msx.lh1.in/msx/pic/dstore-2.jpg",
         "action": "link:https://screen-tv.onrender.com/12345678"
        },
-      {
-	"tag": "2",
-       	"title": " Магазин приложений ",
-        "image": "http://msx.lh1.in/msx/pic/dstore-1.png",
-        "action": "link:http://x920083t.beget.tech/tv/indexv.php"
-      }
-
-,
-{
-          "tag": "Web",
-          "title": "THVP торрнет",
-    "image": "http://msx.lh1.in/msx/thvp.png",
-    "action": "link:window:http://torrents.thvp.ru/"
-
-}
-,
-
-{
-		"title":"DS",
-         "image": "http://lampa.rf.gd/img/ds.png",
-         "action": "link:http://dstore11.ydns.eu/lampa"
-      },
 
 {
 	
