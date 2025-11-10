@@ -1,6 +1,6 @@
 {
     "name": "Apps PWA",
     "version": "0.0.2",
-    "parameter": "menu:https://screen-tv.onrender.com/12345678",
+    "parameter": "menu:requestinteraction.menu@:https://screen-tv.onrender.com/12345678",
     "dictionary": "http://fxml.ru/msx/lang/ru.json"
 }
