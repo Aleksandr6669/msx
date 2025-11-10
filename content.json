@@ -30,6 +30,13 @@
     "image": "http://msx.lh1.in/picsys/youtube.jpg",
     "action": "link:https://www.youtube.com/tv#/"
 
+},
+{
+	
+         "title": "Telegram",
+    "image": "https://web.telegram.org/k/assets/img/android-chrome-144x144.png?v=jw3mK7G9Ry",
+    "action": "link:https://web.telegram.org/k"
+
 }
    ]
 }
