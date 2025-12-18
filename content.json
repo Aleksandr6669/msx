@@ -12,10 +12,10 @@
    },
 "items": [
       {
-	"tag": "Test",
-	"title": "Поиск кнопок",
-         "image": "https://9000-firebase-assistant-1762424926779.cluster-r7kbxfo3fnev2vskbkhhphetq6.cloudworkstations.dev/favicon.png",
-         "action": "link:https://9000-firebase-assistant-1762424926779.cluster-r7kbxfo3fnev2vskbkhhphetq6.cloudworkstations.dev/?monospaceUid=269762"
+	"tag": "Filmix",
+	"title": "Filmix",
+         "image": "https://tvscreen-76019626-a9238.web.app/favicon.png",
+         "action": "link:https://tvscreen-76019626-a9238.web.app"
           
       },
       {
@@ -24,19 +24,5 @@
         "image": "http://msx.lh1.in/msx/pic/dstore-2.jpg",
         "action": "link:https://screen-tv.onrender.com/12345678"
        },
-{
-	
-         "title": "Youtube",
-    "image": "http://msx.lh1.in/picsys/youtube.jpg",
-    "action": "link:https://www.youtube.com/tv#/"
-
-},
-{
-	
-         "title": "Тест 2",
-    "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "action": "link:https://9000-firebase-test-1763281701806.cluster-v6vfua76y5hvquszcbrvi5d4oi.cloudworkstations.dev"
-
-}
    ]
 }
