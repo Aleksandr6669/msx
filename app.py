@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -153,20 +153,25 @@ def add_cors_headers(response):
 
 # ---------------------------------------------------------------------------
 # MEDIA STATION X (MSX) API ENDPOINTS
+# In MSX, entering just the host (e.g. myapp.vercel.app or 192.168.1.50:5000)
+# automatically appends "/msx/start.json"!
+# Both "/msx/start.json" and "/start.json" are mapped here.
 # ---------------------------------------------------------------------------
 
 @app.route('/start.json')
+@app.route('/msx/start.json')
 def msx_start():
     base_url = get_base_url()
     return jsonify({
         "name": "MX Station Glass Portal",
         "version": "1.2.0",
-        "parameter": f"menu:{base_url}/menu.json",
+        "parameter": f"menu:{base_url}/msx/menu.json",
         "background": current_settings["background_url"],
         "logo": f"{base_url}/static/images/logo.svg"
     })
 
 @app.route('/menu.json')
+@app.route('/msx/menu.json')
 def msx_menu():
     base_url = get_base_url()
     return jsonify({
@@ -209,7 +214,7 @@ def msx_menu():
                 "icon": "brightness-3",
                 "label": "Заставка MSX",
                 "badge": "SCREENSAVER",
-                "action": f"slideshow:{base_url}/slideshow.json"
+                "action": f"slideshow:{base_url}/msx/slideshow.json"
             },
             {
                 "icon": "settings",
@@ -248,7 +253,7 @@ def msx_content_portal():
                 "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
                 "imageFiller": "cover",
                 "badge": "4K SCREENSAVER",
-                "action": f"slideshow:{base_url}/slideshow.json"
+                "action": f"slideshow:{base_url}/msx/slideshow.json"
             }
         ]
     })
@@ -354,7 +359,9 @@ def msx_content_customize():
         "items": items
     })
 
+# Slideshow route for MSX Screensaver
 @app.route('/slideshow.json')
+@app.route('/msx/slideshow.json')
 def msx_slideshow():
     return jsonify({
         "headline": "4K Заставка Media Station X",
@@ -399,15 +406,15 @@ def msx_content_info():
                 "layout": "0,0,4.5,2.2",
                 "icon": "wallpaper",
                 "label": "Адрес заставки для MSX Settings",
-                "title": f"{base_url}/slideshow.json",
-                "action": f"info:Введите {base_url}/slideshow.json в Настройки -> Заставка"
+                "title": f"{base_url}/msx/slideshow.json",
+                "action": f"info:Укажите {base_url}/msx/slideshow.json в Настройки -> Заставка"
             },
             {
                 "type": "button",
                 "layout": "0,0,4.5,2.2",
                 "icon": "refresh",
                 "label": "Перезагрузить портал",
-                "action": f"menu:{base_url}/menu.json"
+                "action": f"menu:{base_url}/msx/menu.json"
             }
         ]
     })
@@ -459,9 +466,8 @@ def web_screensaver():
 if __name__ == '__main__':
     print("=" * 65)
     print("  MX Station Player — Portal & Widget Engine")
-    print("  URL для Media Station X (Start Parameter):")
-    print("  http://<IP_ЭТОГО_КОМПЬЮТЕРА>:5000/start.json")
-    print("  URL для стандартной заставки MSX (Настройки -> Заставка):")
-    print("  http://<IP_ЭТОГО_КОМПЬЮТЕРА>:5000/slideshow.json")
+    print("  В Media Station X на ТВ (Start Parameter -> Setup) достаточно ввести:")
+    print("  <IP_ЭТОГО_КОМПЬЮТЕРА>:5000  (MSX сам добавит /msx/start.json)")
+    print("  или полный URL: http://<IP>:5000/msx/start.json")
     print("=" * 65)
     app.run(host='0.0.0.0', port=5000, debug=True)

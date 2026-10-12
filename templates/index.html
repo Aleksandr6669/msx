@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body class="theme-active" id="mainBody">
-    <!-- Background Layer (Image or Gradient) -->
     <div class="bg-layer" id="bgLayer"></div>
     <div class="ambient-glow glow-primary"></div>
     <div class="ambient-glow glow-secondary"></div>
@@ -52,8 +51,11 @@
                 <div class="msx-connect-pill" id="msxUrlCard" title="Нажмите для копирования URL">
                     <span class="msx-dot"></span>
                     <div class="msx-info">
-                        <span class="msx-lbl">Start Parameter для ТВ:</span>
-                        <code class="msx-val">{{ base_url }}/start.json</code>
+                        <span class="msx-lbl">Start Parameter в MSX:</span>
+                        <code class="msx-val">{{ base_url }}/msx/start.json</code>
+                        <span style="display:block; font-size: 0.68rem; color: #94a3b8; margin-top: 3px;">
+                            (или просто домен без папки: MSX сам подставит /msx/start.json)
+                        </span>
                     </div>
                 </div>
             </div>
@@ -115,7 +117,6 @@
                                 <span class="mark m6">6</span>
                                 <span class="mark m9">9</span>
                             </div>
-                            <!-- Clock Hands -->
                             <div class="hand hand-hour" id="analogHour"></div>
                             <div class="hand hand-min" id="analogMin"></div>
                             <div class="hand hand-sec" id="analogSec"></div>
@@ -147,9 +148,7 @@
                         <div class="calendar-days-header">
                             <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="weekend">СБ</span><span class="weekend">ВС</span>
                         </div>
-                        <div class="calendar-grid-cells" id="calGridCells">
-                            <!-- Populated dynamically by JavaScript -->
-                        </div>
+                        <div class="calendar-grid-cells" id="calGridCells"></div>
                     </div>
 
                     <!-- WIDGET 5: Compact Date & Weather / Mood Card -->
@@ -376,8 +375,8 @@
             <span class="material-icons icon-guide">info</span>
             <div class="guide-text">
                 <strong>Стандартная заставка в Media Station X:</strong> 
-                Откройте на ТВ <code>Настройки → Заставка</code> (Settings → Screensaver) и укажите адрес слайд-шоу: 
-                <span class="code-highlight">{{ base_url }}/slideshow.json</span>
+                В <code>Настройки → Заставка</code> укажите адрес: 
+                <span class="code-highlight">{{ base_url }}/msx/slideshow.json</span>
             </div>
         </div>
     </div>
