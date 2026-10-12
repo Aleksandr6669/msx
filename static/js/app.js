@@ -1,15 +1,128 @@
-// State & Preferences
-let appState = {
-    clock: localStorage.getItem('mx_clock') || 'digital',
-    calendar: localStorage.getItem('mx_calendar') || 'grid',
-    position: localStorage.getItem('mx_pos') || 'center',
-    bgType: localStorage.getItem('mx_bg_type') || 'image',
-    bgVal: localStorage.getItem('mx_bg_val') || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85',
-    blur: localStorage.getItem('mx_blur') || 'medium'
+// ==========================================================================
+// MX STATION PLAYER — CLIENT ENGINE FOR SMART TV & MEDIA STATION X
+// ==========================================================================
+
+const SECTION_WALLPAPERS = {
+    widgets: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
+    apps: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=85",
+    settings: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85",
+    info: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=85"
+};
+
+const DEFAULT_APPS_LIST = [
+    {
+        id: "app_lampa",
+        name: "Lampa",
+        url: "http://lampa.mx",
+        sub: "Онлайн-кинотеатр и сериалы",
+        icon: "movie",
+        badge: "CINEMA",
+        image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        "id": "app_youtube",
+        name: "YouTube MSX",
+        url: "http://msx.benzac.de/plugins/youtube.html",
+        sub: "Видео, клипы и стримы",
+        icon: "play_circle",
+        badge: "VIDEO",
+        image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_forkplayer",
+        name: "ForkPlayer",
+        url: "http://operats.obovse.ru/2.5/",
+        sub: "Портал онлайн-ТВ и плейлистов",
+        icon: "language",
+        badge: "PORTAL",
+        image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_iptv",
+        name: "IPTV Плеер HD",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        sub: "Телеканалы прямой эфир",
+        icon: "live_tv",
+        badge: "LIVE",
+        image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_music",
+        name: "Lo-Fi Chill Radio",
+        url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        sub: "Круглосуточный релакс-поток",
+        icon: "music_note",
+        badge: "CHILL",
+        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80"
+    }
+];
+
+// App State
+let state = {
+    activeTab: "widgets",
+    widgetsPos: localStorage.getItem('mx_pos') || "center",
+    blur: localStorage.getItem('mx_blur') || "medium",
+    idleTimeoutSec: parseInt(localStorage.getItem('mx_idle_sec') || "120", 10),
+    screensaverBg: localStorage.getItem('mx_ss_bg') || "ss_all",
+    widgets: JSON.parse(localStorage.getItem('mx_widgets') || JSON.stringify({
+        clock_digital: true,
+        clock_modern: false,
+        clock_analog: true,
+        calendar_grid: true,
+        calendar_compact: false,
+        calendar_events: true
+    })),
+    apps: JSON.parse(localStorage.getItem('mx_apps') || JSON.stringify(DEFAULT_APPS_LIST))
 };
 
 // ---------------------------------------------------------------------------
-// CLOCKS & TIME ENGINE
+// 1. WALLPAPERS & TAB SWITCHING
+// ---------------------------------------------------------------------------
+const bgWallpaper = document.getElementById('bgWallpaper');
+const menuTabs = document.querySelectorAll('.menu-tab');
+const tabPanes = {
+    widgets: document.getElementById('tabWidgets'),
+    apps: document.getElementById('tabApps'),
+    settings: document.getElementById('tabSettings'),
+    info: document.getElementById('tabInfo')
+};
+
+function switchTab(tabId) {
+    state.activeTab = tabId;
+
+    // 1. Update menu buttons
+    menuTabs.forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+    });
+
+    // 2. Switch tab panes
+    Object.keys(tabPanes).forEach(k => {
+        if (tabPanes[k]) {
+            tabPanes[k].classList.toggle('active', k === tabId);
+        }
+    });
+
+    // 3. Smooth background transition for this section
+    const bgUrl = SECTION_WALLPAPERS[tabId] || SECTION_WALLPAPERS.widgets;
+    if (bgWallpaper) {
+        bgWallpaper.style.backgroundImage = `url('${bgUrl}')`;
+    }
+}
+
+menuTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-tab');
+        if (target) switchTab(target);
+    });
+});
+
+// Check URL query parameters (e.g. ?tab=apps)
+const urlParams = new URLSearchParams(window.location.search);
+const initialTab = urlParams.get('tab') || 'widgets';
+switchTab(initialTab);
+
+// ---------------------------------------------------------------------------
+// 2. REAL-TIME CLOCKS ENGINE
 // ---------------------------------------------------------------------------
 function updateClocks() {
     const now = new Date();
@@ -23,348 +136,509 @@ function updateClocks() {
     const sStr = String(s).padStart(2, '0');
 
     // 1. Digital Clock
-    const digH = document.getElementById('digHours');
-    const digM = document.getElementById('digMinutes');
-    const digS = document.getElementById('digSeconds');
-    if (digH && digM && digS) {
-        digH.textContent = hStr;
-        digM.textContent = mStr;
-        digS.textContent = sStr;
+    const elH = document.getElementById('digH');
+    const elM = document.getElementById('digM');
+    const elS = document.getElementById('digS');
+    if (elH && elM && elS) {
+        elH.textContent = hStr;
+        elM.textContent = mStr;
+        elS.textContent = sStr;
     }
 
     // 2. Modern Clock
-    const modTime = document.getElementById('modTime');
-    if (modTime) {
-        modTime.textContent = `${hStr}:${mStr}`;
+    const elModTime = document.getElementById('modTimeVal');
+    const elModWeek = document.getElementById('modWeekdayVal');
+    const elModMonth = document.getElementById('modMonthVal');
+    if (elModTime) {
+        elModTime.textContent = `${hStr}:${mStr}`;
     }
 
-    // 3. Analog Clock (Smooth continuous second hand)
-    const hourHand = document.getElementById('analogHour');
-    const minHand = document.getElementById('analogMin');
-    const secHand = document.getElementById('analogSec');
-
-    if (hourHand && minHand && secHand) {
-        const secDeg = (s + ms / 1000) * 6; // 360 / 60 = 6 deg per sec
+    // 3. Analog Clock (moving hands)
+    const hHand = document.getElementById('handHour');
+    const mHand = document.getElementById('handMin');
+    const sHand = document.getElementById('handSec');
+    if (hHand && mHand && sHand) {
+        const secDeg = (s + ms / 1000) * 6;
         const minDeg = (m + s / 60) * 6;
         const hourDeg = ((h % 12) + m / 60) * 30;
 
-        secHand.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
-        minHand.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
-        hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+        sHand.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+        mHand.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+        hHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
     }
 
-    // Date Strings
-    const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const dateStr = now.toLocaleDateString('ru-RU', optionsDate);
-    const dateFooter = document.getElementById('digDateFooter');
-    if (dateFooter) {
-        dateFooter.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-    }
+    // Dates
+    const ruMonths = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", 
+                     "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"] ;
+    const ruWeekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+    const fullDateStr = `${ruWeekdays[(now.getDay() + 6) % 7]}, ${now.getDate()} ${ruMonths[now.getMonth()]} ${now.getFullYear()}`;
 
-    // Compact date
-    const compactDay = document.getElementById('compactDayNum');
-    const compactMY = document.getElementById('compactMonthYear');
-    const compactW = document.getElementById('compactWeekday');
-    if (compactDay && compactMY && compactW) {
-        compactDay.textContent = String(now.getDate());
-        compactMY.textContent = now.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
-        compactW.textContent = now.toLocaleDateString('ru-RU', { weekday: 'long' });
-    }
+    const digFullDate = document.getElementById('digFullDate');
+    if (digFullDate) digFullDate.textContent = fullDateStr;
+
+    if (elModWeek) elModWeek.textContent = ruWeekdays[(now.getDay() + 6) % 7].toUpperCase();
+    if (elModMonth) elModMonth.textContent = `${ruMonths[now.getMonth()].toUpperCase()} ${now.getFullYear()}`;
+
+    // Compact Card
+    const compDayNum = document.getElementById('compDayNum');
+    const compMonth = document.getElementById('compMonth');
+    const compWeek = document.getElementById('compWeek');
+    if (compDayNum) compDayNum.textContent = String(now.getDate());
+    if (compMonth) compMonth.textContent = `${ruMonths[now.getMonth()]} ${now.getFullYear()}`;
+    if (compWeek) compWeek.textContent = ruWeekdays[(now.getDay() + 6) % 7];
+
+    // Screensaver Clocks
+    const ssTimeText = document.getElementById('ssTimeText');
+    const ssDateText = document.getElementById('ssDateText');
+    const ssCityTime = document.getElementById('ssCityTime');
+    if (ssTimeText) ssTimeText.textContent = `${hStr}:${mStr}`;
+    if (ssDateText) ssDateText.textContent = fullDateStr;
+    if (ssCityTime) ssCityTime.textContent = `Точное время: ${hStr}:${mStr}:${sStr}`;
 }
 
-// RequestAnimationFrame for ultra-smooth analog clock
-function runClockLoop() {
+function clockLoop() {
     updateClocks();
-    requestAnimationFrame(runClockLoop);
+    requestAnimationFrame(clockLoop);
 }
-requestAnimationFrame(runClockLoop);
+requestAnimationFrame(clockLoop);
 
 // ---------------------------------------------------------------------------
-// CALENDAR ENGINE (DYNAMIC MONTH GENERATOR)
+// 3. DYNAMIC CALENDAR ENGINE
 // ---------------------------------------------------------------------------
-function renderMonthCalendar() {
-    const calGrid = document.getElementById('calGridCells');
-    const calTitle = document.getElementById('calMonthTitle');
-    if (!calGrid || !calTitle) return;
+function renderCalendarGrid() {
+    const calCells = document.getElementById('calCellsGrid');
+    const calMonthName = document.getElementById('calMonthName');
+    if (!calCells || !calMonthName) return;
 
     const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-    const todayDate = now.getDate();
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth();
+    const today = now.getDate();
 
     const monthNames = [
-        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+        "ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ",
+        "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"
     ];
-    calTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    calMonthName.textContent = `${monthNames[curMonth]} ${curYear}`;
 
-    // First day of month (0 is Sunday, 1 is Monday... convert to Monday=0)
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const firstDay = new Date(curYear, curMonth, 1).getDay();
     const startOffset = (firstDay + 6) % 7; // Monday = 0
+    const totalDays = new Date(curYear, curMonth + 1, 0).getDate();
 
-    // Number of days in current month
-    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+    calCells.innerHTML = '';
 
-    calGrid.innerHTML = '';
-
-    // Empty offset cells
     for (let i = 0; i < startOffset; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'cal-cell empty';
-        calGrid.appendChild(emptyCell);
+        const empty = document.createElement('div');
+        empty.className = 'cell empty';
+        calCells.appendChild(empty);
     }
 
-    // Day cells
     for (let d = 1; d <= totalDays; d++) {
         const cell = document.createElement('div');
-        cell.className = 'cal-cell';
+        cell.className = 'cell';
         cell.textContent = d;
 
         const dayOfWeek = (startOffset + d - 1) % 7;
         if (dayOfWeek === 5 || dayOfWeek === 6) {
-            cell.classList.add('weekend');
+            cell.classList.add('we');
         }
-
-        if (d === todayDate) {
+        if (d === today) {
             cell.classList.add('today');
         }
-
-        calGrid.appendChild(cell);
+        calCells.appendChild(cell);
     }
 }
-renderMonthCalendar();
+renderCalendarGrid();
 
 // ---------------------------------------------------------------------------
-// VIEW SWITCHING (Tabs: Dashboard / Catalog / Settings)
+// 4. WIDGETS DISPLAY & POSITIONING
 // ---------------------------------------------------------------------------
-const navButtons = document.querySelectorAll('.nav-btn[data-view]');
-const viewSections = {
-    dashboard: document.getElementById('viewDashboard'),
-    catalog: document.getElementById('viewCatalog'),
-    settings: document.getElementById('viewSettings')
+const widgetsWrapper = document.getElementById('widgetsWrapper');
+const wClockDigital = document.getElementById('wClockDigital');
+const wClockAnalog = document.getElementById('wClockAnalog');
+const wClockModern = document.getElementById('wClockModern');
+const wCalGrid = document.getElementById('wCalGrid');
+const wCalCompact = document.getElementById('wCalCompact');
+const wCalEvents = document.getElementById('wCalEvents');
+
+function applyWidgetsLayout() {
+    // 1. Toggles
+    if (wClockDigital) wClockDigital.style.display = state.widgets.clock_digital ? 'block' : 'none';
+    if (wClockAnalog) wClockAnalog.style.display = state.widgets.clock_analog ? 'flex' : 'none';
+    if (wClockModern) wClockModern.style.display = state.widgets.clock_modern ? 'block' : 'none';
+
+    if (wCalGrid) wCalGrid.style.display = state.widgets.calendar_grid ? 'block' : 'none';
+    if (wCalCompact) wCalCompact.style.display = state.widgets.calendar_compact ? 'block' : 'none';
+    if (wCalEvents) wCalEvents.style.display = state.widgets.calendar_events ? 'block' : 'none';
+
+    // 2. Position
+    if (widgetsWrapper) {
+        widgetsWrapper.className = `widgets-wrapper pos-${state.widgetsPos}`;
+    }
+
+    // 3. Blur
+    const root = document.documentElement;
+    if (state.blur === 'light') root.style.setProperty('--glass-blur', '14px');
+    else if (state.blur === 'heavy') root.style.setProperty('--glass-blur', '38px');
+    else root.style.setProperty('--glass-blur', '25px');
+
+    localStorage.setItem('mx_widgets', JSON.stringify(state.widgets));
+    localStorage.setItem('mx_pos', state.widgetsPos);
+    localStorage.setItem('mx_blur', state.blur);
+}
+applyWidgetsLayout();
+
+// Subtabs inside Settings
+const subtabBtns = document.querySelectorAll('.subtab-btn');
+const subpanes = {
+    'sub-widgets': document.getElementById('sub-widgets'),
+    'sub-apps': document.getElementById('sub-apps'),
+    'sub-screensaver': document.getElementById('sub-screensaver')
 };
 
-function switchView(viewName) {
-    navButtons.forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-view') === viewName);
-    });
-
-    Object.keys(viewSections).forEach(k => {
-        if (viewSections[k]) {
-            viewSections[k].classList.toggle('active', k === viewName);
-        }
-    });
-}
-
-navButtons.forEach(btn => {
+subtabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-        const target = btn.getAttribute('data-view');
-        if (target) switchView(target);
+        subtabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const target = btn.getAttribute('data-subtab');
+        Object.keys(subpanes).forEach(k => {
+            if (subpanes[k]) subpanes[k].classList.toggle('active', k === target);
+        });
     });
 });
 
-const openSettingsBtn = document.getElementById('openSettingsBtn');
-if (openSettingsBtn) {
-    openSettingsBtn.addEventListener('click', () => switchView('settings'));
-}
-
-const saveAndBackBtn = document.getElementById('saveAndBackBtn');
-if (saveAndBackBtn) {
-    saveAndBackBtn.addEventListener('click', () => switchView('dashboard'));
-}
-
-const toggleScreensaverBtn = document.getElementById('toggleScreensaverBtn');
-if (toggleScreensaverBtn) {
-    toggleScreensaverBtn.addEventListener('click', () => {
-        window.open('/screensaver', '_blank');
+// Quick Buttons in Widgets Tab
+const gotoWidgetSettingsBtn = document.getElementById('gotoWidgetSettingsBtn');
+if (gotoWidgetSettingsBtn) {
+    gotoWidgetSettingsBtn.addEventListener('click', () => {
+        switchTab('settings');
+        subtabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-subtab') === 'sub-widgets'));
+        Object.keys(subpanes).forEach(k => {
+            if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-widgets');
+        });
     });
 }
+
+// Widget Toggles in Settings
+const togglePills = document.querySelectorAll('.toggle-pill');
+function updateTogglePillsUI() {
+    togglePills.forEach(pill => {
+        const key = pill.getAttribute('data-key');
+        const isChecked = state.widgets[key];
+        pill.classList.toggle('checked', !!isChecked);
+        const checkEl = pill.querySelector('.toggle-check');
+        if (checkEl) checkEl.textContent = isChecked ? '✓' : '—';
+    });
+}
+updateTogglePillsUI();
+
+togglePills.forEach(pill => {
+    pill.addEventListener('click', () => {
+        const key = pill.getAttribute('data-key');
+        state.widgets[key] = !state.widgets[key];
+        updateTogglePillsUI();
+        applyWidgetsLayout();
+    });
+});
+
+// Position buttons
+const posBtns = document.querySelectorAll('.pos-option-btn');
+posBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        posBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.widgetsPos = btn.getAttribute('data-pos');
+        applyWidgetsLayout();
+    });
+});
+posBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.widgetsPos));
+
+// Blur buttons
+const blurBtns = document.querySelectorAll('.blur-option-btn');
+blurBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        blurBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.blur = btn.getAttribute('data-blur');
+        applyWidgetsLayout();
+    });
+});
+blurBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-blur') === state.blur));
 
 // ---------------------------------------------------------------------------
-// WIDGET CUSTOMIZATION (Clocks, Calendars, Positioning, Backgrounds)
+// 5. APPS MANAGEMENT ENGINE
 // ---------------------------------------------------------------------------
-const widgetsContainer = document.getElementById('widgetsContainer');
-const widgetDigital = document.getElementById('widgetClockDigital');
-const widgetAnalog = document.getElementById('widgetClockAnalog');
-const widgetModern = document.getElementById('widgetClockModern');
-const widgetCalGrid = document.getElementById('widgetCalendarGrid');
-const widgetCalCompact = document.getElementById('widgetCalendarCompact');
-const widgetCalEvents = document.getElementById('widgetCalendarEvents');
-const bgLayer = document.getElementById('bgLayer');
+const appsGrid = document.getElementById('appsGrid');
+const appsCountBadge = document.getElementById('appsCountBadge');
+const installedAppsManageList = document.getElementById('installedAppsManageList');
 
-function applyWidgetSettings() {
-    // 1. Clocks Visibility
-    if (widgetDigital) widgetDigital.style.display = 'none';
-    if (widgetAnalog) widgetAnalog.style.display = 'none';
-    if (widgetModern) widgetModern.style.display = 'none';
+function renderApps() {
+    if (appsCountBadge) appsCountBadge.textContent = state.apps.length;
 
-    if (appState.clock === 'digital') {
-        if (widgetDigital) widgetDigital.style.display = 'block';
-    } else if (appState.clock === 'analog') {
-        if (widgetAnalog) widgetAnalog.style.display = 'flex';
-    } else if (appState.clock === 'modern') {
-        if (widgetModern) widgetModern.style.display = 'block';
-    } else if (appState.clock === 'both') {
-        if (widgetDigital) widgetDigital.style.display = 'block';
-        if (widgetAnalog) widgetAnalog.style.display = 'flex';
-    }
+    // Render Main Grid (Tab 2)
+    if (appsGrid) {
+        appsGrid.innerHTML = '';
+        state.apps.forEach(app => {
+            const card = document.createElement('div');
+            card.className = 'app-card';
+            card.tabIndex = 0;
 
-    // 2. Calendar Visibility
-    if (widgetCalGrid) widgetCalGrid.style.display = 'none';
-    if (widgetCalCompact) widgetCalCompact.style.display = 'none';
-    if (widgetCalEvents) widgetCalEvents.style.display = 'none';
+            const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
+            card.innerHTML = `
+                <div class="app-card-img-wrap">
+                    <img src="${imgUrl}" alt="${app.name}" class="app-card-img" loading="lazy">
+                    <span class="app-card-badge">${app.badge || 'APP'}</span>
+                </div>
+                <div class="app-card-body">
+                    <div class="app-card-name">
+                        <span class="material-icons">${app.icon || 'launch'}</span>
+                        <span>${app.name}</span>
+                    </div>
+                    <div class="app-card-sub">${app.sub || app.url}</div>
+                </div>
+            `;
 
-    if (appState.calendar === 'grid') {
-        if (widgetCalGrid) widgetCalGrid.style.display = 'block';
-    } else if (appState.calendar === 'compact') {
-        if (widgetCalCompact) widgetCalCompact.style.display = 'block';
-    } else if (appState.calendar === 'events') {
-        if (widgetCalEvents) widgetCalEvents.style.display = 'block';
-    } else if (appState.calendar === 'both') {
-        if (widgetCalGrid) widgetCalGrid.style.display = 'block';
-        if (widgetCalEvents) widgetCalEvents.style.display = 'block';
-    }
-
-    // 3. Position
-    if (widgetsContainer) {
-        widgetsContainer.className = `widgets-container pos-${appState.position}`;
-    }
-
-    // 4. Background
-    if (bgLayer) {
-        if (appState.bgType === 'image') {
-            bgLayer.style.backgroundImage = `url('${appState.bgVal}')`;
-            bgLayer.style.background = '';
-            bgLayer.style.backgroundImage = `url('${appState.bgVal}')`;
-        } else {
-            bgLayer.style.backgroundImage = 'none';
-            bgLayer.style.background = appState.bgVal;
-        }
-    }
-
-    // 5. Blur Strength
-    const root = document.documentElement;
-    if (appState.blur === 'light') {
-        root.style.setProperty('--glass-blur', '14px');
-    } else if (appState.blur === 'heavy') {
-        root.style.setProperty('--glass-blur', '38px');
-    } else {
-        root.style.setProperty('--glass-blur', '24px');
-    }
-
-    // Persist to localStorage
-    localStorage.setItem('mx_clock', appState.clock);
-    localStorage.setItem('mx_calendar', appState.calendar);
-    localStorage.setItem('mx_pos', appState.position);
-    localStorage.setItem('mx_bg_type', appState.bgType);
-    localStorage.setItem('mx_bg_val', appState.bgVal);
-    localStorage.setItem('mx_blur', appState.blur);
-
-    // Sync with Flask backend
-    fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            clock_widget: appState.clock,
-            calendar_widget: appState.calendar,
-            widgets_position: appState.position,
-            background_type: appState.bgType,
-            background_url: appState.bgType === 'image' ? appState.bgVal : ''
-        })
-    }).catch(e => console.log('Settings synced locally'));
-}
-
-// Clock Option Buttons
-const clockButtons = document.querySelectorAll('#clockOptionGroup .opt-btn');
-clockButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        clockButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        appState.clock = btn.getAttribute('data-clock');
-        applyWidgetSettings();
-    });
-});
-
-// Calendar Option Buttons
-const calButtons = document.querySelectorAll('#calendarOptionGroup .opt-btn');
-calButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        calButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        appState.calendar = btn.getAttribute('data-calendar');
-        applyWidgetSettings();
-    });
-});
-
-// Position Option Buttons
-const posButtons = document.querySelectorAll('.pos-btn');
-posButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        posButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        appState.position = btn.getAttribute('data-pos');
-        applyWidgetSettings();
-    });
-});
-
-// Blur Option Buttons
-const blurButtons = document.querySelectorAll('.blur-btn');
-blurButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        blurButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        appState.blur = btn.getAttribute('data-blur');
-        applyWidgetSettings();
-    });
-});
-
-// Background Thumbnails
-const bgCards = document.querySelectorAll('.bg-thumb-card');
-bgCards.forEach(card => {
-    card.addEventListener('click', () => {
-        bgCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-
-        const type = card.getAttribute('data-bg-type');
-        appState.bgType = type;
-        if (type === 'image') {
-            appState.bgVal = card.getAttribute('data-bg-url');
-        } else {
-            appState.bgVal = card.getAttribute('data-bg-css');
-        }
-        applyWidgetSettings();
-    });
-});
-
-// Copy Start URL Pill
-const msxUrlCard = document.getElementById('msxUrlCard');
-if (msxUrlCard) {
-    msxUrlCard.addEventListener('click', () => {
-        const code = msxUrlCard.querySelector('code');
-        if (code) {
-            navigator.clipboard.writeText(code.textContent.trim()).then(() => {
-                const prev = code.textContent;
-                code.textContent = 'Скопировано в буфер!';
-                setTimeout(() => code.textContent = prev, 1800);
+            card.addEventListener('click', () => {
+                if (app.url) {
+                    window.location.href = app.url;
+                }
             });
+
+            appsGrid.appendChild(card);
+        });
+    }
+
+    // Render Management List in Settings
+    if (installedAppsManageList) {
+        installedAppsManageList.innerHTML = '';
+        state.apps.forEach((app, index) => {
+            const item = document.createElement('div');
+            item.className = 'installed-item';
+            item.innerHTML = `
+                <span><strong>${app.name}</strong> (${app.url})</span>
+                <button class="btn-del-app" data-index="${index}" tabindex="0">Удалить</button>
+            `;
+            const delBtn = item.querySelector('.btn-del-app');
+            delBtn.addEventListener('click', () => {
+                state.apps.splice(index, 1);
+                localStorage.setItem('mx_apps', JSON.stringify(state.apps));
+                renderApps();
+            });
+            installedAppsManageList.appendChild(item);
+        });
+    }
+}
+renderApps();
+
+// Add Custom App
+const btnSaveApp = document.getElementById('btnSaveApp');
+const inputAppName = document.getElementById('inputAppName');
+const inputAppUrl = document.getElementById('inputAppUrl');
+const selectAppIcon = document.getElementById('selectAppIcon');
+
+if (btnSaveApp && inputAppName && inputAppUrl) {
+    btnSaveApp.addEventListener('click', () => {
+        const name = inputAppName.value.trim();
+        const url = inputAppUrl.value.trim();
+        const icon = selectAppIcon ? selectAppIcon.value : 'launch';
+
+        if (!name || !url) {
+            alert('Пожалуйста, заполните название и URL приложения.');
+            return;
         }
+
+        state.apps.push({
+            id: `app_custom_${Date.now()}`,
+            name: name,
+            url: url,
+            sub: 'Пользовательский ярлык',
+            icon: icon,
+            badge: 'CUSTOM',
+            image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500'
+        });
+
+        localStorage.setItem('mx_apps', JSON.stringify(state.apps));
+        inputAppName.value = '';
+        inputAppUrl.value = '';
+        renderApps();
+        alert(`Приложение «${name}» успешно добавлено!`);
     });
 }
 
-// Initial Setup
-applyWidgetSettings();
+// Preset Quick Add Buttons
+const presetBtns = document.querySelectorAll('.preset-btn');
+presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const name = btn.getAttribute('data-name');
+        const url = btn.getAttribute('data-url');
+        const icon = btn.getAttribute('data-icon');
 
-// Sync active buttons with stored state
-clockButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-clock') === appState.clock));
-calButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-calendar') === appState.calendar));
-posButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === appState.position));
-blurButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-blur') === appState.blur));
-
-// ---------------------------------------------------------------------------
-// SMART TV REMOTE CONTROL KEYS (D-Pad Keyboard Navigation)
-// ---------------------------------------------------------------------------
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' || e.key === 'Backspace') {
-        switchView('dashboard');
-    }
+        if (!state.apps.some(a => a.url === url)) {
+            state.apps.push({
+                id: `app_${name.toLowerCase()}`,
+                name: name,
+                url: url,
+                sub: 'Популярное ТВ-приложение',
+                icon: icon,
+                badge: 'APP',
+                image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500'
+            });
+            localStorage.setItem('mx_apps', JSON.stringify(state.apps));
+            renderApps();
+            alert(`Приложение «${name}» добавлено в программы!`);
+        } else {
+            alert(`Приложение «${name}» уже есть в списке.`);
+        }
+    });
 });
+
+// Reset Apps Button
+const btnResetDefaultApps = document.getElementById('btnResetDefaultApps');
+if (btnResetDefaultApps) {
+    btnResetDefaultApps.addEventListener('click', () => {
+        state.apps = JSON.parse(JSON.stringify(DEFAULT_APPS_LIST));
+        localStorage.setItem('mx_apps', JSON.stringify(state.apps));
+        renderApps();
+    });
+}
+
+const openAddAppModalBtn = document.getElementById('openAddAppModalBtn');
+if (openAddAppModalBtn) {
+    openAddAppModalBtn.addEventListener('click', () => {
+        switchTab('settings');
+        subtabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-subtab') === 'sub-apps'));
+        Object.keys(subpanes).forEach(k => {
+            if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-apps');
+        });
+    });
+}
+
+// ---------------------------------------------------------------------------
+// 6. 4K SCREENSAVER ENGINE (IDLE TIMER & MANUAL START)
+// ---------------------------------------------------------------------------
+const screensaverLayer = document.getElementById('screensaverLayer');
+let idleTimer = null;
+
+function showScreensaver() {
+    if (screensaverLayer) {
+        screensaverLayer.classList.add('active');
+    }
+}
+
+function hideScreensaver() {
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        screensaverLayer.classList.remove('active');
+        resetIdleTimer();
+    }
+}
+
+function resetIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    if (state.idleTimeoutSec > 0) {
+        idleTimer = setTimeout(() => {
+            showScreensaver();
+        }, state.idleTimeoutSec * 1000);
+    }
+}
+
+// Reset idle timer on any user activity (mouse / remote)
+window.addEventListener('keydown', (e) => {
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        hideScreensaver();
+        e.preventDefault();
+        return;
+    }
+    resetIdleTimer();
+});
+
+window.addEventListener('mousemove', () => {
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        hideScreensaver();
+        return;
+    }
+    resetIdleTimer();
+});
+
+resetIdleTimer();
+
+// Manual screensaver triggers
+const startScreensaverBtn = document.getElementById('startScreensaverBtn');
+if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', showScreensaver);
+
+const launchScreensaverActionBtn = document.getElementById('launchScreensaverActionBtn');
+if (launchScreensaverActionBtn) launchScreensaverActionBtn.addEventListener('click', showScreensaver);
+
+const btnTestScreensaver = document.getElementById('btnTestScreensaver');
+if (btnTestScreensaver) btnTestScreensaver.addEventListener('click', showScreensaver);
+
+// Screensaver Wallpaper Picker
+const ssThumbCards = document.querySelectorAll('.ss-thumb-card');
+ssThumbCards.forEach(card => {
+    card.addEventListener('click', () => {
+        ssThumbCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.screensaverBg = card.getAttribute('data-id');
+        localStorage.setItem('mx_ss_bg', state.screensaverBg);
+    });
+});
+
+// Timeout selector buttons
+const timeoutBtns = document.querySelectorAll('.timeout-btn');
+timeoutBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        timeoutBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.idleTimeoutSec = parseInt(btn.getAttribute('data-time'), 10);
+        localStorage.setItem('mx_idle_sec', String(state.idleTimeoutSec));
+        resetIdleTimer();
+    });
+});
+timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-time'), 10) === state.idleTimeoutSec));
+
+// Canvas Stars Particles for Screensaver
+const canvas = document.getElementById('ssStarsCanvas');
+if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    for (let i = 0; i < 90; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2 + 0.5,
+            alpha: Math.random() * 0.7 + 0.3,
+            dx: (Math.random() - 0.5) * 0.35,
+            dy: (Math.random() - 0.5) * 0.35
+        });
+    }
+
+    function renderParticles() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(180, 220, 255, ${p.alpha})`;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#00d2ff';
+            ctx.fill();
+
+            p.x += p.dx;
+            p.y += p.dy;
+
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+        });
+        requestAnimationFrame(renderParticles);
+    }
+    renderParticles();
+}
