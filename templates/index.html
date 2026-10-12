@@ -9,41 +9,45 @@
     <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Main Style -->
     <link rel="stylesheet" href="{{ base_url }}/static/css/style.css">
 </head>
-<body class="trans-frosted">
-
-    <!-- DYNAMIC AMBIENT WALLPAPER BACKGROUND -->
+<body class="tv-mode" id="tvBody">
+    <!-- Dynamic 4K Background Layer (Cross-fades per section) -->
     <div class="bg-wallpaper" id="bgWallpaper"></div>
-    <div class="bg-overlay"></div>
+    <div class="ambient-vignette"></div>
 
-    <!-- MAIN TV APPLICATION CONTAINER -->
+    <!-- MAIN APP SHELL -->
     <div class="tv-shell" id="tvShell">
-
-        <!-- COLLAPSIBLE SIDEBAR -->
+        <!-- 1. SIDEBAR (COLLAPSIBLE, NARROW & CLEAN) -->
         <aside class="tv-sidebar" id="tvSidebar">
             <div class="sidebar-logo">
-                <img src="{{ base_url }}/static/images/logo.svg" alt="Home Portal" class="logo-img" id="sidebarLogoImg">
-                <span class="logo-title">HOME PORTAL</span>
+                <img src="{{ base_url }}/static/images/logo.svg" alt="Home Portal TV" class="sidebar-logo-img" style="max-width: 176px; width: 100%; height: auto; display: block; object-fit: contain;">
             </div>
 
             <nav class="sidebar-menu">
+                <!-- ITEM 1: ВИДЖЕТЫ -->
                 <button class="menu-tab active" data-tab="widgets" tabindex="0">
                     <span class="material-icons">dashboard</span>
                     <span class="tab-label">Виджеты</span>
                 </button>
+
+                <!-- ITEM 2: ПРОГРАММЫ -->
                 <button class="menu-tab" data-tab="apps" tabindex="0">
                     <span class="material-icons">apps</span>
                     <span class="tab-label">Программы</span>
                     <span class="tab-badge" id="appsCountBadge">7</span>
                 </button>
+
+                <!-- ITEM 3: НАСТРОЙКИ -->
                 <button class="menu-tab" data-tab="settings" tabindex="0">
                     <span class="material-icons">settings</span>
                     <span class="tab-label">Настройки</span>
                 </button>
+
+                <!-- ITEM 4: О ПРИЛОЖЕНИИ -->
                 <button class="menu-tab" data-tab="info" tabindex="0">
                     <span class="material-icons">info</span>
                     <span class="tab-label">Инфо</span>
@@ -51,25 +55,25 @@
             </nav>
 
             <div class="sidebar-bottom">
-                <button class="quick-screensaver-btn" id="quickScreensaverBtn" tabindex="0" title="Включить заставку 4K">
-                    <span class="material-icons">bedtime</span>
+                <button class="quick-screensaver-btn" id="startScreensaverBtn" tabindex="0" title="Включить заставку сейчас">
+                    <span class="material-icons">wallpaper</span>
                     <span>Заставка</span>
                 </button>
-                <button class="quick-restart-btn" id="restartPortalBtn" tabindex="0" title="Перезапустить портал">
-                    <span class="material-icons">restart_alt</span>
+                <button class="quick-restart-btn" id="restartPortalBtn" tabindex="0" title="Выход и перезагрузка портала">
+                    <span class="material-icons">refresh</span>
                     <span>Перезапуск</span>
                 </button>
                 <div class="sidebar-status">
-                    <span class="status-indicator"></span>
+                    <span class="live-dot"></span>
                     <span>Smart TV 4K</span>
                 </div>
             </div>
         </aside>
 
-        <!-- MAIN VIEWPORT STAGE -->
-        <main class="tv-stage" id="tvStage">
-
-            <!-- TAB 1: BENTO WIDGETS DASHBOARD -->
+        <!-- 2. MAIN CONTENT STAGE -->
+        <main class="tv-content-stage tv-stage" id="tvStage">
+            
+            <!-- TAB 1: ВИДЖЕТЫ -->
             <section class="tab-pane active" id="tabWidgets">
                 <div class="tab-header">
                     <div class="header-left">
@@ -78,118 +82,116 @@
                     </div>
                 </div>
 
-                <!-- BENTO GRID SYSTEM FOR MODULAR WIDGETS -->
-                <div class="widgets-wrapper bento-grid" id="widgetsWrapper">
+                <!-- Bento Box Grid of Modular Widgets (1x1, 2x1, 2x2) -->
+                <div class="widgets-bento-grid" id="widgetsWrapper">
                     
-                    <!-- WIDGET 1: ДИДЖИТАЛ ЧАСЫ С СЕКУНДАМИ И ДАТОЙ -->
-                    <div class="glass-widget widget-digital-clock span-2" id="wClockDigital" tabindex="0">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">schedule</span>
-                            <span class="widget-title">Текущее время</span>
-                            <span class="live-dot" title="Синхронизировано"></span>
+                    <!-- WIDGET: DIGITAL NEON CLOCK -->
+                    <div class="glass-widget widget-clock-digital span-2" id="wClockDigital" tabindex="0">
+                        <div class="w-header">
+                            <span class="material-icons w-icon">schedule</span>
+                            <span class="w-label">ЦИФРОВЫЕ ЧАСЫ</span>
+                            <span class="w-sec-badge" id="wSecBadge">SEC</span>
                         </div>
-                        <div class="digital-clock-display">
-                            <div class="time-main">
-                                <span class="time-dig" id="digH">12</span>
-                                <span class="time-colon">:</span>
-                                <span class="time-dig" id="digM">00</span>
-                            </div>
-                            <div class="time-sec-badge">
-                                <span id="digS">00</span>
-                                <span class="sec-label">СЕК</span>
-                            </div>
+                        <div class="w-digital-time">
+                            <span id="digH">18</span>
+                            <span class="colon">:</span>
+                            <span id="digM">45</span>
+                            <span class="sec-text" id="digS">30</span>
                         </div>
-                        <div class="clock-date-line" id="digFullDate">
+                        <div class="w-footer-date" id="digFullDate">
                             Понедельник, 12 Октября 2026
                         </div>
                     </div>
 
-                    <!-- WIDGET 2: АНАЛОГОВЫЙ ХРОНОГРАФ -->
-                    <div class="glass-widget widget-analog-clock span-1" id="wClockAnalog" tabindex="0">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">watch_later</span>
-                            <span class="widget-title">Аналоговый</span>
+                    <!-- WIDGET: ANALOG LUXURY CLOCK -->
+                    <div class="glass-widget widget-clock-analog span-1" id="wClockAnalog" tabindex="0">
+                        <div class="w-header">
+                            <span class="material-icons w-icon">watch_later</span>
+                            <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
                         </div>
-                        <div class="analog-face-wrap">
-                            <div class="analog-dial">
-                                <div class="dial-center-dot"></div>
-                                <div class="hand hand-hour" id="handHour"></div>
-                                <div class="hand hand-min" id="handMin"></div>
-                                <div class="hand hand-sec" id="handSec"></div>
-                                <span class="dial-num num-12">12</span>
-                                <span class="dial-num num-3">3</span>
-                                <span class="dial-num num-6">6</span>
-                                <span class="dial-num num-9">9</span>
+                        <div class="analog-face">
+                            <div class="face-numbers">
+                                <span class="n12">12</span>
+                                <span class="n3">3</span>
+                                <span class="n6">6</span>
+                                <span class="n9">9</span>
                             </div>
+                            <div class="hand hour-hand" id="handHour"></div>
+                            <div class="hand min-hand" id="handMin"></div>
+                            <div class="hand sec-hand" id="handSec"></div>
+                            <div class="center-pin"></div>
                         </div>
+                        <div class="analog-title">PORTAL CHRONOGRAPH</div>
                     </div>
 
-                    <!-- WIDGET 3: МИНИМАЛ ЧАСЫ С ДНЕМ НЕДЕЛИ -->
-                    <div class="glass-widget widget-modern-clock span-1" id="wClockModern" tabindex="0" style="display: none;">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">av_timer</span>
-                            <span class="widget-title">Минимал</span>
+                    <!-- WIDGET: MODERN MINIMAL CLOCK -->
+                    <div class="glass-widget widget-clock-modern span-1" id="wClockModern" tabindex="0">
+                        <div class="w-header">
+                            <span class="material-icons w-icon">av_timer</span>
+                            <span class="w-label">МИНИМАЛ ЧАСЫ</span>
                         </div>
-                        <div class="modern-time-val" id="modTimeVal">12:00</div>
-                        <div class="modern-weekday" id="modWeekdayVal">ПОНЕДЕЛЬНИК</div>
-                        <div class="modern-month" id="modMonthVal">ОКТЯБРЬ 2026</div>
+                        <div class="modern-time-val" id="modTimeVal">18:45</div>
+                        <div class="modern-weekday-val" id="modWeekdayVal">ПОНЕДЕЛЬНИК</div>
+                        <div class="modern-month-val" id="modMonthVal">ОКТЯБРЬ 2026</div>
                     </div>
 
-                    <!-- WIDGET 4: ПОЛНАЯ СЕТКА КАЛЕНДАРЯ МЕСЯЦА (2x2 = 4 ЯЧЕЙКИ) -->
-                    <div class="glass-widget widget-calendar-grid span-4" id="wCalGrid" tabindex="0">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">calendar_month</span>
-                            <span class="widget-title" id="calMonthName">ОКТЯБРЬ 2026</span>
-                            <span class="cal-badge">МЕСЯЦ</span>
+                    <!-- WIDGET: CALENDAR MONTH GRID -->
+                    <div class="glass-widget widget-cal-grid span-2" id="wCalGrid" tabindex="0">
+                        <div class="w-header">
+                            <span class="material-icons w-icon">calendar_month</span>
+                            <span class="w-label" id="calMonthName">ОКТЯБРЬ 2026</span>
                         </div>
-                        <div class="calendar-table-wrap">
-                            <div class="cal-weekdays">
-                                <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
-                            </div>
-                            <div class="cal-cells-grid" id="calCellsGrid">
-                                <!-- Dynamic JS Generated Calendar Grid -->
-                            </div>
+                        <div class="cal-days-head">
+                            <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
                         </div>
+                        <div class="cal-cells" id="calCellsGrid"></div>
                     </div>
 
-                    <!-- WIDGET 5: КОМПАКТНАЯ ДАТА СЕГОДНЯ -->
-                    <div class="glass-widget widget-calendar-compact span-1" id="wCalCompact" tabindex="0" style="display: none;">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">today</span>
-                            <span class="widget-title">Сегодня</span>
+                    <!-- WIDGET: COMPACT DATE CARD -->
+                    <div class="glass-widget widget-cal-compact span-1" id="wCalCompact" tabindex="0">
+                        <div class="w-header">
+                            <span class="material-icons w-icon">today</span>
+                            <span class="w-label">СЕГОДНЯ</span>
                         </div>
-                        <div class="compact-day-big" id="compDayNum">12</div>
-                        <div class="compact-month-sub" id="compMonth">Октябрь 2026</div>
-                        <div class="compact-weekday-pill" id="compWeek">Понедельник</div>
-                    </div>
-
-                    <!-- WIDGET 6: ПЛАНИРОВЩИК ТВ -->
-                    <div class="glass-widget widget-events span-2" id="wCalEvents" tabindex="0">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">event_note</span>
-                            <span class="widget-title">Планы & ТВ Релакс</span>
-                            <span class="events-badge">СЕГОДНЯ</span>
-                        </div>
-                        <div class="events-list-vertical">
-                            <div class="event-item">
-                                <span class="event-time">19:00</span>
-                                <div class="event-desc">
-                                    <div class="event-name">Фильм вечера в Lampa</div>
-                                    <div class="event-sub">Каталог 4K HDR • Домашний кинозал</div>
+                        <div class="compact-flex">
+                            <div class="compact-day-big" id="compDayNum">12</div>
+                            <div class="compact-info">
+                                <div class="comp-month" id="compMonth">Октября 2026</div>
+                                <div class="comp-week" id="compWeek">Понедельник</div>
+                                <div class="comp-badge">
+                                    <span class="material-icons" style="font-size: 15px; color: #f59e0b;">wb_sunny</span>
+                                    <span>Уютный вечер на ТВ</span>
                                 </div>
                             </div>
-                            <div class="event-item">
-                                <span class="event-time">21:30</span>
-                                <div class="event-desc">
-                                    <div class="event-name">Трансляция YouTube / Twitch</div>
-                                    <div class="event-sub">Стримы и музыка в высоком качестве</div>
+                        </div>
+                    </div>
+
+                    <!-- WIDGET: SCHEDULE & EVENTS -->
+                    <div class="glass-widget widget-cal-events span-2" id="wCalEvents" tabindex="0">
+                        <div class="w-header">
+                            <span class="material-icons w-icon">event_note</span>
+                            <span class="w-label">ПЛАНИРОВЩИК ТВ</span>
+                        </div>
+                        <div class="events-stack">
+                            <div class="ev-item ev-current">
+                                <span class="ev-time">19:00</span>
+                                <div class="ev-text">
+                                    <span class="ev-title">Интерстеллар (4K Dolby)</span>
+                                    <span class="ev-sub">Семейный киносеанс</span>
                                 </div>
                             </div>
-                            <div class="event-item">
-                                <span class="event-time">23:00</span>
-                                <div class="event-desc">
-                                    <div class="event-name">4K Заставка & Релакс</div>
-                                    <div class="event-sub">Автоматический переход в режим отдыха</div>
+                            <div class="ev-item">
+                                <span class="ev-time">21:30</span>
+                                <div class="ev-text">
+                                    <span class="ev-title">Discovery Nature 4K</span>
+                                    <span class="ev-sub">Прямой эфир</span>
+                                </div>
+                            </div>
+                            <div class="ev-item">
+                                <span class="ev-time">23:00</span>
+                                <div class="ev-text">
+                                    <span class="ev-title">Заставка & Lo-Fi Relax</span>
+                                    <span class="ev-sub">Ночной релакс</span>
                                 </div>
                             </div>
                         </div>
@@ -198,27 +200,26 @@
                 </div>
             </section>
 
-            <!-- TAB 2: APPS / PROGRAMS -->
+            <!-- TAB 2: ПРОГРАММЫ (APPS) - COMPACT PHONE-LIKE ICONS -->
             <section class="tab-pane" id="tabApps">
                 <div class="tab-header">
                     <div class="header-left">
-                        <h2>Программы & Онлайн-сервисы</h2>
-                        <span class="header-sub">Запуск веб-приложений и кинотеатров на весь экран (управление на пульте)</span>
+                        <h2>Программы & Кинозалы</h2>
+                        <span class="header-sub">Быстрый запуск веб-сервисов и онлайн-кинотеатров на весь экран</span>
                     </div>
                 </div>
 
-                <!-- PHONE-LIKE COMPACT APPS GRID (6-7 ICONS PER ROW) -->
-                <div class="apps-grid-compact" id="appsGrid">
-                    <!-- Dynamic Apps Loaded from JS -->
+                <div class="apps-grid" id="appsGrid">
+                    <!-- Apps dynamically rendered as compact phone-like app icons (6-7 per row) -->
                 </div>
             </section>
 
-            <!-- TAB 3: SETTINGS -->
+            <!-- TAB 3: НАСТРОЙКИ (SETTINGS) -->
             <section class="tab-pane" id="tabSettings">
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>Настройки системы</h2>
-                        <span class="header-sub">Управление темами, размерами виджетов, программами и заставкой</span>
+                        <span class="header-sub">Персонализация внешнего вида, виджетов, программ и заставки</span>
                     </div>
                 </div>
 
@@ -280,33 +281,27 @@
                         <h3>Скорость и плавность анимаций</h3>
                         <p class="setting-desc">Оптимизация отклика пульта для максимальной отзывчивости на ТВ:</p>
                         <div class="anim-selector" id="animSelector">
-                            <button class="anim-option-btn active" data-anim="snappy" tabindex="0">
-                                <span class="material-icons">bolt</span>
-                                <span>Быстрый отклик (Snappy 60fps) — Рекомендуется</span>
-                            </button>
-                            <button class="anim-option-btn" data-anim="fast" tabindex="0">
-                                <span class="material-icons">speed</span>
-                                <span>Максимальная скорость (Мгновенно)</span>
-                            </button>
+                            <button class="anim-option-btn active" data-anim="snappy" tabindex="0">⚡ Быстрые (100 ms) — Оптимально для ТВ</button>
+                            <button class="anim-option-btn" data-anim="fast" tabindex="0">🚀 Мгновенные (Без анимаций, 0 ms)</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- SUBTAB 2: ВИДЖЕТЫ & СЕТКА -->
+                <!-- SUBTAB 2: НАСТРОЙКИ ВИДЖЕТОВ И СЕТКИ -->
                 <div class="settings-subpane" id="sub-widgets">
-                    
-                    <!-- 1. SPAN/LIST VIEW -->
+                    <!-- VIEW A: СПИСОК ВСЕХ ВИДЖЕТОВ -->
                     <div id="widgetsListView">
                         <div class="setting-card">
-                            <h3>Управление виджетами и размером в сетке</h3>
-                            <p class="setting-desc">Выберите конкретный виджет для детальной настройки размера (1 ячейка, 2 по горизонтали или 2x2):</p>
+                            <h3>Категории виджетов & Bento-сетка</h3>
+                            <p class="setting-desc">Выберите виджет и нажмите <strong>«⚙ Настроить»</strong>, чтобы изменить его размер (1, 2 или 4 ячейки) и видимость:</p>
+                            
                             <div class="widgets-manage-grid" id="widgetsManageGrid">
-                                <!-- Generated by JS: List of widgets with Configure buttons -->
+                                <!-- Cards generated dynamically -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- 2. DETAIL EDIT VIEW FOR SELECTED WIDGET -->
+                    <!-- VIEW B: ДЕТАЛЬНАЯ НАСТРОЙКА ВЫБРАННОГО ВИДЖЕТА -->
                     <div id="widgetDetailView" style="display: none;">
                         <div class="setting-card">
                             <div class="detail-top-nav">
@@ -314,224 +309,206 @@
                                     <span class="material-icons">arrow_back</span>
                                     <span>Назад к списку виджетов</span>
                                 </button>
-                                <span class="detail-badge" id="detailWidgetBadge">WIDGET</span>
+                                <div class="detail-widget-badge" id="detailWidgetBadge">Виджет</div>
                             </div>
 
-                            <div class="detail-card-body">
-                                <div class="detail-title-row">
-                                    <span class="material-icons detail-big-icon" id="detailWidgetIcon">schedule</span>
-                                    <div>
-                                        <h3 id="detailWidgetTitle">Настройка виджета</h3>
-                                        <p class="setting-desc" id="detailWidgetDesc">Настройте отображение и количество занимаемых ячеек в сетке</p>
-                                    </div>
+                            <h3 id="detailWidgetTitle" style="font-size: 1.4rem; margin-top: 14px; margin-bottom: 6px;">Настройка виджета</h3>
+                            <p class="setting-desc" id="detailWidgetDesc">Настройте видимость и размер ячеек в сетке Bento:</p>
+
+                            <div class="detail-section">
+                                <h4>Отображение виджета</h4>
+                                <div class="toggle-pill" id="detailTogglePill" tabindex="0">
+                                    <span class="material-icons" id="detailWidgetIcon">schedule</span>
+                                    <span id="detailToggleLabel">Виджет включен на главном экране</span>
+                                    <span class="toggle-check" id="detailToggleCheck">✓</span>
                                 </div>
+                            </div>
 
-                                <div class="detail-toggle-box">
-                                    <span class="detail-opt-label">Отображение виджета:</span>
-                                    <div class="toggle-pill checked" id="detailTogglePill" tabindex="0">
-                                        <span class="toggle-check" id="detailToggleCheck">✓</span>
-                                        <span class="toggle-text" id="detailToggleLabel">Виджет включен в сетке</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-bento-sizing">
-                                    <h4>Выберите размер ячейки в сетке:</h4>
-                                    <div class="bento-sizes-row">
-                                        
-                                        <!-- 1 CELL: 1x1 -->
-                                        <div class="bento-size-card" data-size="1" tabindex="0">
-                                            <div class="bento-visual size-1-visual">
-                                                <div class="bento-block active">1×1</div>
-                                            </div>
-                                            <div class="bento-size-info">
-                                                <span class="bento-size-name">1 ячейка</span>
-                                                <span class="bento-size-sub">Компактный размер 1×1</span>
-                                            </div>
+                            <div class="detail-section" style="margin-top: 18px;">
+                                <h4>Размер виджета в сетке</h4>
+                                <p class="setting-desc" style="margin-bottom: 10px;">Выберите один из 3 вариантов компоновки:</p>
+                                <div class="bento-size-options" id="detailSizeOptions">
+                                    <button class="bento-size-card" data-size="1" tabindex="0">
+                                        <div class="bento-visual size-1-visual">
+                                            <span class="cell-active"></span><span></span><span></span><span></span>
                                         </div>
+                                        <div class="bento-size-name">1 ячейка</div>
+                                        <div class="bento-size-desc">1×1 • Компактный блок</div>
+                                    </button>
 
-                                        <!-- 2 CELLS: 2x1 HORIZONTAL -->
-                                        <div class="bento-size-card active" data-size="2" tabindex="0">
-                                            <div class="bento-visual size-2-visual">
-                                                <div class="bento-block active">2 по гориз.</div>
-                                            </div>
-                                            <div class="bento-size-info">
-                                                <span class="bento-size-name">2 ячейки</span>
-                                                <span class="bento-size-sub">Только 2 по горизонтали (2×1)</span>
-                                            </div>
+                                    <button class="bento-size-card" data-size="2" tabindex="0">
+                                        <div class="bento-visual size-2-visual">
+                                            <span class="cell-active"></span><span class="cell-active"></span><span></span><span></span>
                                         </div>
+                                        <div class="bento-size-name">2 ячейки</div>
+                                        <div class="bento-size-desc">2×1 • По горизонтали</div>
+                                    </button>
 
-                                        <!-- 4 CELLS: 2x2 (2 VERTICAL, 2 HORIZONTAL) -->
-                                        <div class="bento-size-card" data-size="4" tabindex="0">
-                                            <div class="bento-visual size-4-visual">
-                                                <div class="bento-block active">2×2</div>
-                                            </div>
-                                            <div class="bento-size-info">
-                                                <span class="bento-size-name">4 ячейки (2×2)</span>
-                                                <span class="bento-size-sub">2 по вертикали и 2 по горизонтали</span>
-                                            </div>
+                                    <button class="bento-size-card" data-size="4" tabindex="0">
+                                        <div class="bento-visual size-4-visual">
+                                            <span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span>
                                         </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="detail-actions">
-                                    <button class="btn-save-detail" id="btnSaveWidgetDetail" tabindex="0">
-                                        <span class="material-icons">check</span>
-                                        <span>Готово и сохранить</span>
+                                        <div class="bento-size-name">4 ячейки</div>
+                                        <div class="bento-size-desc">2×2 • 2 по гор. и 2 по верт.</div>
                                     </button>
                                 </div>
                             </div>
+
+                            <div style="margin-top: 22px;">
+                                <button class="action-btn action-primary" id="btnSaveWidgetDetail" tabindex="0">
+                                    <span class="material-icons">check</span>
+                                    <span>Готово</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- SUBTAB 3: ПРОГРАММЫ -->
+                <!-- SUBTAB 3: НАСТРОЙКИ ПРОГРАММ -->
                 <div class="settings-subpane" id="sub-apps">
                     <div class="setting-card">
                         <h3>Добавить программу вручную</h3>
-                        <p class="setting-desc">Укажите адрес любого приложения или онлайн-кинотеатра:</p>
+                        <p class="setting-desc">Укажите название и URL для быстрого запуска на телевизоре:</p>
                         <div class="add-app-inline-form">
-                            <input type="text" id="inputAppName" placeholder="Название (например, HDRezka)" tabindex="0">
-                            <input type="text" id="inputAppUrl" placeholder="URL (например, http://rezka.ag)" tabindex="0">
-                            <select id="selectAppIcon" tabindex="0">
-                                <option value="movie">Фильмы (movie)</option>
-                                <option value="play_circle">Видео (play)</option>
-                                <option value="live_tv">ТВ (live_tv)</option>
-                                <option value="language">Браузер (web)</option>
-                                <option value="music_note">Музыка (music)</option>
-                                <option value="star">Избранное (star)</option>
-                            </select>
-                            <button class="btn-save-app" id="btnSaveApp" tabindex="0">+ Добавить программу</button>
+                            <div class="form-group" style="flex: 1; min-width: 140px;">
+                                <label>Название</label>
+                                <input type="text" id="inputAppName" placeholder="Например: Kinopoisk" tabindex="0">
+                            </div>
+                            <div class="form-group" style="flex: 2; min-width: 220px;">
+                                <label>Ссылка (URL)</label>
+                                <input type="text" id="inputAppUrl" placeholder="http://..." tabindex="0">
+                            </div>
+                            <div class="form-group" style="width: 120px;">
+                                <label>Иконка</label>
+                                <select id="selectAppIcon" tabindex="0">
+                                    <option value="movie">Фильмы</option>
+                                    <option value="play_circle">Видео</option>
+                                    <option value="tv">ТВ</option>
+                                    <option value="videogame_asset">Игры</option>
+                                    <option value="music_note">Музыка</option>
+                                    <option value="language">Браузер</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button class="btn-save-app" id="btnSaveApp" tabindex="0">Сохранить</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="setting-card">
                         <h3>Быстрое добавление популярных сервисов</h3>
                         <div class="presets-grid">
-                            <button class="btn-add-preset" data-name="Filmix" data-url="http://filmix.tv" data-badge="CINEMA" data-icon="movie_filter" data-img="https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500" tabindex="0">
-                                <span class="material-icons">movie_filter</span>
-                                <span>+ Filmix (Онлайн-кинотеатр)</span>
-                            </button>
-                            <button class="btn-add-preset" data-name="Lampa" data-url="http://lampa.mx" data-badge="FILMS" data-icon="movie" data-img="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500" tabindex="0">
-                                <span class="material-icons">movie</span>
-                                <span>+ Lampa (Фильмы)</span>
-                            </button>
-                            <button class="btn-add-preset" data-name="YouTube" data-url="http://msx.benzac.de/plugins/youtube.html" data-badge="VIDEO" data-icon="play_circle" data-img="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500" tabindex="0">
-                                <span class="material-icons">play_circle</span>
-                                <span>+ YouTube MSX</span>
-                            </button>
-                            <button class="btn-add-preset" data-name="ForkPlayer" data-url="http://operats.obovse.ru/2.5/" data-badge="PORTAL" data-icon="language" data-img="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500" tabindex="0">
-                                <span class="material-icons">language</span>
-                                <span>+ ForkPlayer</span>
-                            </button>
-                            <button class="btn-add-preset" data-name="Deeplex 4K" data-url="http://deeplex.cc" data-badge="CINEMA" data-icon="theaters" data-img="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" tabindex="0">
-                                <span class="material-icons">theaters</span>
-                                <span>+ Deeplex 4K</span>
-                            </button>
-                            <button class="btn-add-preset" data-name="Twitch" data-url="http://msx.benzac.de/plugins/twitch.html" data-badge="GAMES" data-icon="videogame_asset" data-img="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" tabindex="0">
-                                <span class="material-icons">videogame_asset</span>
-                                <span>+ Twitch</span>
-                            </button>
+                            <button class="preset-btn" data-name="Filmix" data-url="http://filmix.tv" data-icon="movie_filter" tabindex="0">+ Filmix Cinema</button>
+                            <button class="preset-btn" data-name="Deeplex" data-url="http://deeplex.cc" data-icon="theaters" tabindex="0">+ Deeplex 4K</button>
+                            <button class="preset-btn" data-name="Vplay" data-url="http://vplay.one" data-icon="video_library" tabindex="0">+ Vplay One</button>
+                            <button class="preset-btn" data-name="HDRezka" data-url="http://rezka.ag" data-icon="movie_filter" tabindex="0">+ HDRezka</button>
+                            <button class="preset-btn" data-name="Kinopub" data-url="http://kino.pub" data-icon="star" tabindex="0">+ Kinopub</button>
+                            <button class="preset-btn" data-name="Twitch" data-url="http://msx.benzac.de/plugins/twitch.html" data-icon="videogame_asset" tabindex="0">+ Twitch MSX</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Список установленных программ</h3>
-                        <p class="setting-desc">Удаляйте ненужные программы или сбрасывайте список к базовому:</p>
-                        <div class="settings-apps-list" id="settingsAppsList">
-                            <!-- Populated by JS -->
+                        <h3>Управление существующими программами</h3>
+                        <div class="installed-list" id="installedAppsManageList">
+                            <!-- Populated dynamically with delete buttons -->
                         </div>
-                        <div style="margin-top: 16px;">
-                            <button class="action-btn" id="btnResetDefaultApps" tabindex="0">Сбросить программы по умолчанию</button>
-                        </div>
+                        <button class="btn-reset-all" id="btnResetDefaultApps" tabindex="0">Сбросить к стандартному списку</button>
                     </div>
                 </div>
 
-                <!-- SUBTAB 4: ЗАСТАВКА 4K -->
+                <!-- SUBTAB 4: НАСТРОЙКА ЗАСТАВКИ (СКРИНСЕЙВЕРА) -->
                 <div class="settings-subpane" id="sub-screensaver">
-                    <!-- ВЫБОР ТИПА МЕДИА: ФОТО / YOUTUBE / MP4 -->
                     <div class="setting-card">
-                        <h3>Тип медиа для заставки (Фото / Видео / YouTube)</h3>
-                        <p class="setting-desc">Выберите, что воспроизводить в заставке — 4K фото, видео камина/аквариума или YouTube:</p>
+                        <h3>Тип медиа для заставки</h3>
+                        <p class="setting-desc">Выберите режим заставки: 4K фото, видеопоток YouTube (камин, аквариум) или локальное MP4 видео:</p>
                         <div class="ss-media-type-selector" id="ssMediaTypeSelector">
                             <button class="ss-media-btn active" data-media="photo" tabindex="0">
                                 <span class="material-icons">photo_library</span>
-                                <span>Фото 4K (Слайд-шоу)</span>
+                                <span>Фото (4K Слайд-шоу)</span>
                             </button>
                             <button class="ss-media-btn" data-media="youtube" tabindex="0">
-                                <span class="material-icons">ondemand_video</span>
+                                <span class="material-icons">smart_display</span>
                                 <span>YouTube (Камин / Аквариум)</span>
                             </button>
                             <button class="ss-media-btn" data-media="video" tabindex="0">
-                                <span class="material-icons">videocam</span>
-                                <span>MP4 Видео файл</span>
+                                <span class="material-icons">movie</span>
+                                <span>MP4 Видео (Фоновый цикл)</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- АНИМАЦИЯ НА ФОТО -->
-                    <div class="setting-card" id="ssPhotoAnimCard">
-                        <h3>Анимация на фото-заставке (Плавное движение)</h3>
-                        <p class="setting-desc">Включить или выключить эффект кинематографичного плавного приближения (Ken Burns) на фото:</p>
+                    <div class="setting-card">
+                        <h3>Анимация фотографии (Эффект приближения)</h3>
+                        <p class="setting-desc">Плавное динамическое приближение (Ken Burns) для фото-заставки:</p>
                         <div class="ss-photo-anim-selector" id="ssPhotoAnimSelector">
                             <button class="ss-anim-btn active" data-anim="on" tabindex="0">
                                 <span class="material-icons">motion_photos_on</span>
-                                <span>Анимация включена (Движение)</span>
+                                <span>Анимация включена (Плавное панорамирование)</span>
                             </button>
                             <button class="ss-anim-btn" data-anim="off" tabindex="0">
                                 <span class="material-icons">motion_photos_off</span>
-                                <span>Анимация выключена (Статично)</span>
+                                <span>Статичное фото (Без движения)</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- ВИДЕО ПРЕСЕТЫ (КАМИН / АКВАРИУМ / YOUTUBE) -->
-                    <div class="setting-card" id="ssVideoPresetsCard">
-                        <h3>Видео-коллекция: Камин, Аквариум и Релакс (YouTube / MP4)</h3>
-                        <p class="setting-desc">Выберите готовое видео для заставки или вставьте собственную ссылку на YouTube:</p>
-                        <div class="ss-video-presets-grid" id="ssVideoPresetsGrid">
-                            <button class="ss-vpreset-btn active" data-type="youtube" data-id="L_LUpnjgPso" tabindex="0">
+                    <div class="setting-card">
+                        <h3>Прозрачность виджетов на заставке</h3>
+                        <p class="setting-desc">Степень прозрачности часов и календаря в режиме заставки:</p>
+                        <div class="ss-opacity-selector" id="ssOpacitySelector">
+                            <button class="ss-opacity-btn" data-opacity="none" tabindex="0">
+                                <span class="material-icons">visibility</span>
+                                <span>Без фона (100% прозрачно, только текст с тенью)</span>
+                            </button>
+                            <button class="ss-opacity-btn active" data-opacity="ultra" tabindex="0">
+                                <span class="material-icons">opacity</span>
+                                <span>Ультра-прозрачный (Легкая дымка 12%)</span>
+                            </button>
+                            <button class="ss-opacity-btn" data-opacity="glass" tabindex="0">
+                                <span class="material-icons">filter_none</span>
+                                <span>Стекло (Glassmorphism 28%)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Готовые видеозаставки (Камин, Аквариум, Океан)</h3>
+                        <p class="setting-desc">Выберите готовый атмосферный видеопоток:</p>
+                        <div class="ss-video-presets-grid">
+                            <button class="ss-vpreset-btn active" data-type="youtube" data-val="L_LUpnjgPso" tabindex="0">
                                 <span class="material-icons">local_fire_department</span>
                                 <div>
                                     <span class="vpreset-title">Уютный Камин 4K</span>
-                                    <span class="vpreset-sub">YouTube • Треск дров и пламя</span>
+                                    <span class="vpreset-sub">YouTube • Треск дров и живое пламя</span>
                                 </div>
                             </button>
-                            <button class="ss-vpreset-btn" data-type="youtube" data-id="1vU7x1C4kI4" tabindex="0">
-                                <span class="material-icons">water</span>
-                                <div>
-                                    <span class="vpreset-title">Морской Аквариум 4K</span>
-                                    <span class="vpreset-sub">YouTube • Коралловые рыбки</span>
-                                </div>
-                            </button>
-                            <button class="ss-vpreset-btn" data-type="youtube" data-id="WHPEKLQID4U" tabindex="0">
+                            <button class="ss-vpreset-btn" data-type="youtube" data-val="s6zR2T9vn2c" tabindex="0">
                                 <span class="material-icons">waves</span>
                                 <div>
-                                    <span class="vpreset-title">Океанский Прибой 4K</span>
-                                    <span class="vpreset-sub">YouTube • Закат и волны</span>
+                                    <span class="vpreset-title">Тропический Аквариум 4K</span>
+                                    <span class="vpreset-sub">YouTube • Коралловые рыбки и подводный мир</span>
                                 </div>
                             </button>
-                            <button class="ss-vpreset-btn" data-type="youtube" data-id="xRPjKOmTrRA" tabindex="0">
-                                <span class="material-icons">public</span>
+                            <button class="ss-vpreset-btn" data-type="youtube" data-val="WHPEKLQID4U" tabindex="0">
+                                <span class="material-icons">nights_stay</span>
                                 <div>
-                                    <span class="vpreset-title">Земля из Космоса 4K</span>
-                                    <span class="vpreset-sub">YouTube • Вид с МКС</span>
+                                    <span class="vpreset-title">Ночной Океан & Костер</span>
+                                    <span class="vpreset-sub">YouTube • Ночной пляж и волны</span>
                                 </div>
                             </button>
-                            <button class="ss-vpreset-btn" data-type="video" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" tabindex="0">
-                                <span class="material-icons">fireplace</span>
+                            <button class="ss-vpreset-btn" data-type="video" data-val="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" tabindex="0">
+                                <span class="material-icons">movie</span>
                                 <div>
-                                    <span class="vpreset-title">Огонь камина (MP4)</span>
-                                    <span class="vpreset-sub">Локальный видеофайл</span>
+                                    <span class="vpreset-title">Огонь и искра (MP4)</span>
+                                    <span class="vpreset-sub">Прямой видеофайл без рекламы</span>
                                 </div>
                             </button>
                         </div>
 
                         <div class="ss-custom-video-box">
-                            <h4>Добавить своё видео (YouTube ссылка / ID или MP4 URL):</h4>
+                            <h4>Собственная ссылка на видео (YouTube или MP4):</h4>
                             <div class="ss-custom-input-row">
-                                <input type="text" id="inputCustomVideo" class="ss-video-input" placeholder="Ссылка на YouTube (камин, аквариум) или MP4" tabindex="0">
+                                <input type="text" id="inputCustomVideo" class="ss-video-input" placeholder="Вставьте URL с YouTube (youtu.be/...) или прямую ссылку на .mp4" tabindex="0">
                                 <button class="btn-apply-video" id="btnApplyCustomVideo" tabindex="0">
                                     <span class="material-icons">check</span>
                                     <span>Применить</span>
@@ -540,171 +517,123 @@
                         </div>
                     </div>
 
-                    <!-- ПРОЗРАЧНОСТЬ ВИДЖЕТОВ НА ЗАСТАВКЕ -->
                     <div class="setting-card">
-                        <h3>Прозрачность виджетов на заставке</h3>
-                        <p class="setting-desc">Сделайте виджеты прозрачнее, чтобы они не перекрывали видео или фото заставки:</p>
-                        <div class="ss-opacity-selector" id="ssOpacitySelector">
-                            <button class="ss-opacity-btn active" data-opacity="ultra" tabindex="0">
-                                <span class="material-icons">opacity</span>
-                                <span>Ультра-прозрачный (12%)</span>
-                            </button>
-                            <button class="ss-opacity-btn" data-opacity="none" tabindex="0">
-                                <span class="material-icons">blur_off</span>
-                                <span>100% Прозрачный (Без фона)</span>
-                            </button>
-                            <button class="ss-opacity-btn" data-opacity="glass" tabindex="0">
-                                <span class="material-icons">blur_on</span>
-                                <span>Легкое стекло (28%)</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="setting-card">
-                        <h3>Ручной запуск заставки</h3>
-                        <p class="setting-desc">Включите заставку прямо сейчас для проверки или режима отдыха:</p>
+                        <h3>Ручной запуск и проверка заставки</h3>
+                        <p class="setting-desc">Включите заставку прямо сейчас для проверки выбранного режима:</p>
                         <button class="btn-launch-big" id="btnTestScreensaver" tabindex="0">
-                            <span class="material-icons">play_circle</span>
-                            <span>Запустить заставку на весь экран</span>
+                            <span class="material-icons">play_circle_filled</span>
+                            <span>Запустить заставку прямо сейчас</span>
                         </button>
                     </div>
 
                     <div class="setting-card">
+                        <h3>Автозапуск при бездействии (Таймаут заставки)</h3>
+                        <p class="setting-desc">Заставка автоматически включится, если пульт не трогают:</p>
+                        <div class="timeout-selector" id="timeoutSelector">
+                            <button class="timeout-btn" data-time="30" tabindex="0">30 сек</button>
+                            <button class="timeout-btn" data-time="60" tabindex="0">1 мин</button>
+                            <button class="timeout-btn active" data-time="120" tabindex="0">2 мин</button>
+                            <button class="timeout-btn" data-time="180" tabindex="0">3 мин</button>
+                            <button class="timeout-btn" data-time="300" tabindex="0">5 мин</button>
+                            <button class="timeout-btn" data-time="600" tabindex="0">10 мин</button>
+                            <button class="timeout-btn" data-time="900" tabindex="0">15 мин</button>
+                            <button class="timeout-btn" data-time="0" tabindex="0">Выключено</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
                         <h3>Виджеты на заставке</h3>
-                        <p class="setting-desc">Выберите, какую информацию выводить поверх 4K заставки:</p>
-                        <div class="ss-widget-type-selector" id="ssWidgetTypeSelector">
-                            <button class="ss-wtype-btn active" data-wtype="both" tabindex="0">
-                                <span class="material-icons">dashboard</span>
-                                <span>Часы + Календарь</span>
-                            </button>
-                            <button class="ss-wtype-btn" data-wtype="clock" tabindex="0">
-                                <span class="material-icons">schedule</span>
-                                <span>Только часы</span>
-                            </button>
-                            <button class="ss-wtype-btn" data-wtype="calendar" tabindex="0">
-                                <span class="material-icons">calendar_month</span>
-                                <span>Только календарь</span>
-                            </button>
-                            <button class="ss-wtype-btn" data-wtype="none" tabindex="0">
-                                <span class="material-icons">visibility_off</span>
-                                <span>Без виджетов (Чистый экран)</span>
-                            </button>
+                        <p class="setting-desc">Выберите, какие блоки отображать поверх заставки:</p>
+                        <div class="ss-widget-type-selector">
+                            <button class="ss-wtype-btn active" data-wtype="both" tabindex="0">Часы и Календарь</button>
+                            <button class="ss-wtype-btn" data-wtype="clock" tabindex="0">Только Часы</button>
+                            <button class="ss-wtype-btn" data-wtype="calendar" tabindex="0">Только Календарь</button>
+                            <button class="ss-wtype-btn" data-wtype="none" tabindex="0">Без виджетов (Чистое видео)</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
                         <h3>Расположение виджетов на заставке</h3>
-                        <p class="setting-desc">Выберите позицию часов и календаря на экране заставки:</p>
-                        <div class="ss-position-selector" id="ssPositionSelector">
-                            <button class="ss-pos-btn active" data-pos="center" tabindex="0">
-                                <span>По центру</span>
-                            </button>
-                            <button class="ss-pos-btn" data-pos="top-left" tabindex="0">
-                                <span>Сверху слева</span>
-                            </button>
-                            <button class="ss-pos-btn" data-pos="top-center" tabindex="0">
-                                <span>Сверху по центру</span>
-                            </button>
-                            <button class="ss-pos-btn" data-pos="top-right" tabindex="0">
-                                <span>Сверху справа</span>
-                            </button>
-                            <button class="ss-pos-btn" data-pos="bottom-left" tabindex="0">
-                                <span>Снизу слева</span>
-                            </button>
-                            <button class="ss-pos-btn" data-pos="bottom-center" tabindex="0">
-                                <span>Снизу по центру</span>
-                            </button>
-                            <button class="ss-pos-btn" data-pos="bottom-right" tabindex="0">
-                                <span>Снизу справа</span>
-                            </button>
+                        <p class="setting-desc">Позиция часов и календаря на экране в режиме заставки:</p>
+                        <div class="ss-position-selector">
+                            <button class="ss-pos-btn active" data-pos="center" tabindex="0">По центру</button>
+                            <button class="ss-pos-btn" data-pos="top-left" tabindex="0">Вверху слева</button>
+                            <button class="ss-pos-btn" data-pos="top-right" tabindex="0">Вверху справа</button>
+                            <button class="ss-pos-btn" data-pos="bottom-left" tabindex="0">Внизу слева</button>
+                            <button class="ss-pos-btn" data-pos="bottom-right" tabindex="0">Внизу справа</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Коллекция 4K заставок</h3>
-                        <p class="setting-desc">Выберите тему для слайд-шоу или конкретную 4K заставку:</p>
-                        <div class="ss-thumbs-grid" id="ssThumbsGrid">
-                            {% for img in ss_wallpapers %}
-                            <div class="ss-thumb-card {% if loop.first %}selected{% endif %}" 
-                                 data-id="{{ img.id }}" 
-                                 data-url="{{ img.url or '' }}" 
-                                 tabindex="0">
-                                <img src="{{ img.thumb }}" alt="{{ img.name }}" class="ss-img">
-                                <span class="ss-title">{{ img.name }}</span>
+                        <h3>Коллекция 4K фотографий</h3>
+                        <p class="setting-desc">Выберите фоновое изображение для фото-режима заставки:</p>
+                        <div class="ss-thumbs-grid">
+                            <div class="ss-thumb-card selected" data-id="ss_all" tabindex="0">
+                                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" class="ss-img" alt="Слайд-шоу">
+                                <span class="ss-title">Все по очереди (4K)</span>
                             </div>
-                            {% endfor %}
+                            <div class="ss-thumb-card" data-id="ss_space" tabindex="0">
+                                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" class="ss-img" alt="Космос">
+                                <span class="ss-title">Космическая Аврора</span>
+                            </div>
+                            <div class="ss-thumb-card" data-id="ss_cyber" tabindex="0">
+                                <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=300" class="ss-img" alt="Киберпанк">
+                                <span class="ss-title">Ночной Неон</span>
+                            </div>
+                            <div class="ss-thumb-card" data-id="ss_mountains" tabindex="0">
+                                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300" class="ss-img" alt="Горы">
+                                <span class="ss-title">Горный Закат</span>
+                            </div>
+                            <div class="ss-thumb-card" data-id="ss_ocean" tabindex="0">
+                                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300" class="ss-img" alt="Океан">
+                                <span class="ss-title">Океанский Прибой</span>
+                            </div>
+                            <div class="ss-thumb-card" data-id="ss_fireplace" tabindex="0">
+                                <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300" class="ss-img" alt="Камин">
+                                <span class="ss-title">Огонь Камина</span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Автозапуск при бездействии (Таймаут заставки)</h3>
-                        <p class="setting-desc">Заставка автоматически включится, если пульт не используется указанное время:</p>
-                        <div class="timeout-selector" id="timeoutSelector">
-                            <button class="timeout-btn" data-sec="60" tabindex="0">1 мин</button>
-                            <button class="timeout-btn active" data-sec="120" tabindex="0">2 мин</button>
-                            <button class="timeout-btn" data-sec="300" tabindex="0">5 мин</button>
-                            <button class="timeout-btn" data-sec="600" tabindex="0">10 мин</button>
-                            <button class="timeout-btn" data-sec="0" tabindex="0">Выключено</button>
-                        </div>
+                        <h3>Адрес заставки для ТВ</h3>
+                        <p class="setting-desc">Прямой системный адрес конфигурации заставки:</p>
+                        <div class="code-box-display">{{ base_url }}/screensaver.json</div>
                     </div>
                 </div>
 
-                <!-- SUBTAB 5: ИНФО -->
-                <div class="settings-subpane" id="sub-info">
-                    <div class="setting-card">
-                        <h3>О системе Home Portal TV</h3>
-                        <p class="setting-desc">Персональный мультимедийный хаб для вашего Smart TV на базе Media Station X.</p>
-                        <div class="info-specs-list">
-                            <div class="spec-row">
-                                <span class="spec-label">Версия интерфейса:</span>
-                                <span class="spec-val">3.0.0 Glassmorphic Ultra</span>
-                            </div>
-                            <div class="spec-row">
-                                <span class="spec-label">Разрешение экрана:</span>
-                                <span class="spec-val">4K UHD / Full HD (Adaptive 60 FPS)</span>
-                            </div>
-                            <div class="spec-row">
-                                <span class="spec-label">Навигация:</span>
-                                <span class="spec-val">Пульт ДУ (D-Pad стрелки, ОК, Назад)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
 
-            <!-- TAB 4: INFO -->
+            <!-- TAB 4: О ПРИЛОЖЕНИИ (INFO) -->
             <section class="tab-pane" id="tabInfo">
                 <div class="tab-header">
                     <div class="header-left">
-                        <h2>О портале & Быстрые команды</h2>
-                        <span class="header-sub">Инструкция по использованию пульта и возможностям системы</span>
+                        <h2>О приложении Home Portal</h2>
+                        <span class="header-sub">Информация о системе, хосте и пульт-навигации</span>
                     </div>
                 </div>
 
-                <div class="info-grid">
-                    <div class="glass-widget info-card span-2" tabindex="0">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">navigation</span>
-                            <span class="widget-title">Управление пультом Smart TV</span>
-                        </div>
-                        <div class="info-content-text">
-                            <p><strong>Стрелки (Вверх, Вниз, Влево, Вправо):</strong> перемещение фокуса между виджетами, кнопками и карточками программ.</p>
-                            <p><strong>Кнопка ОК / Enter:</strong> запуск выбранной программы, открытие настроек или переключение параметров.</p>
-                            <p><strong>Стрелка Влево:</strong> быстрый вызов выдвижного бокового меню с любого первого элемента.</p>
-                            <p><strong>Кнопка НАЗАД (Return):</strong> возврат на главный экран виджетов из любого раздела или выход из заставки.</p>
-                        </div>
+                <div class="info-cards-grid">
+                    <div class="info-card">
+                        <span class="material-icons info-icon">tv</span>
+                        <h3>Smart TV Оболочка</h3>
+                        <p>Портал оптимизирован под большие экраны 1080p и 4K (Samsung Tizen, LG webOS, Android TV, Fire TV, Apple TV).</p>
                     </div>
 
-                    <div class="glass-widget info-card span-2" tabindex="0">
-                        <div class="widget-header">
-                            <span class="material-icons widget-icon">tune</span>
-                            <span class="widget-title">Быстрые советы</span>
-                        </div>
-                        <div class="info-content-text">
-                            <p><strong>Bento-сетка:</strong> виджеты можно настраивать индивидуально в «Настройки → Виджеты & Сетка», выбирая 1 ячейку, 2 по горизонтали или блок 2×2.</p>
-                            <p><strong>Камин и Аквариум:</strong> в настройках заставки можно включить видео YouTube или MP4 с эффектом камина или аквариума.</p>
-                            <p><strong>Прозрачность:</strong> настройте уровень прозрачности часов и календаря поверх видео в настройках заставки.</p>
-                        </div>
+                    <div class="info-card">
+                        <span class="material-icons info-icon">wifi</span>
+                        <h3>Хост сервера</h3>
+                        <p>Адрес запуска: <code class="host-badge">{{ base_url }}</code></p>
+                    </div>
+
+                    <div class="info-card">
+                        <span class="material-icons info-icon">keyboard</span>
+                        <h3>Навигация и кнопка Назад</h3>
+                        <p>
+                            • Кнопка <strong>Назад / Return / ESC</strong> на пульте мгновенно закрывает открытые программы и возвращает на главный экран виджетов.<br>
+                            • В меню стрелки <strong>Вверх / Вниз / Влево / Вправо</strong> — перемещение фокуса.<br>
+                            • Кнопка <strong>OK / Enter</strong> — запуск выбранной программы.
+                        </p>
                     </div>
                 </div>
             </section>
@@ -712,42 +641,65 @@
         </main>
     </div>
 
-    <!-- 4K SCREENSAVER INTERACTIVE LAYER -->
+    <!-- 3. APP TRANSITION LOADER OVERLAY -->
+    <div class="app-nav-loader" id="appNavLoader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text" id="loaderText">Переход в программу...</div>
+        <div class="loader-sub">Загрузка веб-сайта на весь экран</div>
+    </div>
+
+    <!-- 4. FULLSCREEN 4K SCREENSAVER OVERLAY WITH SELECTABLE WIDGETS & POSITION -->
     <div class="screensaver-layer" id="screensaverLayer">
+        <!-- 1. Background Photo Layer (4K Ultra HD) -->
         <div class="ss-bg-image" id="ssBgImage"></div>
-        <video class="ss-bg-video" id="ssBgVideo" autoplay loop muted playsinline preload="auto"></video>
+
+        <!-- 2. Background Video Layer (MP4 / WebM: Fireplace, Aquarium, Ambient) -->
+        <video class="ss-bg-video" id="ssBgVideo" loop muted playsinline></video>
+
+        <!-- 3. YouTube Embed Video Layer (Fireplace, Relaxing 4K streams) -->
         <div class="ss-bg-youtube-wrap" id="ssBgYoutubeWrap">
-            <iframe id="ssBgYoutubeIframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe id="ssBgYoutubeIframe" src="about:blank" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
+
         <div class="ss-ambient-overlay"></div>
         <canvas id="ssStarsCanvas"></canvas>
         <div class="ss-ambient-nebula ss-neb-1"></div>
         <div class="ss-ambient-nebula ss-neb-2"></div>
 
-        <div class="ss-widgets-container" id="ssWidgetsContainer">
-            <div class="ss-widget-block ss-clock-block trans-ultra" id="ssClockBlock">
-                <div class="ss-clock-time" id="ssTimeText">12:00</div>
-                <div class="ss-clock-date" id="ssDateText">Понедельник, 12 Октября</div>
+        <div class="ss-content-wrap" id="ssContentWrap">
+            <!-- Widgets container with dynamic position class (pos-center, pos-top-left, etc.) -->
+            <div class="ss-widgets-container pos-center" id="ssWidgetsContainer">
+                
+                <!-- Screensaver Clock Block -->
+                <div class="ss-widget-block ss-clock-block trans-ultra" id="ssClockBlock">
+                    <div class="ss-clock-time" id="ssClockTime">18:45:00</div>
+                    <div class="ss-clock-date" id="ssClockDate">Понедельник, 12 Октября 2026</div>
+                    <div class="ss-mode-badge" id="ssModeBadge">
+                        <span class="ss-pulse-point"></span>
+                        <span>Режим отдыха</span>
+                    </div>
+                </div>
+
+                <!-- Screensaver Calendar Block -->
+                <div class="ss-widget-block ss-calendar-block trans-ultra" id="ssCalendarBlock">
+                    <div class="ss-cal-head" id="ssCalHeader">ОКТЯБРЬ 2026</div>
+                    <div class="ss-cal-days-row">
+                        <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
+                    </div>
+                    <div class="ss-cal-cells-grid" id="ssCalGrid"></div>
+                </div>
+
             </div>
 
-            <div class="ss-widget-block ss-calendar-block trans-ultra" id="ssCalendarBlock">
-                <div class="ss-cal-header" id="ssCalHeader">ОКТЯБРЬ 2026</div>
-                <div class="cal-weekdays">
-                    <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
-                </div>
-                <div class="cal-cells-grid" id="ssCalGrid"></div>
+            <!-- Bottom Floating Hint -->
+            <div class="ss-bottom-hint">
+                <span class="material-icons" style="font-size: 16px;">keyboard_backspace</span>
+                <span>Нажмите любую кнопку на пульте для возврата</span>
             </div>
         </div>
     </div>
 
-    <!-- APP TRANSITION LOADER OVERLAY (DIRECT FULLSCREEN NAVIGATION) -->
-    <div class="app-nav-loader" id="appNavLoader">
-        <div class="loader-spinner"></div>
-        <div class="loader-text" id="loaderText">Запуск программы...</div>
-        <div class="loader-sub">Пожалуйста, подождите, открывается веб-приложение</div>
-    </div>
-
-    <!-- MAIN JAVASCRIPT ENGINE -->
+    <!-- Scripts -->
     <script src="{{ base_url }}/static/js/app.js"></script>
 </body>
 </html>
