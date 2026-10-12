@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MX Station Player — Портал для Smart TV</title>
+    <title>Home Portal TV — Портал для Smart TV</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -20,9 +20,9 @@
         <!-- 1. LEFT SIDEBAR (EXACTLY 4 ITEMS) -->
         <aside class="tv-sidebar" id="tvSidebar">
             <div class="sidebar-logo">
-                <span class="material-icons logo-icon">play_circle_filled</span>
+                <span class="material-icons logo-icon">cottage</span>
                 <div class="logo-title">
-                    <span class="logo-brand">MX STATION</span>
+                    <span class="logo-brand">HOME PORTAL</span>
                     <span class="logo-sub">SMART PORTAL</span>
                 </div>
             </div>
@@ -92,11 +92,11 @@
                     </div>
                 </div>
 
-                <!-- Positionable Widgets Container -->
-                <div class="widgets-wrapper pos-center" id="widgetsWrapper">
+                <!-- Bento Box Grid of Modular Widgets -->
+                <div class="widgets-bento-grid" id="widgetsWrapper">
                     
                     <!-- WIDGET: DIGITAL NEON CLOCK -->
-                    <div class="glass-widget widget-clock-digital" id="wClockDigital" tabindex="0">
+                    <div class="glass-widget widget-clock-digital span-2" id="wClockDigital" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">schedule</span>
                             <span class="w-label">КИБЕР-ВРЕМЯ</span>
@@ -114,7 +114,7 @@
                     </div>
 
                     <!-- WIDGET: ANALOG LUXURY CLOCK (Animated moving hands) -->
-                    <div class="glass-widget widget-clock-analog" id="wClockAnalog" tabindex="0">
+                    <div class="glass-widget widget-clock-analog span-1" id="wClockAnalog" class="glass-widget widget-clock-analog span-1" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">watch_later</span>
                             <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
@@ -131,11 +131,11 @@
                             <div class="hand sec-hand" id="handSec"></div>
                             <div class="center-pin"></div>
                         </div>
-                        <div class="analog-title">MX CHRONOGRAPH</div>
+                        <div class="analog-title">PORTAL CHRONOGRAPH</div>
                     </div>
 
                     <!-- WIDGET: MODERN MINIMAL CLOCK -->
-                    <div class="glass-widget widget-clock-modern" id="wClockModern" tabindex="0">
+                    <div class="glass-widget widget-clock-modern span-1" id="wClockModern" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">av_timer</span>
                             <span class="w-label">МИНИМАЛ ЧАСЫ</span>
@@ -146,7 +146,7 @@
                     </div>
 
                     <!-- WIDGET: CALENDAR MONTH GRID -->
-                    <div class="glass-widget widget-cal-grid" id="wCalGrid" tabindex="0">
+                    <div class="glass-widget widget-cal-grid span-2" id="wCalGrid" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">calendar_month</span>
                             <span class="w-label" id="calMonthName">ОКТЯБРЬ 2026</span>
@@ -158,7 +158,7 @@
                     </div>
 
                     <!-- WIDGET: COMPACT DATE CARD -->
-                    <div class="glass-widget widget-cal-compact" id="wCalCompact" tabindex="0">
+                    <div class="glass-widget widget-cal-compact span-1" id="wCalCompact" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">today</span>
                             <span class="w-label">СЕГОДНЯ</span>
@@ -177,7 +177,7 @@
                     </div>
 
                     <!-- WIDGET: SCHEDULE & EVENTS -->
-                    <div class="glass-widget widget-cal-events" id="wCalEvents" tabindex="0">
+                    <div class="glass-widget widget-cal-events span-2" id="wCalEvents" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">event_note</span>
                             <span class="w-label">ПЛАНИРОВЩИК ТВ</span>
@@ -240,67 +240,143 @@
                 </div>
 
                 <div class="settings-subtabs">
-                    <button class="subtab-btn active" data-subtab="sub-widgets" tabindex="0">Настройки виджетов</button>
-                    <button class="subtab-btn" data-subtab="sub-apps" tabindex="0">Настройки программ</button>
-                    <button class="subtab-btn" data-subtab="sub-screensaver" tabindex="0">Настройка заставки</button>
+                    <button class="subtab-btn active" data-subtab="sub-appearance" tabindex="0">🎨 Стиль & Цвета</button>
+                    <button class="subtab-btn" data-subtab="sub-widgets" tabindex="0">📊 Виджеты & Сетка</button>
+                    <button class="subtab-btn" data-subtab="sub-apps" tabindex="0">🚀 Программы</button>
+                    <button class="subtab-btn" data-subtab="sub-screensaver" tabindex="0">🌙 Заставка 4K</button>
                 </div>
 
-                <!-- SUBTAB 1: НАСТРОЙКИ ВИДЖЕТОВ -->
-                <div class="settings-subpane active" id="sub-widgets">
+                <!-- SUBTAB 1: СТИЛЬ & ЦВЕТА -->
+                <div class="settings-subpane active" id="sub-appearance">
                     <div class="setting-card">
-                        <h3>Включение / отключение виджетов</h3>
-                        <p class="setting-desc">Выберите, какие информационные блоки отображать на экране:</p>
-                        <div class="toggles-grid" id="widgetTogglesGrid">
-                            <label class="toggle-pill" tabindex="0" data-key="clock_digital">
-                                <span class="material-icons">schedule</span>
-                                <span>Цифровые часы (Неон)</span>
-                                <span class="toggle-check">✓</span>
-                            </label>
-                            <label class="toggle-pill" tabindex="0" data-key="clock_modern">
-                                <span class="material-icons">av_timer</span>
-                                <span>Минимал часы</span>
-                                <span class="toggle-check">✓</span>
-                            </label>
-                            <label class="toggle-pill" tabindex="0" data-key="clock_analog">
-                                <span class="material-icons">watch_later</span>
-                                <span>Аналоговые часы (Стрелки)</span>
-                                <span class="toggle-check">✓</span>
-                            </label>
-                            <label class="toggle-pill" tabindex="0" data-key="calendar_grid">
-                                <span class="material-icons">calendar_month</span>
-                                <span>Календарь (Сетка месяца)</span>
-                                <span class="toggle-check">✓</span>
-                            </label>
-                            <label class="toggle-pill" tabindex="0" data-key="calendar_compact">
-                                <span class="material-icons">today</span>
-                                <span>Компактная дата</span>
-                                <span class="toggle-check">✓</span>
-                            </label>
-                            <label class="toggle-pill" tabindex="0" data-key="calendar_events">
-                                <span class="material-icons">event_note</span>
-                                <span>Планировщик ТВ</span>
-                                <span class="toggle-check">✓</span>
-                            </label>
+                        <h3>Цвет акцента и темы интерфейса</h3>
+                        <p class="setting-desc">Выберите цвет выделения, кнопок и рамки фокуса для пульта:</p>
+                        <div class="color-swatches-grid" id="colorSwatchesGrid">
+                            <button class="color-swatch-btn active" data-color="#00d2ff" data-rgb="0, 210, 255" style="--c: #00d2ff;" tabindex="0"><span class="dot"></span><span>Бирюзовый</span></button>
+                            <button class="color-swatch-btn" data-color="#38bdf8" data-rgb="56, 189, 248" style="--c: #38bdf8;" tabindex="0"><span class="dot"></span><span>Небесный</span></button>
+                            <button class="color-swatch-btn" data-color="#3b82f6" data-rgb="59, 130, 246" style="--c: #3b82f6;" tabindex="0"><span class="dot"></span><span>Синий</span></button>
+                            <button class="color-swatch-btn" data-color="#10b981" data-rgb="16, 185, 129" style="--c: #10b981;" tabindex="0"><span class="dot"></span><span>Изумруд</span></button>
+                            <button class="color-swatch-btn" data-color="#84cc16" data-rgb="132, 204, 22" style="--c: #84cc16;" tabindex="0"><span class="dot"></span><span>Лайм</span></button>
+                            <button class="color-swatch-btn" data-color="#eab308" data-rgb="234, 179, 8" style="--c: #eab308;" tabindex="0"><span class="dot"></span><span>Золотой</span></button>
+                            <button class="color-swatch-btn" data-color="#f97316" data-rgb="249, 115, 22" style="--c: #f97316;" tabindex="0"><span class="dot"></span><span>Оранжевый</span></button>
+                            <button class="color-swatch-btn" data-color="#ef4444" data-rgb="239, 68, 68" style="--c: #ef4444;" tabindex="0"><span class="dot"></span><span>Красный</span></button>
+                            <button class="color-swatch-btn" data-color="#f43f5e" data-rgb="244, 63, 94" style="--c: #f43f5e;" tabindex="0"><span class="dot"></span><span>Розовый</span></button>
+                            <button class="color-swatch-btn" data-color="#a855f7" data-rgb="168, 85, 247" style="--c: #a855f7;" tabindex="0"><span class="dot"></span><span>Фиолетовый</span></button>
+                            <button class="color-swatch-btn" data-color="#ffffff" data-rgb="255, 255, 255" style="--c: #ffffff;" tabindex="0"><span class="dot"></span><span>Белый</span></button>
+                            <button class="color-swatch-btn" data-color="#94a3b8" data-rgb="148, 163, 184" style="--c: #94a3b8;" tabindex="0"><span class="dot"></span><span>Графит</span></button>
+                            <button class="color-swatch-btn" data-color="#18181b" data-rgb="24, 24, 27" style="--c: #18181b;" tabindex="0"><span class="dot" style="background:#18181b; border: 1.5px solid rgba(255,255,255,0.4);"></span><span>Черный оникс</span></button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Расположение виджетов на экране</h3>
-                        <div class="positions-selector" id="positionsSelector">
-                            <button class="pos-option-btn active" data-pos="center" tabindex="0">Посередине</button>
-                            <button class="pos-option-btn" data-pos="left" tabindex="0">Слева</button>
-                            <button class="pos-option-btn" data-pos="right" tabindex="0">Справа</button>
-                            <button class="pos-option-btn" data-pos="top" tabindex="0">Сверху</button>
-                            <button class="pos-option-btn" data-pos="bottom" tabindex="0">Снизу</button>
+                        <h3>Прозрачность виджетов</h3>
+                        <p class="setting-desc">Выберите стиль подложки информационных блоков:</p>
+                        <div class="transparency-selector" id="transparencySelector">
+                            <button class="trans-option-btn active" data-trans="frosted" tabindex="0">Матовое стекло (Glass Blur)</button>
+                            <button class="trans-option-btn" data-trans="transparent" tabindex="0">Полностью прозрачные (Без фона)</button>
+                            <button class="trans-option-btn" data-trans="dark" tabindex="0">Тёмная контрастная подложка</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Интенсивность размытия стекла (Glass Blur)</h3>
-                        <div class="blur-selector" id="blurSelector">
-                            <button class="blur-option-btn" data-blur="light" tabindex="0">Легкий (14px)</button>
-                            <button class="blur-option-btn active" data-blur="medium" tabindex="0">Стандартный (25px)</button>
-                            <button class="blur-option-btn" data-blur="heavy" tabindex="0">Глубокий матовый (38px)</button>
+                        <h3>Плавность анимаций интерфейса</h3>
+                        <p class="setting-desc">Настройка плавности переходов и перемещения фокуса:</p>
+                        <div class="anim-selector" id="animSelector">
+                            <button class="anim-option-btn active" data-anim="smooth" tabindex="0">Плавные кинематографичные (60 fps)</button>
+                            <button class="anim-option-btn" data-anim="fast" tabindex="0">Мгновенные (Без анимаций)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 2: НАСТРОЙКИ ВИДЖЕТОВ И СЕТКИ -->
+                <div class="settings-subpane" id="sub-widgets">
+                    <div class="setting-card">
+                        <h3>Включение и настройка размеров ячеек в сетке</h3>
+                        <p class="setting-desc">Выберите размер каждого виджета (1 ячейка = 25% экрана, 2 ячейки = 50%, 4 ячейки = вся ширина):</p>
+                        <div class="widget-config-stack" id="widgetConfigStack">
+                            <div class="widget-config-row" data-key="clock_digital">
+                                <label class="toggle-pill" tabindex="0" data-key="clock_digital">
+                                    <span class="material-icons">schedule</span>
+                                    <span>Цифровые часы</span>
+                                    <span class="toggle-check">✓</span>
+                                </label>
+                                <div class="size-selector" data-target="clock_digital">
+                                    <span class="size-label">Размер:</span>
+                                    <button class="size-btn" data-size="1" tabindex="0">1 ячейка</button>
+                                    <button class="size-btn active" data-size="2" tabindex="0">2 ячейки</button>
+                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                                </div>
+                            </div>
+
+                            <div class="widget-config-row" data-key="clock_analog">
+                                <label class="toggle-pill" tabindex="0" data-key="clock_analog">
+                                    <span class="material-icons">watch_later</span>
+                                    <span>Аналоговые стрелочные</span>
+                                    <span class="toggle-check">✓</span>
+                                </label>
+                                <div class="size-selector" data-target="clock_analog">
+                                    <span class="size-label">Размер:</span>
+                                    <button class="size-btn active" data-size="1" tabindex="0">1 ячейка</button>
+                                    <button class="size-btn" data-size="2" tabindex="0">2 ячейки</button>
+                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                                </div>
+                            </div>
+
+                            <div class="widget-config-row" data-key="clock_modern">
+                                <label class="toggle-pill" tabindex="0" data-key="clock_modern">
+                                    <span class="material-icons">av_timer</span>
+                                    <span>Минимал часы</span>
+                                    <span class="toggle-check">✓</span>
+                                </label>
+                                <div class="size-selector" data-target="clock_modern">
+                                    <span class="size-label">Размер:</span>
+                                    <button class="size-btn active" data-size="1" tabindex="0">1 ячейка</button>
+                                    <button class="size-btn" data-size="2" tabindex="0">2 ячейки</button>
+                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                                </div>
+                            </div>
+
+                            <div class="widget-config-row" data-key="calendar_grid">
+                                <label class="toggle-pill" tabindex="0" data-key="calendar_grid">
+                                    <span class="material-icons">calendar_month</span>
+                                    <span>Календарь (Сетка месяца)</span>
+                                    <span class="toggle-check">✓</span>
+                                </label>
+                                <div class="size-selector" data-target="calendar_grid">
+                                    <span class="size-label">Размер:</span>
+                                    <button class="size-btn" data-size="1" tabindex="0">1 ячейка</button>
+                                    <button class="size-btn active" data-size="2" tabindex="0">2 ячейки</button>
+                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                                </div>
+                            </div>
+
+                            <div class="widget-config-row" data-key="calendar_compact">
+                                <label class="toggle-pill" tabindex="0" data-key="calendar_compact">
+                                    <span class="material-icons">today</span>
+                                    <span>Компактная дата</span>
+                                    <span class="toggle-check">✓</span>
+                                </label>
+                                <div class="size-selector" data-target="calendar_compact">
+                                    <span class="size-label">Размер:</span>
+                                    <button class="size-btn active" data-size="1" tabindex="0">1 ячейка</button>
+                                    <button class="size-btn" data-size="2" tabindex="0">2 ячейки</button>
+                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                                </div>
+                            </div>
+
+                            <div class="widget-config-row" data-key="calendar_events">
+                                <label class="toggle-pill" tabindex="0" data-key="calendar_events">
+                                    <span class="material-icons">event_note</span>
+                                    <span>Планировщик ТВ</span>
+                                    <span class="toggle-check">✓</span>
+                                </label>
+                                <div class="size-selector" data-target="calendar_events">
+                                    <span class="size-label">Размер:</span>
+                                    <button class="size-btn" data-size="1" tabindex="0">1 ячейка</button>
+                                    <button class="size-btn active" data-size="2" tabindex="0">2 ячейки</button>
+                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -399,7 +475,7 @@
             <section class="tab-pane" id="tabInfo">
                 <div class="tab-header">
                     <div class="header-left">
-                        <h2>О приложении MX Station</h2>
+                        <h2>О приложении Home Portal</h2>
                         <span class="header-sub">Информация о системе, хосте и пульт-навигации</span>
                     </div>
                 </div>
@@ -437,7 +513,7 @@
         <header class="app-viewer-header">
             <button class="btn-app-exit" id="btnExitAppViewer" tabindex="0">
                 <span class="material-icons">arrow_back</span>
-                <span>Назад в MX Portal (ESC / BACK)</span>
+                <span>Назад в Home Portal (ESC / BACK)</span>
             </button>
             <div class="app-viewer-info">
                 <span class="viewer-title" id="appViewerTitle">Загрузка приложения...</span>
@@ -464,7 +540,7 @@
             <div class="ss-top-bar">
                 <div class="ss-brand">
                     <span class="material-icons" style="color: #00d2ff;">blur_on</span>
-                    <span>MX STATION • 4K AMBIENT</span>
+                    <span>HOME PORTAL • 4K AMBIENT</span>
                 </div>
                 <div class="ss-hint-pill">
                     Нажмите НАЗАД на пульте для возврата
