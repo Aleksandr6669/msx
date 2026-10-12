@@ -1,5 +1,6 @@
 // ==========================================================================
 // HOME PORTAL TV — CLIENT ENGINE FOR SMART TV & MEDIA STATION X
+// Optimized for 60fps, TV Remote D-Pad Navigation, Bento 2x2 Grid
 // ==========================================================================
 
 const SECTION_WALLPAPERS = {
@@ -14,7 +15,12 @@ const SCREENSAVER_IMAGES = {
     ss_cyber: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90",
     ss_mountains: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
     ss_ocean: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
-    ss_fireplace: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90"
+    ss_fireplace: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90",
+    ss_forest: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&auto=format&fit=crop&q=90",
+    ss_lake: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=90",
+    ss_nebula: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=90",
+    ss_waterfall: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1920&auto=format&fit=crop&q=90",
+    ss_city_night: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1920&auto=format&fit=crop&q=90"
 };
 const SS_SLIDESHOW_LIST = Object.values(SCREENSAVER_IMAGES);
 let ssSlideshowInterval = null;
@@ -25,16 +31,16 @@ const DEFAULT_APPS_LIST = [
         id: "app_lampa",
         name: "Lampa",
         url: "http://lampa.mx",
-        sub: "Онлайн-кинотеатр и сериалы",
+        sub: "Онлайн-кинотеатр",
         icon: "movie",
-        badge: "CINEMA",
+        badge: "FILMS",
         image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80"
     },
     {
         id: "app_youtube",
-        name: "YouTube MSX",
+        name: "YouTube",
         url: "http://msx.benzac.de/plugins/youtube.html",
-        sub: "Видео, клипы и стримы",
+        sub: "Видео и стримы",
         icon: "play_circle",
         badge: "VIDEO",
         image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop&q=80"
@@ -43,30 +49,87 @@ const DEFAULT_APPS_LIST = [
         id: "app_forkplayer",
         name: "ForkPlayer",
         url: "http://operats.obovse.ru/2.5/",
-        sub: "Портал онлайн-ТВ и плейлистов",
+        sub: "Медиа-портал",
         icon: "language",
         badge: "PORTAL",
         image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
     },
     {
         id: "app_iptv",
-        name: "IPTV Плеер HD",
+        name: "IPTV HD",
         url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        sub: "Телеканалы прямой эфир",
+        sub: "Телеканалы",
         icon: "live_tv",
         badge: "LIVE",
         image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&auto=format&fit=crop&q=80"
     },
     {
         id: "app_music",
-        name: "Lo-Fi Chill Radio",
+        name: "Lo-Fi Radio",
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        sub: "Круглосуточный релакс-поток",
+        sub: "Релакс музыка",
         icon: "music_note",
         badge: "CHILL",
         image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_deeplex",
+        name: "Deeplex 4K",
+        url: "http://deeplex.cc",
+        sub: "Фильмы и сериалы",
+        icon: "theaters",
+        badge: "CINEMA",
+        image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_twitch",
+        name: "Twitch",
+        url: "http://msx.benzac.de/plugins/twitch.html",
+        sub: "Игровые трансляции",
+        icon: "videogame_asset",
+        badge: "GAMES",
+        image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop&q=80"
     }
 ];
+
+const WIDGETS_METADATA = {
+    clock_digital: {
+        title: "Цифровые часы",
+        desc: "Крупные часы с секундами и датой",
+        icon: "schedule",
+        defaultSize: 2
+    },
+    clock_analog: {
+        title: "Аналоговые часы",
+        desc: "Стрелочный хронограф с секундной стрелкой",
+        icon: "watch_later",
+        defaultSize: 1
+    },
+    clock_modern: {
+        title: "Минимал часы",
+        desc: "Лаконичный циферблат и день недели",
+        icon: "av_timer",
+        defaultSize: 1
+    },
+    calendar_grid: {
+        title: "Календарь (Сетка месяца)",
+        desc: "Полная сетка дней текущего месяца",
+        icon: "calendar_month",
+        defaultSize: 2
+    },
+    calendar_compact: {
+        title: "Компактная дата",
+        desc: "Карточка сегодняшнего дня",
+        icon: "today",
+        defaultSize: 1
+    },
+    calendar_events: {
+        title: "Планировщик ТВ",
+        desc: "Список предстоящих передач и фильмов",
+        icon: "event_note",
+        defaultSize: 2
+    }
+};
 
 // App State
 let state = {
@@ -74,13 +137,15 @@ let state = {
     themeColor: localStorage.getItem('hp_theme_color') || "#00d2ff",
     themeRgb: localStorage.getItem('hp_theme_rgb') || "0, 210, 255",
     transparency: localStorage.getItem('hp_transparency') || "frosted",
-    animations: localStorage.getItem('hp_animations') || "smooth",
+    animations: localStorage.getItem('hp_animations') || "snappy",
     idleTimeoutSec: parseInt(localStorage.getItem('hp_idle_sec') || "120", 10),
     screensaverBg: localStorage.getItem('hp_ss_bg') || "ss_all",
+    ssWidgetType: localStorage.getItem('hp_ss_wtype') || "both", // both, clock, calendar, none
+    ssPosition: localStorage.getItem('hp_ss_pos') || "center", // center, top-left, top-right, etc.
     widgets: JSON.parse(localStorage.getItem('hp_widgets') || JSON.stringify({
         clock_digital: true,
-        clock_modern: false,
         clock_analog: true,
+        clock_modern: false,
         calendar_grid: true,
         calendar_compact: false,
         calendar_events: true
@@ -89,11 +154,12 @@ let state = {
         clock_digital: 2,
         clock_analog: 1,
         clock_modern: 1,
-        calendar_grid: 2,
+        calendar_grid: 4, // 2x2 = 4 cells!
         calendar_compact: 1,
         calendar_events: 2
     })),
-    apps: JSON.parse(localStorage.getItem('hp_apps') || JSON.stringify(DEFAULT_APPS_LIST))
+    apps: JSON.parse(localStorage.getItem('hp_apps') || JSON.stringify(DEFAULT_APPS_LIST)),
+    currentEditingWidget: null
 };
 
 // ---------------------------------------------------------------------------
@@ -276,12 +342,13 @@ function clockLoop() {
 requestAnimationFrame(clockLoop);
 
 // ---------------------------------------------------------------------------
-// 4. DYNAMIC CALENDAR ENGINE
+// 4. DYNAMIC CALENDAR ENGINE (MAIN GRID & SCREENSAVER MINI-GRID)
 // ---------------------------------------------------------------------------
-function renderCalendarGrid() {
+function renderCalendars() {
     const calCells = document.getElementById('calCellsGrid');
     const calMonthName = document.getElementById('calMonthName');
-    if (!calCells || !calMonthName) return;
+    const ssCalGrid = document.getElementById('ssCalGrid');
+    const ssCalHeader = document.getElementById('ssCalHeader');
 
     const now = new Date();
     const curYear = now.getFullYear();
@@ -292,54 +359,59 @@ function renderCalendarGrid() {
         "ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ",
         "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"
     ];
-    calMonthName.textContent = `${monthNames[curMonth]} ${curYear}`;
+    const monthTitle = `${monthNames[curMonth]} ${curYear}`;
+
+    if (calMonthName) calMonthName.textContent = monthTitle;
+    if (ssCalHeader) ssCalHeader.textContent = monthTitle;
 
     const firstDay = new Date(curYear, curMonth, 1).getDay();
     const startOffset = (firstDay + 6) % 7;
     const totalDays = new Date(curYear, curMonth + 1, 0).getDate();
 
-    calCells.innerHTML = '';
+    function fillGrid(gridElement) {
+        if (!gridElement) return;
+        gridElement.innerHTML = '';
 
-    for (let i = 0; i < startOffset; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'cell empty';
-        calCells.appendChild(empty);
+        for (let i = 0; i < startOffset; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'cell empty';
+            gridElement.appendChild(empty);
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.textContent = d;
+
+            const dayOfWeek = (startOffset + d - 1) % 7;
+            if (dayOfWeek === 5 || dayOfWeek === 6) {
+                cell.classList.add('we');
+            }
+            if (d === today) {
+                cell.classList.add('today');
+            }
+            gridElement.appendChild(cell);
+        }
     }
 
-    for (let d = 1; d <= totalDays; d++) {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.textContent = d;
-
-        const dayOfWeek = (startOffset + d - 1) % 7;
-        if (dayOfWeek === 5 || dayOfWeek === 6) {
-            cell.classList.add('we');
-        }
-        if (d === today) {
-            cell.classList.add('today');
-        }
-        calCells.appendChild(cell);
-    }
+    fillGrid(calCells);
+    fillGrid(ssCalGrid);
 }
-renderCalendarGrid();
+renderCalendars();
 
 // ---------------------------------------------------------------------------
 // 5. MODULAR BENTO GRID & WIDGET SIZING ENGINE
+// 1 cell = 1x1 (span-1)
+// 2 cells = 2x1 (span-2)
+// 4 cells = 2x2 (span-4: 2 cols x 2 rows)
 // ---------------------------------------------------------------------------
-const wClockDigital = document.getElementById('wClockDigital');
-const wClockAnalog = document.getElementById('wClockAnalog');
-const wClockModern = document.getElementById('wClockModern');
-const wCalGrid = document.getElementById('wCalGrid');
-const wCalCompact = document.getElementById('wCalCompact');
-const wCalEvents = document.getElementById('wCalEvents');
-
 const widgetElements = {
-    clock_digital: wClockDigital,
-    clock_analog: wClockAnalog,
-    clock_modern: wClockModern,
-    calendar_grid: wCalGrid,
-    calendar_compact: wCalCompact,
-    calendar_events: wCalEvents
+    clock_digital: document.getElementById('wClockDigital'),
+    clock_analog: document.getElementById('wClockAnalog'),
+    clock_modern: document.getElementById('wClockModern'),
+    calendar_grid: document.getElementById('wCalGrid'),
+    calendar_compact: document.getElementById('wCalCompact'),
+    calendar_events: document.getElementById('wCalEvents')
 };
 
 function applyWidgetSizesAndToggles() {
@@ -351,7 +423,7 @@ function applyWidgetSizesAndToggles() {
         const isVisible = !!state.widgets[key];
         el.style.display = isVisible ? 'flex' : 'none';
 
-        // Apply grid column span (1, 2, or 4 cells)
+        // Apply grid column & row span (1, 2, or 4 cells)
         const size = state.widgetSizes[key] || 2;
         el.classList.remove('span-1', 'span-2', 'span-4');
         el.classList.add(`span-${size}`);
@@ -382,6 +454,10 @@ subtabBtns.forEach(btn => {
         Object.keys(subpanes).forEach(k => {
             if (subpanes[k]) subpanes[k].classList.toggle('active', k === target);
         });
+
+        if (target === 'sub-widgets') {
+            showWidgetsListView();
+        }
     });
 });
 
@@ -410,7 +486,7 @@ transBtns.forEach(btn => {
 });
 transBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-trans') === state.transparency));
 
-// Animation Modes
+// Animation Modes (snappy vs fast)
 const animBtns = document.querySelectorAll('.anim-option-btn');
 animBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -422,76 +498,161 @@ animBtns.forEach(btn => {
 });
 animBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-anim') === state.animations));
 
-// Widget Size Buttons in Settings
-const widgetConfigRows = document.querySelectorAll('.widget-config-row');
-widgetConfigRows.forEach(row => {
-    const key = row.getAttribute('data-key');
-    const togglePill = row.querySelector('.toggle-pill');
-    const sizeBtns = row.querySelectorAll('.size-btn');
+// ---------------------------------------------------------------------------
+// 7. DEDICATED WIDGETS MANAGER IN SETTINGS (Cards -> Detail Configurator)
+// ---------------------------------------------------------------------------
+const widgetsListView = document.getElementById('widgetsListView');
+const widgetDetailView = document.getElementById('widgetDetailView');
+const widgetsManageGrid = document.getElementById('widgetsManageGrid');
+const btnBackToWidgetsList = document.getElementById('btnBackToWidgetsList');
 
-    // Update toggle state
-    if (togglePill) {
-        const isChecked = !!state.widgets[key];
-        togglePill.classList.toggle('checked', isChecked);
-        const checkEl = togglePill.querySelector('.toggle-check');
-        if (checkEl) checkEl.textContent = isChecked ? '✓' : '—';
+const detailWidgetTitle = document.getElementById('detailWidgetTitle');
+const detailWidgetDesc = document.getElementById('detailWidgetDesc');
+const detailWidgetBadge = document.getElementById('detailWidgetBadge');
+const detailWidgetIcon = document.getElementById('detailWidgetIcon');
+const detailTogglePill = document.getElementById('detailTogglePill');
+const detailToggleLabel = document.getElementById('detailToggleLabel');
+const detailToggleCheck = document.getElementById('detailToggleCheck');
+const bentoSizeCards = document.querySelectorAll('.bento-size-card');
+const btnSaveWidgetDetail = document.getElementById('btnSaveWidgetDetail');
 
-        togglePill.addEventListener('click', () => {
-            state.widgets[key] = !state.widgets[key];
-            togglePill.classList.toggle('checked', state.widgets[key]);
-            if (checkEl) checkEl.textContent = state.widgets[key] ? '✓' : '—';
-            applyWidgetSizesAndToggles();
+function formatSizeText(size) {
+    if (size === 1) return '1 ячейка (1×1)';
+    if (size === 2) return '2 ячейки (2×1 • По горизонтали)';
+    if (size === 4) return '4 ячейки (2×2 • 2 по верт. и 2 по гор.)';
+    return `${size} ячейки`;
+}
+
+function renderWidgetsManageGrid() {
+    if (!widgetsManageGrid) return;
+    widgetsManageGrid.innerHTML = '';
+
+    Object.keys(WIDGETS_METADATA).forEach(key => {
+        const meta = WIDGETS_METADATA[key];
+        const isEnabled = !!state.widgets[key];
+        const curSize = state.widgetSizes[key] || meta.defaultSize;
+
+        const card = document.createElement('div');
+        card.className = 'widget-card-manage';
+        card.tabIndex = 0;
+        card.innerHTML = `
+            <div class="wcm-left">
+                <span class="material-icons wcm-icon">${meta.icon}</span>
+                <div>
+                    <span class="wcm-title">${meta.title}</span>
+                    <span class="wcm-size-badge">${isEnabled ? 'Включен' : 'Выключен'} • ${formatSizeText(curSize)}</span>
+                </div>
+            </div>
+            <button class="btn-manage-cfg" tabindex="0">
+                <span class="material-icons" style="font-size: 16px;">tune</span>
+                <span>Настроить</span>
+            </button>
+        `;
+
+        card.addEventListener('click', () => openWidgetDetail(key));
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                openWidgetDetail(key);
+            }
         });
-    }
 
-    // Size selector buttons (1, 2, 4 cells)
-    const currentSize = state.widgetSizes[key] || 2;
-    sizeBtns.forEach(btn => {
-        const sizeVal = parseInt(btn.getAttribute('data-size'), 10);
-        btn.classList.toggle('active', sizeVal === currentSize);
-
-        btn.addEventListener('click', () => {
-            sizeBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            state.widgetSizes[key] = sizeVal;
-            applyWidgetSizesAndToggles();
-        });
-    });
-});
-
-const gotoWidgetSettingsBtn = document.getElementById('gotoWidgetSettingsBtn');
-if (gotoWidgetSettingsBtn) {
-    gotoWidgetSettingsBtn.addEventListener('click', () => {
-        switchTab('settings');
-        subtabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-subtab') === 'sub-widgets'));
-        Object.keys(subpanes).forEach(k => {
-            if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-widgets');
-        });
-        expandSidebar(false);
+        widgetsManageGrid.appendChild(card);
     });
 }
 
+function showWidgetsListView() {
+    if (widgetsListView) widgetsListView.style.display = 'block';
+    if (widgetDetailView) widgetDetailView.style.display = 'none';
+    renderWidgetsManageGrid();
+}
+
+function openWidgetDetail(key) {
+    state.currentEditingWidget = key;
+    const meta = WIDGETS_METADATA[key];
+    if (!meta) return;
+
+    if (widgetsListView) widgetsListView.style.display = 'none';
+    if (widgetDetailView) widgetDetailView.style.display = 'block';
+
+    if (detailWidgetTitle) detailWidgetTitle.textContent = `Настройка: ${meta.title}`;
+    if (detailWidgetDesc) detailWidgetDesc.textContent = meta.desc;
+    if (detailWidgetBadge) detailWidgetBadge.textContent = key.toUpperCase();
+    if (detailWidgetIcon) detailWidgetIcon.textContent = meta.icon;
+
+    updateDetailToggleUI();
+    updateDetailSizeUI();
+
+    if (btnBackToWidgetsList) {
+        btnBackToWidgetsList.focus();
+    }
+}
+
+function updateDetailToggleUI() {
+    const key = state.currentEditingWidget;
+    if (!key) return;
+    const isChecked = !!state.widgets[key];
+    if (detailTogglePill) detailTogglePill.classList.toggle('checked', isChecked);
+    if (detailToggleCheck) detailToggleCheck.textContent = isChecked ? '✓' : '—';
+    if (detailToggleLabel) detailToggleLabel.textContent = isChecked ? 'Виджет включен в сетке' : 'Виджет выключен (скрыт)';
+}
+
+function updateDetailSizeUI() {
+    const key = state.currentEditingWidget;
+    if (!key) return;
+    const curSize = state.widgetSizes[key] || 2;
+    bentoSizeCards.forEach(card => {
+        const sizeVal = parseInt(card.getAttribute('data-size'), 10);
+        card.classList.toggle('active', sizeVal === curSize);
+    });
+}
+
+if (detailTogglePill) {
+    detailTogglePill.addEventListener('click', () => {
+        const key = state.currentEditingWidget;
+        if (!key) return;
+        state.widgets[key] = !state.widgets[key];
+        updateDetailToggleUI();
+        applyWidgetSizesAndToggles();
+    });
+}
+
+bentoSizeCards.forEach(card => {
+    card.addEventListener('click', () => {
+        const key = state.currentEditingWidget;
+        if (!key) return;
+        const sizeVal = parseInt(card.getAttribute('data-size'), 10);
+        state.widgetSizes[key] = sizeVal;
+        updateDetailSizeUI();
+        applyWidgetSizesAndToggles();
+    });
+});
+
+if (btnBackToWidgetsList) {
+    btnBackToWidgetsList.addEventListener('click', () => {
+        showWidgetsListView();
+    });
+}
+
+if (btnSaveWidgetDetail) {
+    btnSaveWidgetDetail.addEventListener('click', () => {
+        showWidgetsListView();
+    });
+}
+
+renderWidgetsManageGrid();
+
 // ---------------------------------------------------------------------------
-// 7. IN-APP FULLSCREEN APP VIEWER & SEAMLESS RETURN ENGINE
+// 8. IN-APP FULLSCREEN APP VIEWER (100% FULLSCREEN WITHOUT ON-SCREEN BARS!)
 // ---------------------------------------------------------------------------
 const appViewerModal = document.getElementById('appViewerModal');
 const appViewerFrame = document.getElementById('appViewerFrame');
-const appViewerTitle = document.getElementById('appViewerTitle');
-const appViewerDirectLink = document.getElementById('appViewerDirectLink');
-const btnExitAppViewer = document.getElementById('btnExitAppViewer');
 let lastFocusedElement = null;
 
 function openAppViewer(app) {
     if (!app || !app.url) return;
     lastFocusedElement = document.activeElement;
 
-    if (appViewerTitle) {
-        appViewerTitle.textContent = app.name || 'Приложение';
-    }
-    if (appViewerDirectLink) {
-        appViewerDirectLink.href = app.url;
-        appViewerDirectLink.title = `Открыть ${app.name} напрямую`;
-    }
     if (appViewerFrame) {
         appViewerFrame.src = app.url;
     }
@@ -502,12 +663,6 @@ function openAppViewer(app) {
     try {
         window.history.pushState({ appViewerOpen: true, appName: app.name }, '', '#app-' + (app.id || 'view'));
     } catch (err) {}
-
-    setTimeout(() => {
-        if (btnExitAppViewer) {
-            btnExitAppViewer.focus();
-        }
-    }, 150);
 }
 
 function closeAppViewer(triggerHistoryBack = true) {
@@ -529,16 +684,8 @@ function closeAppViewer(triggerHistoryBack = true) {
     }
 }
 
-if (btnExitAppViewer) {
-    btnExitAppViewer.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeAppViewer(true);
-        switchTab('widgets');
-    });
-}
-
 // ---------------------------------------------------------------------------
-// 8. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
+// 9. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
 // Guarantees: ALWAYS returns to main screen (Widgets) and NEVER exits app!
 // ---------------------------------------------------------------------------
 function handleTvBackButton(e) {
@@ -547,10 +694,9 @@ function handleTvBackButton(e) {
         e.stopPropagation();
     }
 
-    // 1. If App Viewer (iframe) is active -> close it and return to widgets!
+    // 1. If App Viewer (iframe) is active -> close it and return to apps/widgets!
     if (appViewerModal && appViewerModal.classList.contains('active')) {
         closeAppViewer(true);
-        switchTab('widgets');
         expandSidebar(false);
         focusCurrentTabContent();
         return true;
@@ -565,7 +711,13 @@ function handleTvBackButton(e) {
         return true;
     }
 
-    // 3. If in Apps, Settings, or Info -> return directly to widgets tab!
+    // 3. If in widget detail view -> go back to widgets list
+    if (state.activeTab === 'settings' && widgetDetailView && widgetDetailView.style.display !== 'none') {
+        showWidgetsListView();
+        return true;
+    }
+
+    // 4. If in Apps, Settings, or Info -> return directly to widgets tab!
     if (state.activeTab !== 'widgets') {
         switchTab('widgets');
         expandSidebar(false);
@@ -573,7 +725,7 @@ function handleTvBackButton(e) {
         return true;
     }
 
-    // 4. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
+    // 5. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
     expandSidebar(false);
     return true;
 }
@@ -608,10 +760,9 @@ window.addEventListener('keydown', (e) => {
     } else if (e.key === 'ArrowLeft' && !inSidebar && !appViewerModal?.classList.contains('active') && !screensaverLayer?.classList.contains('active')) {
         const activeEl = document.activeElement;
         const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
-        const isHeaderBtn = activeEl && (activeEl.id === 'gotoWidgetSettingsBtn' || activeEl.id === 'openAddAppModalBtn' || activeEl.classList.contains('subtab-btn'));
         const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === widgetsWrapper?.firstElementChild;
 
-        if (isFirstAppCard || isHeaderBtn || isFirstWidget || activeEl === document.body || !activeEl) {
+        if (isFirstAppCard || isFirstWidget || activeEl === document.body || !activeEl) {
             e.preventDefault();
             expandSidebar(true);
             const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`);
@@ -641,7 +792,7 @@ window.addEventListener('popstate', (e) => {
 });
 
 // ---------------------------------------------------------------------------
-// 9. APPS MANAGEMENT ENGINE
+// 10. COMPACT PHONE-LIKE APPS RENDERING ENGINE (6-7 ICONS PER ROW)
 // ---------------------------------------------------------------------------
 const appsGrid = document.getElementById('appsGrid');
 const appsCountBadge = document.getElementById('appsCountBadge');
@@ -659,23 +810,14 @@ function renderApps() {
 
             const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
             card.innerHTML = `
-                <div class="app-card-img-wrap">
-                    <img src="${imgUrl}" alt="${app.name}" class="app-card-img" loading="lazy">
+                <div class="app-icon-squircle">
+                    <img src="${imgUrl}" alt="${app.name}" class="app-icon-img" loading="lazy">
                     <span class="app-card-badge">${app.badge || 'APP'}</span>
                 </div>
-                <div class="app-card-body">
-                    <div class="app-card-name">
-                        <span class="material-icons">${app.icon || 'launch'}</span>
-                        <span>${app.name}</span>
-                    </div>
-                    <div class="app-card-sub">${app.sub || app.url}</div>
-                </div>
+                <div class="app-card-name">${app.name}</div>
             `;
 
-            card.addEventListener('click', () => {
-                openAppViewer(app);
-            });
-
+            card.addEventListener('click', () => openAppViewer(app));
             card.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.keyCode === 13) {
                     e.preventDefault();
@@ -708,7 +850,7 @@ function renderApps() {
 }
 renderApps();
 
-// Add Custom App
+// Add Custom App (In Settings)
 const btnSaveApp = document.getElementById('btnSaveApp');
 const inputAppName = document.getElementById('inputAppName');
 const inputAppUrl = document.getElementById('inputAppUrl');
@@ -721,7 +863,7 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
         const icon = selectAppIcon ? selectAppIcon.value : 'launch';
 
         if (!name || !url) {
-            alert('Пожалуйста, заполните название и URL приложения.');
+            alert('Пожалуйста, заполните название и URL программы.');
             return;
         }
 
@@ -739,7 +881,7 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
         inputAppName.value = '';
         inputAppUrl.value = '';
         renderApps();
-        alert(`Приложение «${name}» успешно добавлено!`);
+        alert(`Программа «${name}» успешно добавлена!`);
     });
 }
 
@@ -763,9 +905,9 @@ presetBtns.forEach(btn => {
             });
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
             renderApps();
-            alert(`Приложение «${name}» добавлено в программы!`);
+            alert(`Программа «${name}» добавлена!`);
         } else {
-            alert(`Приложение «${name}» уже есть в списке.`);
+            alert(`Программа «${name}» уже есть в списке.`);
         }
     });
 });
@@ -780,32 +922,39 @@ if (btnResetDefaultApps) {
     });
 }
 
-const openAddAppModalBtn = document.getElementById('openAddAppModalBtn');
-if (openAddAppModalBtn) {
-    openAddAppModalBtn.addEventListener('click', () => {
-        switchTab('settings');
-        subtabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-subtab') === 'sub-apps'));
-        Object.keys(subpanes).forEach(k => {
-            if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-apps');
-        });
-        expandSidebar(false);
-    });
-}
-
-// Exit to MSX Button
-const exitToMsxBtn = document.getElementById('exitToMsxBtn');
-if (exitToMsxBtn) {
-    exitToMsxBtn.addEventListener('click', () => {
-        window.location.href = "http://msx.benzac.de/exit.html";
+// Restart Portal Button
+const restartPortalBtn = document.getElementById('restartPortalBtn');
+if (restartPortalBtn) {
+    restartPortalBtn.addEventListener('click', () => {
+        window.location.reload();
     });
 }
 
 // ---------------------------------------------------------------------------
-// 10. 4K SCREENSAVER ENGINE (WALLPAPER PICKER & AUTO-RUN)
+// 11. ENHANCED 4K SCREENSAVER ENGINE (WALLPAPERS, WIDGET TYPES & POSITIONS)
 // ---------------------------------------------------------------------------
 const screensaverLayer = document.getElementById('screensaverLayer');
 const ssBgImage = document.getElementById('ssBgImage');
+const ssWidgetsContainer = document.getElementById('ssWidgetsContainer');
+const ssClockBlock = document.getElementById('ssClockBlock');
+const ssCalendarBlock = document.getElementById('ssCalendarBlock');
 let idleTimer = null;
+
+function applyScreensaverLayout() {
+    if (!ssWidgetsContainer) return;
+
+    // Apply position class
+    ssWidgetsContainer.className = `ss-widgets-container pos-${state.ssPosition || 'center'}`;
+
+    // Apply widget type visibility
+    const type = state.ssWidgetType || 'both';
+    if (ssClockBlock) {
+        ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'inline-flex' : 'none';
+    }
+    if (ssCalendarBlock) {
+        ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'inline-flex' : 'none';
+    }
+}
 
 function updateScreensaverWallpaper() {
     const bgLayer = document.getElementById('ssBgImage');
@@ -834,6 +983,8 @@ function updateScreensaverWallpaper() {
 function showScreensaver() {
     if (screensaverLayer) {
         updateScreensaverWallpaper();
+        applyScreensaverLayout();
+        renderCalendars();
         screensaverLayer.classList.add('active');
     }
 }
@@ -884,9 +1035,6 @@ resetIdleTimer();
 const startScreensaverBtn = document.getElementById('startScreensaverBtn');
 if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', showScreensaver);
 
-const launchScreensaverActionBtn = document.getElementById('launchScreensaverActionBtn');
-if (launchScreensaverActionBtn) launchScreensaverActionBtn.addEventListener('click', showScreensaver);
-
 const btnTestScreensaver = document.getElementById('btnTestScreensaver');
 if (btnTestScreensaver) btnTestScreensaver.addEventListener('click', showScreensaver);
 
@@ -914,7 +1062,7 @@ ssThumbCards.forEach(card => {
     }
 });
 
-// Timeout selector buttons
+// Timeout selector buttons (30s, 1m, 2m, 3m, 5m, 10m, 15m, 0)
 const timeoutBtns = document.querySelectorAll('.timeout-btn');
 timeoutBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -927,7 +1075,33 @@ timeoutBtns.forEach(btn => {
 });
 timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-time'), 10) === state.idleTimeoutSec));
 
-// Canvas Stars Particles
+// Screensaver Widget Type Selector (both, clock, calendar, none)
+const ssWTypeBtns = document.querySelectorAll('.ss-wtype-btn');
+ssWTypeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssWTypeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssWidgetType = btn.getAttribute('data-wtype');
+        localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
+        applyScreensaverLayout();
+    });
+});
+ssWTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-wtype') === state.ssWidgetType));
+
+// Screensaver Position Selector (center, top-left, top-right, bottom-left, bottom-right, etc.)
+const ssPosBtns = document.querySelectorAll('.ss-pos-btn');
+ssPosBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssPosBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssPosition = btn.getAttribute('data-pos');
+        localStorage.setItem('hp_ss_pos', state.ssPosition);
+        applyScreensaverLayout();
+    });
+});
+ssPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.ssPosition));
+
+// Canvas Stars Particles for Screensaver
 const canvas = document.getElementById('ssStarsCanvas');
 if (canvas) {
     const ctx = canvas.getContext('2d');
