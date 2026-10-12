@@ -78,7 +78,7 @@
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>Виджеты & Монитор</h2>
-                        <span class="header-sub">Текущее время, календарь и статус устройства в реальном времени</span>
+                        <span class="header-sub">Информационная панель реального времени</span>
                     </div>
                 </div>
 
@@ -196,7 +196,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
@@ -224,55 +223,66 @@
                 </div>
 
                 <div class="settings-subtabs">
-                    <button class="subtab-btn active" data-subtab="sub-appearance" tabindex="0">🎨 Стиль & Цвета</button>
-                    <button class="subtab-btn" data-subtab="sub-widgets" tabindex="0">📊 Виджеты & Сетка</button>
-                    <button class="subtab-btn" data-subtab="sub-apps" tabindex="0">🚀 Программы</button>
-                    <button class="subtab-btn" data-subtab="sub-screensaver" tabindex="0">🌙 Заставка 4K</button>
+                    <button class="subtab-btn active" data-subtab="appearance" tabindex="0">🎨 Внешний вид</button>
+                    <button class="subtab-btn" data-subtab="widgets" tabindex="0">📊 Виджеты & Сетка</button>
+                    <button class="subtab-btn" data-subtab="apps" tabindex="0">🚀 Программы</button>
+                    <button class="subtab-btn" data-subtab="screensaver" tabindex="0">✨ Заставка 4K</button>
                 </div>
 
-                <!-- SUBTAB 1: СТИЛЬ & ЦВЕТА -->
+                <!-- SUBTAB 1: ВНЕШНИЙ ВИД -->
                 <div class="settings-subpane active" id="sub-appearance">
                     <div class="setting-card">
-                        <h3>Цвет акцента и темы интерфейса</h3>
-                        <p class="setting-desc">Выберите цвет выделения, кнопок и рамки фокуса для пульта:</p>
+                        <h3>Цветовая тема (Неоновый акцент)</h3>
+                        <p class="setting-desc">Выберите цвет для фокуса, неоновых линий и часов:</p>
                         <div class="color-swatches-grid" id="colorSwatchesGrid">
-                            <button class="color-swatch-btn active" data-color="#00d2ff" data-rgb="0, 210, 255" style="--c: #00d2ff;" tabindex="0"><span class="dot"></span><span>Бирюзовый</span></button>
-                            <button class="color-swatch-btn" data-color="#38bdf8" data-rgb="56, 189, 248" style="--c: #38bdf8;" tabindex="0"><span class="dot"></span><span>Небесный</span></button>
-                            <button class="color-swatch-btn" data-color="#3b82f6" data-rgb="59, 130, 246" style="--c: #3b82f6;" tabindex="0"><span class="dot"></span><span>Синий</span></button>
-                            <button class="color-swatch-btn" data-color="#10b981" data-rgb="16, 185, 129" style="--c: #10b981;" tabindex="0"><span class="dot"></span><span>Изумруд</span></button>
-                            <button class="color-swatch-btn" data-color="#84cc16" data-rgb="132, 204, 22" style="--c: #84cc16;" tabindex="0"><span class="dot"></span><span>Лайм</span></button>
-                            <button class="color-swatch-btn" data-color="#eab308" data-rgb="234, 179, 8" style="--c: #eab308;" tabindex="0"><span class="dot"></span><span>Золотой</span></button>
-                            <button class="color-swatch-btn" data-color="#f97316" data-rgb="249, 115, 22" style="--c: #f97316;" tabindex="0"><span class="dot"></span><span>Оранжевый</span></button>
-                            <button class="color-swatch-btn" data-color="#ef4444" data-rgb="239, 68, 68" style="--c: #ef4444;" tabindex="0"><span class="dot"></span><span>Красный</span></button>
-                            <button class="color-swatch-btn" data-color="#f43f5e" data-rgb="244, 63, 94" style="--c: #f43f5e;" tabindex="0"><span class="dot"></span><span>Розовый</span></button>
-                            <button class="color-swatch-btn" data-color="#a855f7" data-rgb="168, 85, 247" style="--c: #a855f7;" tabindex="0"><span class="dot"></span><span>Фиолетовый</span></button>
-                            <button class="color-swatch-btn" data-color="#ffffff" data-rgb="255, 255, 255" style="--c: #ffffff;" tabindex="0"><span class="dot"></span><span>Белый</span></button>
-                            <button class="color-swatch-btn" data-color="#94a3b8" data-rgb="148, 163, 184" style="--c: #94a3b8;" tabindex="0"><span class="dot"></span><span>Графит</span></button>
-                            <button class="color-swatch-btn" data-color="#18181b" data-rgb="24, 24, 27" style="--c: #18181b;" tabindex="0"><span class="dot" style="background:#18181b; border: 1.5px solid rgba(255,255,255,0.4);"></span><span>Черный оникс</span></button>
+                            <button class="color-swatch-btn active" data-color="#00d2ff" data-rgb="0, 210, 255" style="--c: #00d2ff;" tabindex="0">
+                                <span class="swatch-circle" style="background: #00d2ff;"></span>
+                                <span>Циан Неон</span>
+                            </button>
+                            <button class="color-swatch-btn" data-color="#10b981" data-rgb="16, 185, 129" style="--c: #10b981;" tabindex="0">
+                                <span class="swatch-circle" style="background: #10b981;"></span>
+                                <span>Изумруд</span>
+                            </button>
+                            <button class="color-swatch-btn" data-color="#8b5cf6" data-rgb="139, 92, 246" style="--c: #8b5cf6;" tabindex="0">
+                                <span class="swatch-circle" style="background: #8b5cf6;"></span>
+                                <span>Фиолетовый</span>
+                            </button>
+                            <button class="color-swatch-btn" data-color="#f59e0b" data-rgb="245, 158, 11" style="--c: #f59e0b;" tabindex="0">
+                                <span class="swatch-circle" style="background: #f59e0b;"></span>
+                                <span>Янтарь</span>
+                            </button>
+                            <button class="color-swatch-btn" data-color="#ec4899" data-rgb="236, 72, 153" style="--c: #ec4899;" tabindex="0">
+                                <span class="swatch-circle" style="background: #ec4899;"></span>
+                                <span>Розовый</span>
+                            </button>
+                            <button class="color-swatch-btn" data-color="#3b82f6" data-rgb="59, 130, 246" style="--c: #3b82f6;" tabindex="0">
+                                <span class="swatch-circle" style="background: #3b82f6;"></span>
+                                <span>Кобальт</span>
+                            </button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Прозрачность виджетов</h3>
-                        <p class="setting-desc">Выберите стиль подложки информационных блоков:</p>
+                        <h3>Прозрачность панелей и виджетов</h3>
+                        <p class="setting-desc">Уровень размытия и матового стекла:</p>
                         <div class="transparency-selector" id="transparencySelector">
-                            <button class="trans-option-btn active" data-trans="frosted" tabindex="0">Матовое стекло (Glass Blur)</button>
-                            <button class="trans-option-btn" data-trans="transparent" tabindex="0">Полностью прозрачные (Без фона)</button>
-                            <button class="trans-option-btn" data-trans="dark" tabindex="0">Тёмная контрастная подложка</button>
+                            <button class="trans-option-btn active" data-trans="frosted" tabindex="0">Матовое стекло</button>
+                            <button class="trans-option-btn" data-trans="transparent" tabindex="0">Прозрачный фон</button>
+                            <button class="trans-option-btn" data-trans="dark" tabindex="0">Тёмный контраст</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Расположение меню навигации</h3>
+                        <h3>Расположение панели навигации</h3>
                         <p class="setting-desc">Выберите сторону экрана для бокового меню:</p>
                         <div class="sidebar-pos-selector" id="sidebarPosSelector">
-                            <button class="sidebar-pos-btn active" data-pos="left" tabindex="0">
+                            <button class="sidebar-pos-btn" data-pos="left" tabindex="0">
                                 <span class="material-icons">format_textdirection_l_to_r</span>
-                                <span>Слева на экране (Стандарт)</span>
+                                <span>Слева на экране</span>
                             </button>
-                            <button class="sidebar-pos-btn" data-pos="right" tabindex="0">
+                            <button class="sidebar-pos-btn active" data-pos="right" tabindex="0">
                                 <span class="material-icons">format_textdirection_r_to_l</span>
-                                <span>Справа на экране</span>
+                                <span>Справа на экране (Выбрано)</span>
                             </button>
                         </div>
                     </div>
@@ -306,8 +316,8 @@
                         <div class="setting-card">
                             <div class="detail-top-nav">
                                 <button class="detail-back-btn" id="btnBackToWidgetsList" tabindex="0">
-                                    <span class="material-icons">arrow_back</span>
-                                    <span>Назад к списку виджетов</span>
+                                     <span class="material-icons">arrow_back</span>
+                                     <span>Назад к списку виджетов</span>
                                 </button>
                                 <div class="detail-widget-badge" id="detailWidgetBadge">Виджет</div>
                             </div>
