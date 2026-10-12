@@ -20,13 +20,14 @@ const SCREENSAVER_IMAGES = {
 const SS_SLIDESHOW_LIST = Object.values(SCREENSAVER_IMAGES);
 let ssSlideshowInterval = null;
 let ssSlideshowIndex = 0;
+let ssOpenedTimestamp = 0;
 
 const DEFAULT_APPS_LIST = [
     {
         id: "app_filmix",
         name: "Filmix",
         url: "http://filmix.tv",
-        sub: "Онлайн-кинотеатр и сериалы",
+        sub: "Онлайн-кинотеатр",
         icon: "movie_filter",
         badge: "CINEMA",
         image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80"
@@ -35,26 +36,8 @@ const DEFAULT_APPS_LIST = [
         id: "app_lampa",
         name: "Lampa",
         url: "http://lampa.mx",
-        sub: "Онлайн-кинотеатр",
+        sub: "Каталог фильмов и сериалов",
         icon: "movie",
-        badge: "FILMS",
-        image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-        id: "app_youtube",
-        name: "YouTube",
-        url: "http://msx.benzac.de/plugins/youtube.html",
-        sub: "Видео и стримы",
-        icon: "play_circle",
-        badge: "VIDEO",
-        image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-        id: "app_forkplayer",
-        name: "ForkPlayer",
-        url: "http://operats.obovse.ru/2.5/",
-        sub: "Медиа-портал",
-        icon: "language",
         badge: "PORTAL",
         image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
     },
@@ -62,8 +45,8 @@ const DEFAULT_APPS_LIST = [
         id: "app_deeplex",
         name: "Deeplex 4K",
         url: "http://deeplex.cc",
-        sub: "Фильмы и сериалы",
-        icon: "theaters",
+        sub: "Фильмы и сериалы 4K",
+        icon: "play_circle_filled",
         badge: "CINEMA",
         image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=80"
     },
@@ -84,43 +67,67 @@ const DEFAULT_APPS_LIST = [
         icon: "videogame_asset",
         badge: "GAMES",
         image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_youtube",
+        name: "YouTube",
+        url: "http://msx.benzac.de/plugins/youtube.html",
+        sub: "Видео и музыка 4K",
+        icon: "smart_display",
+        badge: "VIDEO",
+        image: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_music",
+        name: "Lo-Fi Radio",
+        url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        sub: "Релакс музыка",
+        icon: "music_note",
+        badge: "CHILL",
+        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80"
     }
 ];
 
 const WIDGETS_METADATA = {
     clock_digital: {
-        title: "Цифровые часы",
-        desc: "Крупные часы с секундами и датой",
+        id: "clock_digital",
+        name: "Цифровые часы",
+        desc: "Неоновые часы с бегущими секундами и полной датой",
         icon: "schedule",
         defaultSize: 2
     },
     clock_analog: {
-        title: "Аналоговые часы",
-        desc: "Стрелочный хронограф с секундной стрелкой",
+        id: "clock_analog",
+        name: "Аналоговые часы",
+        desc: "Круглый швейцарский циферблат с плавной секундной стрелкой",
         icon: "watch_later",
         defaultSize: 1
     },
     clock_modern: {
-        title: "Минимал часы",
-        desc: "Лаконичный циферблат и день недели",
+        id: "clock_modern",
+        name: "Минимал часы",
+        desc: "Крупные контрастные цифры, день недели и месяц",
         icon: "av_timer",
         defaultSize: 1
     },
     calendar_grid: {
-        title: "Календарь (Сетка месяца)",
-        desc: "Полная сетка дней текущего месяца",
+        id: "calendar_grid",
+        name: "Календарь месяца",
+        desc: "Полная сетка дней текущего месяца с подсветкой сегодня",
         icon: "calendar_month",
         defaultSize: 2
     },
     calendar_compact: {
-        title: "Компактная дата",
-        desc: "Карточка сегодняшнего дня",
+        id: "calendar_compact",
+        name: "Карточка Сегодня",
+        desc: "Компактная дата, крупный день и статус дня",
         icon: "today",
         defaultSize: 1
     },
     calendar_events: {
-        title: "Планировщик ТВ",
-        desc: "Список предстоящих передач и фильмов",
+        id: "calendar_events",
+        name: "Планировщик ТВ",
+        desc: "Список вечерних киносеансов и напоминаний",
         icon: "event_note",
         defaultSize: 2
     }
@@ -145,14 +152,14 @@ let state = {
     animations: safeGetStorage('hp_animations', "snappy"),
     idleTimeoutSec: parseInt(safeGetStorage('hp_idle_sec', "120"), 10),
     screensaverBg: safeGetStorage('hp_ss_bg', "ss_all"),
-    sidebarPos: safeGetStorage('hp_sidebar_pos', "right"), // DEFAULT RIGHT as requested by user!
+    sidebarPos: safeGetStorage('hp_sidebar_pos', "right"), // DEFAULT: RIGHT SIDE
     ssMediaType: safeGetStorage('hp_ss_mtype', "photo"), // photo, youtube, video
     ssYoutubeId: safeGetStorage('hp_ss_ytid', "L_LUpnjgPso"),
     ssVideoUrl: safeGetStorage('hp_ss_vurl', "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"),
     ssPhotoAnim: safeGetStorage('hp_ss_photo_anim', 'true') !== 'false',
-    ssWidgetOpacity: safeGetStorage('hp_ss_wopacity', "ultra"), // none, ultra, glass
-    ssWidgetType: safeGetStorage('hp_ss_wtype', "both"), // both, clock, calendar, none
-    ssPosition: safeGetStorage('hp_ss_pos', "center"), // center, top-left, top-right, etc.
+    ssWidgetOpacity: safeGetStorage('hp_ss_wopacity', "ultra"),
+    ssWidgetType: safeGetStorage('hp_ss_wtype', "both"),
+    ssPosition: safeGetStorage('hp_ss_pos', "center"),
     widgets: JSON.parse(safeGetStorage('hp_widgets', JSON.stringify({
         clock_digital: true,
         clock_analog: true,
@@ -173,25 +180,25 @@ let state = {
     currentEditingWidget: null
 };
 
-// URL Normalizer (Ensures TV services stay on HTTP to prevent SSL failures)
+// URL Normalizer (Keeps TV services on HTTP to prevent SSL failures on TV)
 function normalizeUrl(url) {
     if (!url) return '';
     url = url.trim();
 
     if (/filmix/i.test(url)) return 'http://filmix.tv';
-    if (/lampa\\.mx/i.test(url)) return 'http://lampa.mx';
-    if (/msx\\.benzac\\.de\\/plugins\\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
-    if (/msx\\.benzac\\.de\\/plugins\\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
-    if (/deeplex\\.cc/i.test(url)) return 'http://deeplex.cc';
-    if (/obovse\\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
+    if (/lampa\.mx/i.test(url)) return 'http://lampa.mx';
+    if (/msx\.benzac\.de\/plugins\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
+    if (/msx\.benzac\.de\/plugins\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
+    if (/deeplex\.cc/i.test(url)) return 'http://deeplex.cc';
+    if (/obovse\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
 
-    if (!/^https?:\\/\\//i.test(url)) {
+    if (!/^https?:\/\//i.test(url)) {
         return 'http://' + url;
     }
     return url;
 }
 
-// Auto-heal stored apps from localStorage
+// Auto-heal stored apps from localStorage (Filmix must be first)
 if (Array.isArray(state.apps)) {
     if (!state.apps.some(a => a && (a.id === 'app_filmix' || (a.name && a.name.toLowerCase() === 'filmix')))) {
         state.apps.unshift({
@@ -204,22 +211,13 @@ if (Array.isArray(state.apps)) {
             image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80"
         });
     }
-    let appsChanged = false;
     state.apps.forEach(app => {
         if (!app || !app.url) return;
-        const normalized = normalizeUrl(app.url);
-        if (normalized !== app.url) {
-            app.url = normalized;
-            appsChanged = true;
-        }
+        app.url = normalizeUrl(app.url);
     });
-    if (appsChanged) {
-        try {
-            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-        } catch (e) {}
-    }
 }
 
+// Dismiss app transition loader on page show
 window.addEventListener('pageshow', () => {
     const loader = document.getElementById('appNavLoader');
     if (loader) loader.classList.remove('active');
@@ -253,13 +251,14 @@ function applySidebarPosition() {
     const shell = document.getElementById('tvShell');
     if (!shell) return;
     shell.classList.toggle('sidebar-right', state.sidebarPos === 'right');
+    shell.classList.toggle('sidebar-left', state.sidebarPos === 'left');
     try {
         localStorage.setItem('hp_sidebar_pos', state.sidebarPos);
     } catch (e) {}
 }
 
 // ---------------------------------------------------------------------------
-// 2. COLLAPSIBLE SIDEBAR & TAB SWITCHING
+// 2. SIDEBAR NAVIGATION & TAB SWITCHING
 // ---------------------------------------------------------------------------
 const bgWallpaper = document.getElementById('bgWallpaper');
 const tvSidebar = document.getElementById('tvSidebar');
@@ -270,11 +269,6 @@ const tabPanes = {
     settings: document.getElementById('tabSettings'),
     info: document.getElementById('tabInfo')
 };
-
-function expandSidebar(expand) {
-    if (!tvSidebar) return;
-    tvSidebar.classList.toggle('collapsed', !expand);
-}
 
 function focusCurrentTabContent() {
     setTimeout(() => {
@@ -291,7 +285,7 @@ function focusCurrentTabContent() {
             const firstInfo = document.querySelector('.info-card');
             if (firstInfo) firstInfo.focus();
         }
-    }, 100);
+    }, 60);
 }
 
 function switchTab(tabId) {
@@ -299,30 +293,25 @@ function switchTab(tabId) {
     state.activeTab = tabId;
 
     menuTabs.forEach(tab => {
-        tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+        const isActive = tab.getAttribute('data-tab') === tabId;
+        tab.classList.toggle('active', isActive);
     });
 
     Object.keys(tabPanes).forEach(k => {
-        if (tabPanes[k]) {
-            tabPanes[k].classList.toggle('active', k === tabId);
-        }
+        if (tabPanes[k]) tabPanes[k].classList.toggle('active', k === tabId);
     });
 
-    const bgUrl = SECTION_WALLPAPERS[tabId] || SECTION_WALLPAPERS.widgets;
-    if (bgWallpaper) {
-        bgWallpaper.style.backgroundImage = `url('${bgUrl}')`;
+    if (bgWallpaper && SECTION_WALLPAPERS[tabId]) {
+        bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS[tabId]}')`;
     }
 }
 
+// Wire menu tab clicks and Enter keys
 menuTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+        e.preventDefault();
         const target = tab.getAttribute('data-tab');
         switchTab(target);
-        expandSidebar(false);
-        focusCurrentTabContent();
-    });
-    tab.addEventListener('focus', () => {
-        expandSidebar(true);
     });
 });
 
@@ -419,22 +408,18 @@ requestAnimationFrame(clockLoop);
 // ---------------------------------------------------------------------------
 function renderCalendars() {
     const calCells = document.getElementById('calCellsGrid');
-    const calMonthName = document.getElementById('calMonthName');
     const ssCalGrid = document.getElementById('ssCalGrid');
+    const calMonthHeader = document.getElementById('calMonthName');
     const ssCalHeader = document.getElementById('ssCalHeader');
 
     const now = new Date();
     const curYear = now.getFullYear();
     const curMonth = now.getMonth();
-    const today = now.getDate();
+    const curDate = now.getDate();
 
-    const monthNames = [
-        "ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ",
-        "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"
-    ];
+    const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
     const monthTitle = `${monthNames[curMonth]} ${curYear}`;
-
-    if (calMonthName) calMonthName.textContent = monthTitle;
+    if (calMonthHeader) calMonthHeader.textContent = monthTitle;
     if (ssCalHeader) ssCalHeader.textContent = monthTitle;
 
     const firstDay = new Date(curYear, curMonth, 1).getDay();
@@ -446,23 +431,25 @@ function renderCalendars() {
         gridElement.innerHTML = '';
 
         for (let i = 0; i < startOffset; i++) {
-            const empty = document.createElement('div');
-            empty.className = 'cell empty';
-            gridElement.appendChild(empty);
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'cell empty';
+            gridElement.appendChild(emptyCell);
         }
 
         for (let d = 1; d <= totalDays; d++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.textContent = d;
+            cell.textContent = String(d);
 
             const dayOfWeek = (startOffset + d - 1) % 7;
             if (dayOfWeek === 5 || dayOfWeek === 6) {
                 cell.classList.add('we');
             }
-            if (d === today) {
+
+            if (d === curDate) {
                 cell.classList.add('today');
             }
+
             gridElement.appendChild(cell);
         }
     }
@@ -504,49 +491,61 @@ function applyWidgetSizesAndToggles() {
 }
 applyWidgetSizesAndToggles();
 
+// Make widgets clickable to open their configuration in Settings
+Object.keys(widgetElements).forEach(key => {
+    const el = widgetElements[key];
+    if (el) {
+        el.addEventListener('click', () => {
+            switchTab('settings');
+            const subWidgetBtn = document.querySelector('.subtab-btn[data-subtab="widgets"]');
+            if (subWidgetBtn) subWidgetBtn.click();
+            openWidgetDetail(key);
+        });
+    }
+});
+
 // ---------------------------------------------------------------------------
-// 6. SETTINGS SUBTABS & CONTROLLERS
+// 6. SETTINGS SUBTABS & CUSTOMIZATION
 // ---------------------------------------------------------------------------
 const subtabBtns = document.querySelectorAll('.subtab-btn');
 const subpanes = {
-    'sub-appearance': document.getElementById('sub-appearance'),
-    'sub-widgets': document.getElementById('sub-widgets'),
-    'sub-apps': document.getElementById('sub-apps'),
-    'sub-screensaver': document.getElementById('sub-screensaver')
+    appearance: document.getElementById('sub-appearance'),
+    widgets: document.getElementById('sub-widgets'),
+    apps: document.getElementById('sub-apps'),
+    screensaver: document.getElementById('sub-screensaver')
 };
 
 subtabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         subtabBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const target = btn.getAttribute('data-subtab');
         Object.keys(subpanes).forEach(k => {
             if (subpanes[k]) subpanes[k].classList.toggle('active', k === target);
         });
-
-        if (target === 'sub-widgets') {
-            showWidgetsListView();
-        }
     });
 });
 
-// Color Swatches
-const colorSwatchBtns = document.querySelectorAll('.color-swatch-btn');
-colorSwatchBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        colorSwatchBtns.forEach(b => b.classList.remove('active'));
+// Accent Color Swatches
+const colorSwatches = document.querySelectorAll('.color-swatch-btn');
+colorSwatches.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        colorSwatches.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.themeColor = btn.getAttribute('data-color');
         state.themeRgb = btn.getAttribute('data-rgb');
         applyThemeSettings();
     });
 });
-colorSwatchBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-color') === state.themeColor));
+colorSwatches.forEach(b => b.classList.toggle('active', b.getAttribute('data-color') === state.themeColor));
 
 // Transparency Modes
 const transBtns = document.querySelectorAll('.trans-option-btn');
 transBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         transBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.transparency = btn.getAttribute('data-trans');
@@ -558,7 +557,8 @@ transBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-trans')
 // Sidebar Position Selector
 const sidebarPosBtns = document.querySelectorAll('.sidebar-pos-btn');
 sidebarPosBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         sidebarPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.sidebarPos = btn.getAttribute('data-pos') || 'right';
@@ -570,7 +570,8 @@ sidebarPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-po
 // Animation Modes
 const animBtns = document.querySelectorAll('.anim-option-btn');
 animBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         animBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.animations = btn.getAttribute('data-anim');
@@ -587,22 +588,14 @@ const widgetDetailView = document.getElementById('widgetDetailView');
 const widgetsManageGrid = document.getElementById('widgetsManageGrid');
 const btnBackToWidgetsList = document.getElementById('btnBackToWidgetsList');
 
+const detailWidgetIcon = document.getElementById('detailWidgetIcon');
+const detailWidgetBadge = document.getElementById('detailWidgetBadge');
 const detailWidgetTitle = document.getElementById('detailWidgetTitle');
 const detailWidgetDesc = document.getElementById('detailWidgetDesc');
-const detailWidgetBadge = document.getElementById('detailWidgetBadge');
-const detailWidgetIcon = document.getElementById('detailWidgetIcon');
 const detailTogglePill = document.getElementById('detailTogglePill');
-const detailToggleLabel = document.getElementById('detailToggleLabel');
 const detailToggleCheck = document.getElementById('detailToggleCheck');
-const bentoSizeCards = document.querySelectorAll('.bento-size-card');
+const detailSizeCards = document.querySelectorAll('.bento-size-card');
 const btnSaveWidgetDetail = document.getElementById('btnSaveWidgetDetail');
-
-function formatSizeText(size) {
-    if (size === 1) return '1 ячейка (1×1)';
-    if (size === 2) return '2 ячейки (2×1 • По горизонтали)';
-    if (size === 4) return '4 ячейки (2×2 • 2 по верт. и 2 по гор.)';
-    return `${size} ячейки`;
-}
 
 function renderWidgetsManageGrid() {
     if (!widgetsManageGrid) return;
@@ -614,113 +607,118 @@ function renderWidgetsManageGrid() {
         const curSize = state.widgetSizes[key] || meta.defaultSize;
 
         const card = document.createElement('div');
-        card.className = 'widget-card-manage';
-        card.tabIndex = 0;
+        card.className = `widget-card-manage ${isEnabled ? 'is-enabled' : 'is-disabled'}`;
+        card.setAttribute('tabindex', '0');
+
         card.innerHTML = `
-            <div class="wcm-left">
+            <div class="wcm-header">
                 <span class="material-icons wcm-icon">${meta.icon}</span>
-                <div>
-                    <span class="wcm-title">${meta.title}</span>
-                    <span class="wcm-size-badge">${isEnabled ? 'Включен' : 'Выключен'} • ${formatSizeText(curSize)}</span>
-                </div>
+                <span class="wcm-status-pill ${isEnabled ? 'pill-active' : 'pill-inactive'}">
+                    ${isEnabled ? 'Активен' : 'Скрыт'}
+                </span>
             </div>
-            <button class="btn-manage-cfg" tabindex="0">
-                <span class="material-icons" style="font-size: 16px;">tune</span>
-                <span>Настроить</span>
-            </button>
+            <div class="wcm-body">
+                <h4 class="wcm-title">${meta.name}</h4>
+                <p class="wcm-desc">${meta.desc}</p>
+            </div>
+            <div class="wcm-footer">
+                <span class="wcm-size-badge">${curSize === 1 ? '1 ячейка (1x1)' : (curSize === 2 ? '2 ячейки (2x1)' : '4 ячейки (2x2)')}</span>
+                <button class="btn-manage-cfg" tabindex="0">⚙ Настроить</button>
+            </div>
         `;
 
-        card.addEventListener('click', () => openWidgetDetail(key));
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-                openWidgetDetail(key);
-            }
-        });
+        const openHandler = (e) => {
+            e.preventDefault();
+            openWidgetDetail(key);
+        };
+
+        card.addEventListener('click', openHandler);
+        const cfgBtn = card.querySelector('.btn-manage-cfg');
+        if (cfgBtn) cfgBtn.addEventListener('click', openHandler);
 
         widgetsManageGrid.appendChild(card);
     });
 }
 
-function showWidgetsListView() {
-    if (widgetsListView) widgetsListView.style.display = 'block';
-    if (widgetDetailView) widgetDetailView.style.display = 'none';
-    renderWidgetsManageGrid();
-}
-
-function openWidgetDetail(key) {
-    state.currentEditingWidget = key;
-    const meta = WIDGETS_METADATA[key];
+function openWidgetDetail(widgetKey) {
+    state.currentEditingWidget = widgetKey;
+    const meta = WIDGETS_METADATA[widgetKey];
     if (!meta) return;
+
+    if (detailWidgetIcon) detailWidgetIcon.textContent = meta.icon;
+    if (detailWidgetBadge) detailWidgetBadge.textContent = widgetKey.toUpperCase();
+    if (detailWidgetTitle) detailWidgetTitle.textContent = meta.name;
+    if (detailWidgetDesc) detailWidgetDesc.textContent = meta.desc;
+
+    const isEnabled = !!state.widgets[widgetKey];
+    if (detailTogglePill) {
+        detailTogglePill.classList.toggle('checked', isEnabled);
+        if (detailToggleCheck) detailToggleCheck.textContent = isEnabled ? '✓' : '✕';
+    }
+
+    const currentSize = state.widgetSizes[widgetKey] || meta.defaultSize;
+    detailSizeCards.forEach(c => {
+        const sz = parseInt(c.getAttribute('data-size'), 10);
+        c.classList.toggle('selected', sz === currentSize);
+    });
 
     if (widgetsListView) widgetsListView.style.display = 'none';
     if (widgetDetailView) widgetDetailView.style.display = 'block';
 
-    if (detailWidgetTitle) detailWidgetTitle.textContent = `Настройка: ${meta.title}`;
-    if (detailWidgetDesc) detailWidgetDesc.textContent = meta.desc;
-    if (detailWidgetBadge) detailWidgetBadge.textContent = key.toUpperCase();
-    if (detailWidgetIcon) detailWidgetIcon.textContent = meta.icon;
-
-    updateDetailToggleUI();
-    updateDetailSizeUI();
-
-    if (btnBackToWidgetsList) {
-        btnBackToWidgetsList.focus();
-    }
+    if (detailTogglePill) detailTogglePill.focus();
 }
 
-function updateDetailToggleUI() {
-    const key = state.currentEditingWidget;
-    if (!key) return;
-    const isChecked = !!state.widgets[key];
-    if (detailTogglePill) detailTogglePill.classList.toggle('checked', isChecked);
-    if (detailToggleCheck) detailToggleCheck.textContent = isChecked ? '✓' : '—';
-    if (detailToggleLabel) detailToggleLabel.textContent = isChecked ? 'Виджет включен в сетке' : 'Виджет выключен (скрыт)';
+function showWidgetsListView() {
+    if (widgetDetailView) widgetDetailView.style.display = 'none';
+    if (widgetsListView) widgetsListView.style.display = 'block';
+    renderWidgetsManageGrid();
 }
 
-function updateDetailSizeUI() {
-    const key = state.currentEditingWidget;
-    if (!key) return;
-    const curSize = state.widgetSizes[key] || 2;
-    bentoSizeCards.forEach(card => {
-        const sizeVal = parseInt(card.getAttribute('data-size'), 10);
-        card.classList.toggle('active', sizeVal === curSize);
+if (btnBackToWidgetsList) {
+    btnBackToWidgetsList.addEventListener('click', (e) => {
+        e.preventDefault();
+        showWidgetsListView();
     });
 }
 
 if (detailTogglePill) {
-    detailTogglePill.addEventListener('click', () => {
-        const key = state.currentEditingWidget;
-        if (!key) return;
-        state.widgets[key] = !state.widgets[key];
-        updateDetailToggleUI();
-        applyWidgetSizesAndToggles();
+    detailTogglePill.addEventListener('click', (e) => {
+        e.preventDefault();
+        detailTogglePill.classList.toggle('checked');
+        const isChecked = detailTogglePill.classList.contains('checked');
+        if (detailToggleCheck) detailToggleCheck.textContent = isChecked ? '✓' : '✕';
     });
 }
 
-bentoSizeCards.forEach(card => {
-    card.addEventListener('click', () => {
-        const key = state.currentEditingWidget;
-        if (!key) return;
-        const sizeVal = parseInt(card.getAttribute('data-size'), 10);
-        state.widgetSizes[key] = sizeVal;
-        updateDetailSizeUI();
-        applyWidgetSizesAndToggles();
+detailSizeCards.forEach(card => {
+    card.addEventListener('click', (e) => {
+        e.preventDefault();
+        detailSizeCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
     });
 });
 
-if (btnBackToWidgetsList) {
-    btnBackToWidgetsList.addEventListener('click', () => {
-        showWidgetsListView();
-    });
-}
-
 if (btnSaveWidgetDetail) {
-    btnSaveWidgetDetail.addEventListener('click', () => {
+    btnSaveWidgetDetail.addEventListener('click', (e) => {
+        e.preventDefault();
+        const key = state.currentEditingWidget;
+        if (!key) return;
+
+        const isChecked = detailTogglePill ? detailTogglePill.classList.contains('checked') : true;
+        state.widgets[key] = isChecked;
+
+        let selectedSize = 2;
+        detailSizeCards.forEach(c => {
+            if (c.classList.contains('selected')) {
+                selectedSize = parseInt(c.getAttribute('data-size'), 10);
+            }
+        });
+        state.widgetSizes[key] = selectedSize;
+
+        applyWidgetSizesAndToggles();
         showWidgetsListView();
     });
 }
-
 renderWidgetsManageGrid();
 
 // ---------------------------------------------------------------------------
@@ -769,12 +767,9 @@ function renderApps() {
                 <div class="app-card-name">${app.name}</div>
             `;
 
-            card.addEventListener('click', () => openApp(app));
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.keyCode === 13) {
-                    e.preventDefault();
-                    openApp(app);
-                }
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                openApp(app);
             });
 
             appsGrid.appendChild(card);
@@ -792,11 +787,12 @@ function renderApps() {
             `;
             const delBtn = item.querySelector('.btn-del-app');
             if (delBtn) {
-                delBtn.addEventListener('click', () => {
+                delBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     state.apps.splice(index, 1);
                     try {
                         localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-                    } catch (e) {}
+                    } catch (err) {}
                     renderApps();
                 });
             }
@@ -813,7 +809,8 @@ const inputAppUrl = document.getElementById('inputAppUrl');
 const selectAppIcon = document.getElementById('selectAppIcon');
 
 if (btnSaveApp && inputAppName && inputAppUrl) {
-    btnSaveApp.addEventListener('click', () => {
+    btnSaveApp.addEventListener('click', (e) => {
+        e.preventDefault();
         const name = inputAppName.value.trim();
         const url = normalizeUrl(inputAppUrl.value.trim());
         const icon = selectAppIcon ? selectAppIcon.value : 'launch';
@@ -835,18 +832,19 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
 
         try {
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-        } catch (e) {}
+        } catch (err) {}
         inputAppName.value = '';
         inputAppUrl.value = '';
         renderApps();
-        alert(`Программа «${name}» успешно добавлена!`);
+        alert('Программа добавлена в каталог!');
     });
 }
 
 // Preset Quick Add Buttons
 const presetBtns = document.querySelectorAll('.preset-btn');
 presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         const name = btn.getAttribute('data-name');
         const url = normalizeUrl(btn.getAttribute('data-url'));
         const icon = btn.getAttribute('data-icon') || 'launch';
@@ -863,11 +861,11 @@ presetBtns.forEach(btn => {
             });
             try {
                 localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-            } catch (e) {}
+            } catch (err) {}
             renderApps();
             alert(`Программа «${name}» добавлена!`);
         } else {
-            alert(`Программа «${name}» уже есть в списке.`);
+            alert(`Программа «${name}» уже установлена.`);
         }
     });
 });
@@ -875,11 +873,12 @@ presetBtns.forEach(btn => {
 // Reset Apps Button
 const btnResetDefaultApps = document.getElementById('btnResetDefaultApps');
 if (btnResetDefaultApps) {
-    btnResetDefaultApps.addEventListener('click', () => {
+    btnResetDefaultApps.addEventListener('click', (e) => {
+        e.preventDefault();
         state.apps = JSON.parse(JSON.stringify(DEFAULT_APPS_LIST));
         try {
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-        } catch (e) {}
+        } catch (err) {}
         renderApps();
         alert('Список программ сброшен к стандартному.');
     });
@@ -888,13 +887,17 @@ if (btnResetDefaultApps) {
 // Restart Portal Button
 const restartPortalBtn = document.getElementById('restartPortalBtn');
 if (restartPortalBtn) {
-    restartPortalBtn.addEventListener('click', () => {
+    restartPortalBtn.addEventListener('click', (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         window.location.reload();
     });
 }
 
 // ---------------------------------------------------------------------------
-// 9. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
+// 9. UNIVERSAL SMART TV REMOTE NAVIGATION & ENTER/OK HANDLERS
 // ---------------------------------------------------------------------------
 function handleTvBackButton(e) {
     if (e) {
@@ -912,8 +915,6 @@ function handleTvBackButton(e) {
     if (screensaver && screensaver.classList.contains('active')) {
         hideScreensaver();
         switchTab('widgets');
-        expandSidebar(false);
-        focusCurrentTabContent();
         return true;
     }
 
@@ -924,12 +925,10 @@ function handleTvBackButton(e) {
 
     if (state.activeTab !== 'widgets') {
         switchTab('widgets');
-        expandSidebar(false);
         focusCurrentTabContent();
         return true;
     }
 
-    expandSidebar(false);
     return true;
 }
 
@@ -948,23 +947,56 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    // Sidebar D-pad navigation
+    // Screensaver dismiss on any keypress (with debounce guard)
+    const screensaver = document.getElementById('screensaverLayer');
+    if (screensaver && screensaver.classList.contains('active')) {
+        if (Date.now() - ssOpenedTimestamp > 400) {
+            e.preventDefault();
+            hideScreensaver();
+            switchTab('widgets');
+        }
+        return;
+    }
+
+    // Global Enter / OK key execution for any focused interactive element
+    if (e.key === 'Enter' || keyCode === 13) {
+        const active = document.activeElement;
+        if (active && active !== document.body) {
+            e.preventDefault();
+            active.click();
+            return;
+        }
+    }
+
+    // Spatial D-Pad Navigation for Right-Hand Sidebar
     const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
 
-    if (e.key === 'ArrowRight' && inSidebar) {
-        e.preventDefault();
-        expandSidebar(false);
-        focusCurrentTabContent();
-    } else if (e.key === 'ArrowLeft' && !inSidebar && !document.getElementById('screensaverLayer')?.classList.contains('active')) {
-        const activeEl = document.activeElement;
-        const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
-        const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === document.getElementById('widgetsWrapper')?.firstElementChild;
+    if (inSidebar) {
+        const sidebarItems = Array.from(tvSidebar.querySelectorAll('.menu-tab, .quick-screensaver-btn, .quick-restart-btn'));
+        const currentIndex = sidebarItems.indexOf(document.activeElement);
 
-        if (isFirstAppCard || isFirstWidget || activeEl === document.body || !activeEl) {
+        if (e.key === 'ArrowDown') {
+            if (currentIndex !== -1 && currentIndex < sidebarItems.length - 1) {
+                e.preventDefault();
+                sidebarItems[currentIndex + 1].focus();
+            }
+        } else if (e.key === 'ArrowUp') {
+            if (currentIndex > 0) {
+                e.preventDefault();
+                sidebarItems[currentIndex - 1].focus();
+            }
+        } else if (e.key === 'ArrowLeft') {
             e.preventDefault();
-            expandSidebar(true);
-            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`);
-            if (activeTabBtn) activeTabBtn.focus();
+            focusCurrentTabContent();
+        }
+    } else {
+        // In main content stage (on the left): ArrowRight moves INTO the right sidebar
+        if (e.key === 'ArrowRight') {
+            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`) || document.querySelector('.menu-tab');
+            if (activeTabBtn) {
+                e.preventDefault();
+                activeTabBtn.focus();
+            }
         }
     }
 });
@@ -1010,7 +1042,7 @@ function extractYouTubeId(urlOrId) {
     if (!urlOrId) return '';
     const trimmed = urlOrId.trim();
     if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
-    const match = trimmed.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))([\\w-]{11})/i);
+    const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
     return match ? match[1] : trimmed;
 }
 
@@ -1028,6 +1060,7 @@ function applyScreensaverWidgetOpacity() {
 function showScreensaver() {
     if (!screensaverLayer) return;
 
+    ssOpenedTimestamp = Date.now();
     applyScreensaverLayout();
     applyScreensaverWidgetOpacity();
 
@@ -1036,7 +1069,6 @@ function showScreensaver() {
     const ssBgYoutubeWrap = document.getElementById('ssBgYoutubeWrap');
     const ssBgYoutubeIframe = document.getElementById('ssBgYoutubeIframe');
 
-    // Reset media layers
     if (ssBgImage) ssBgImage.style.display = 'none';
     if (ssBgVideo) {
         ssBgVideo.style.display = 'none';
@@ -1051,7 +1083,7 @@ function showScreensaver() {
         const ytId = extractYouTubeId(state.ssYoutubeId || 'L_LUpnjgPso');
         if (ssBgYoutubeWrap && ssBgYoutubeIframe) {
             ssBgYoutubeWrap.style.display = 'block';
-            ssBgYoutubeIframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1`;
+            ssBgYoutubeIframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&playsinline=1&modestbranding=1&rel=0&disablekb=1&enablejsapi=1`;
         }
     } else if (state.ssMediaType === 'video') {
         if (ssBgVideo) {
@@ -1060,7 +1092,6 @@ function showScreensaver() {
             ssBgVideo.play().catch(() => {});
         }
     } else {
-        // Photo mode
         if (ssBgImage) {
             ssBgImage.style.display = 'block';
             ssBgImage.classList.toggle('animated', !!state.ssPhotoAnim);
@@ -1083,8 +1114,6 @@ function showScreensaver() {
     }
 
     screensaverLayer.classList.add('active');
-    updateClocks();
-    renderCalendars();
 }
 
 function hideScreensaver() {
@@ -1109,6 +1138,7 @@ function hideScreensaver() {
         clearInterval(ssSlideshowInterval);
         ssSlideshowInterval = null;
     }
+
     resetIdleTimer();
 }
 
@@ -1121,11 +1151,14 @@ function resetIdleTimer() {
     }
 }
 
-// Any key or movement dismisses screensaver or resets idle timer
-['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
-    window.addEventListener(evt, () => {
+// User activity listener for idle timer & screensaver dismissal
+['mousemove', 'click', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, (e) => {
         if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-            hideScreensaver();
+            if (Date.now() - ssOpenedTimestamp > 400) {
+                hideScreensaver();
+                switchTab('widgets');
+            }
         } else {
             resetIdleTimer();
         }
@@ -1133,17 +1166,25 @@ function resetIdleTimer() {
 });
 resetIdleTimer();
 
-// Manual screensaver triggers
+// Manual screensaver triggers (with stopPropagation to prevent instant self-closing)
 const startScreensaverBtn = document.getElementById('startScreensaverBtn');
 if (startScreensaverBtn) {
-    startScreensaverBtn.addEventListener('click', () => {
+    startScreensaverBtn.addEventListener('click', (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         showScreensaver();
     });
 }
 
 const btnTestScreensaver = document.getElementById('btnTestScreensaver');
 if (btnTestScreensaver) {
-    btnTestScreensaver.addEventListener('click', () => {
+    btnTestScreensaver.addEventListener('click', (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         showScreensaver();
     });
 }
@@ -1151,13 +1192,14 @@ if (btnTestScreensaver) {
 // Screensaver Wallpaper Picker
 const ssThumbCards = document.querySelectorAll('.ss-thumb-card');
 ssThumbCards.forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+        e.preventDefault();
         ssThumbCards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         state.screensaverBg = card.getAttribute('data-id');
         try {
             localStorage.setItem('hp_ss_bg', state.screensaverBg);
-        } catch (e) {}
+        } catch (err) {}
     });
 });
 ssThumbCards.forEach(card => {
@@ -1167,13 +1209,14 @@ ssThumbCards.forEach(card => {
 // Timeout selector buttons
 const timeoutBtns = document.querySelectorAll('.timeout-btn');
 timeoutBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         timeoutBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.idleTimeoutSec = parseInt(btn.getAttribute('data-time'), 10);
         try {
             localStorage.setItem('hp_idle_sec', String(state.idleTimeoutSec));
-        } catch (e) {}
+        } catch (err) {}
         resetIdleTimer();
     });
 });
@@ -1182,13 +1225,14 @@ timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('d
 // Screensaver Widget Type Selector
 const ssWTypeBtns = document.querySelectorAll('.ss-wtype-btn');
 ssWTypeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         ssWTypeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssWidgetType = btn.getAttribute('data-wtype');
         try {
             localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
-        } catch (e) {}
+        } catch (err) {}
         applyScreensaverLayout();
     });
 });
@@ -1197,13 +1241,14 @@ ssWTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-wtype
 // Screensaver Position Selector
 const ssPosBtns = document.querySelectorAll('.ss-pos-btn');
 ssPosBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         ssPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPosition = btn.getAttribute('data-pos');
         try {
             localStorage.setItem('hp_ss_pos', state.ssPosition);
-        } catch (e) {}
+        } catch (err) {}
         applyScreensaverLayout();
     });
 });
@@ -1212,13 +1257,14 @@ ssPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') =
 // Screensaver Media Type Selector (Photo / YouTube / Video)
 const ssMediaBtns = document.querySelectorAll('.ss-media-btn');
 ssMediaBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         ssMediaBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssMediaType = btn.getAttribute('data-media') || 'photo';
         try {
             localStorage.setItem('hp_ss_mtype', state.ssMediaType);
-        } catch (e) {}
+        } catch (err) {}
     });
 });
 ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
@@ -1226,13 +1272,14 @@ ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media
 // Screensaver Photo Animation Toggle (Ken Burns on/off)
 const ssAnimBtns = document.querySelectorAll('.ss-anim-btn');
 ssAnimBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         ssAnimBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPhotoAnim = btn.getAttribute('data-anim') === 'on';
         try {
             localStorage.setItem('hp_ss_photo_anim', String(state.ssPhotoAnim));
-        } catch (e) {}
+        } catch (err) {}
     });
 });
 ssAnimBtns.forEach(b => b.classList.toggle('active', (b.getAttribute('data-anim') === 'on') === !!state.ssPhotoAnim));
@@ -1240,7 +1287,8 @@ ssAnimBtns.forEach(b => b.classList.toggle('active', (b.getAttribute('data-anim'
 // Screensaver Video Presets (Fireplace, Aquarium, Ocean)
 const ssVpresetBtns = document.querySelectorAll('.ss-vpreset-btn');
 ssVpresetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         ssVpresetBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
@@ -1253,14 +1301,14 @@ ssVpresetBtns.forEach(btn => {
             try {
                 localStorage.setItem('hp_ss_mtype', 'youtube');
                 localStorage.setItem('hp_ss_ytid', state.ssYoutubeId);
-            } catch (e) {}
+            } catch (err) {}
         } else if (vtype === 'video') {
             state.ssMediaType = 'video';
             state.ssVideoUrl = vval;
             try {
                 localStorage.setItem('hp_ss_mtype', 'video');
                 localStorage.setItem('hp_ss_vurl', state.ssVideoUrl);
-            } catch (e) {}
+            } catch (err) {}
         }
 
         ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
@@ -1268,28 +1316,29 @@ ssVpresetBtns.forEach(btn => {
     });
 });
 
-// Custom YouTube / Video URL Input
-const inputCustomVideo = document.getElementById('inputCustomVideo');
+// Custom Video Input
 const btnApplyCustomVideo = document.getElementById('btnApplyCustomVideo');
+const inputCustomVideo = document.getElementById('inputCustomVideo');
 if (btnApplyCustomVideo && inputCustomVideo) {
-    btnApplyCustomVideo.addEventListener('click', () => {
+    btnApplyCustomVideo.addEventListener('click', (e) => {
+        e.preventDefault();
         const val = inputCustomVideo.value.trim();
         if (!val) {
-            alert('Пожалуйста, введите ссылку на YouTube или MP4.');
+            alert('Введите ссылку на видео (MP4) или YouTube');
             return;
         }
 
-        if (/\\.(mp4|webm|m3u8)(\\?.*)?$/i.test(val)) {
+        if (/\.(mp4|webm|m3u8)(\?.*)?$/i.test(val)) {
             state.ssMediaType = 'video';
             state.ssVideoUrl = val;
             try {
                 localStorage.setItem('hp_ss_mtype', 'video');
                 localStorage.setItem('hp_ss_vurl', val);
-            } catch (e) {}
+            } catch (err) {}
         } else {
             const ytId = extractYouTubeId(val);
             if (!ytId) {
-                alert('Не удалось распознать ссылку на YouTube.');
+                alert('Не удалось распознать ссылку на YouTube или MP4.');
                 return;
             }
             state.ssMediaType = 'youtube';
@@ -1297,7 +1346,7 @@ if (btnApplyCustomVideo && inputCustomVideo) {
             try {
                 localStorage.setItem('hp_ss_mtype', 'youtube');
                 localStorage.setItem('hp_ss_ytid', ytId);
-            } catch (e) {}
+            } catch (err) {}
         }
 
         ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
@@ -1305,13 +1354,14 @@ if (btnApplyCustomVideo && inputCustomVideo) {
     });
 }
 
-// Screensaver Widget Transparency Selector
+// Screensaver Opacity Selector
 const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
 ssOpacityBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         ssOpacityBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.ssWidgetOpacity = btn.getAttribute('data-opacity') || 'ultra';
+        state.ssWidgetOpacity = btn.getAttribute('data-opacity');
         applyScreensaverWidgetOpacity();
     });
 });
@@ -1364,7 +1414,25 @@ if (canvas) {
     renderParticles();
 }
 
-// Initial initialization calls
-applyThemeSettings();
-applySidebarPosition();
-switchTab(state.activeTab);
+// ---------------------------------------------------------------------------
+// 11. INITIALIZATION & INITIAL FOCUS ON LOAD
+// ---------------------------------------------------------------------------
+function initApp() {
+    applyThemeSettings();
+    applySidebarPosition();
+    switchTab(state.activeTab || 'widgets');
+
+    // CRITICAL FOR SMART TV: Set initial focus to active tab so remote control has anchor!
+    setTimeout(() => {
+        const activeTabBtn = document.querySelector('.menu-tab.active') || document.querySelector('.menu-tab');
+        if (activeTabBtn) {
+            activeTabBtn.focus();
+        }
+    }, 150);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
