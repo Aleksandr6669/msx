@@ -121,8 +121,8 @@ def add_cors_headers(response):
 # ---------------------------------------------------------------------------
 # MEDIA STATION X ENTRYPOINT
 # When user enters <domain> into MSX, MSX automatically fetches /msx/start.json.
-# MSX strictly requires parameter to start with 'menu:' or 'content:'.
-# Our menu.json provides the 4 clean sections and immediately executes link: on start!
+# We use content:...>index:0>execute to pass MSX validation while immediately
+# executing the link: action on startup, launching our main HTML5 portal directly!
 # ---------------------------------------------------------------------------
 
 @app.route('/msx/start.json')
@@ -131,13 +131,44 @@ def msx_start():
     base_url = get_base_url()
     return jsonify({
         "name": "MX Station Portal",
-        "version": "2.3.0",
-        "parameter": f"menu:{base_url}/menu.json",
+        "version": "2.4.0",
+        "parameter": f"content:{base_url}/content.json>index:0>execute",
         "background": SECTION_WALLPAPERS["widgets"],
         "logo": f"{base_url}/static/images/logo.svg"
     })
 
-# MSX Menu Mode
+# Content endpoint with auto-execution to immediately launch main screen
+@app.route('/content.json')
+@app.route('/msx/content.json')
+def msx_content():
+    base_url = get_base_url()
+    return jsonify({
+        "type": "pages",
+        "headline": "MX STATION PLAYER",
+        "background": SECTION_WALLPAPERS["widgets"],
+        "color": "msx-glass",
+        "start": f"link:{base_url}/",
+        "ready": {
+            "action": f"link:{base_url}/"
+        },
+        "pages": [
+            {
+                "items": [
+                    {
+                        "id": "portal",
+                        "type": "default",
+                        "layout": "0,0,12,6",
+                        "color": "msx-glass",
+                        "icon": "dashboard",
+                        "title": "Главный экран MX Station",
+                        "action": f"link:{base_url}/"
+                    }
+                ]
+            }
+        ]
+    })
+
+# If opened via MSX menu mode
 @app.route('/menu.json')
 @app.route('/msx/menu.json')
 def msx_menu():
@@ -209,7 +240,7 @@ def web_index():
 
 if __name__ == '__main__':
     print("=" * 65)
-    print("  MX Station Player v2.3 — HTML5 Portal for Media Station X")
+    print("  MX Station Player v2.4 — HTML5 Portal for Media Station X")
     print("  В MSX на ТВ введите адрес:")
     print("  <IP_ЭТОГО_КОМПЬЮТЕРА>:5000")
     print("=" * 65)

@@ -1,28 +1,25 @@
 {
-   "name": "Додатки PWA",
-   "type": "pages",
-   "headline": "Додатки PWA",
-  "dictionary": "",
-
-   "template": {
-      "type": "separate",
-      "layout": "0,0,2,3",
-      "alignment":"title-center",
-      "color": "msx-glass"
-   },
-"items": [
-      {
-	"tag": "Filmix",
-	"title": "Filmix",
-         "image": "https://tvscreen-76019626-a9238.web.app/favicon.png",
-         "action": "link:https://tvscreen-76019626-a9238.web.app"
-          
-      },
-      {
-	"tag": "screen",
-	"title": " Заставка",
-        "image": "http://msx.lh1.in/msx/pic/dstore-2.jpg",
-        "action": "link:https://screen-tv.onrender.com/12345678"
-       }
-   ]
+  "type": "pages",
+  "headline": "MX STATION PLAYER",
+  "background": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
+  "color": "msx-glass",
+  "start": "link:{PREFIX}{SERVER}/",
+  "ready": {
+    "action": "link:{PREFIX}{SERVER}/"
+  },
+  "pages": [
+    {
+      "items": [
+        {
+          "id": "portal",
+          "type": "default",
+          "layout": "0,0,12,6",
+          "color": "msx-glass",
+          "icon": "dashboard",
+          "title": "Главный экран MX Station",
+          "action": "link:{PREFIX}{SERVER}/"
+        }
+      ]
+    }
+  ]
 }
