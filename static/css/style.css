@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOME PORTAL TV — MINIMALIST GLASS SMART TV UI
+   HOME PORTAL TV — MINIMALIST GLASS SMART TV UI (OPTIMIZED 60FPS)
    ========================================================================== */
 
 :root {
@@ -23,7 +23,7 @@
 }
 
 body.tv-mode {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-main);
     width: 100vw;
@@ -35,6 +35,7 @@ body.tv-mode {
 
 /* ==========================================================================
    SUPER-VISIBLE HIGH CONTRAST FOCUS INDICATOR (SMART TV ACCESSIBILITY)
+   Ultra-fast 80ms transitions to eliminate any TV lag/hang
    ========================================================================== */
 button:focus,
 [tabindex="0"]:focus,
@@ -49,6 +50,8 @@ button:focus,
 .trans-option-btn:focus,
 .anim-option-btn:focus,
 .timeout-btn:focus,
+.ss-wtype-btn:focus,
+.ss-pos-btn:focus,
 .preset-btn:focus,
 .btn-save-app:focus,
 .btn-del-app:focus,
@@ -56,16 +59,42 @@ button:focus,
 .btn-launch-big:focus,
 .ss-thumb-card:focus,
 .quick-screensaver-btn:focus,
-.quick-exit-msx-btn:focus,
-.btn-app-exit:focus,
-.btn-direct-link:focus,
+.quick-restart-btn:focus,
+.detail-back-btn:focus,
+.bento-size-card:focus,
+.widget-card-manage:focus,
+.btn-manage-cfg:focus,
 input:focus, select:focus {
     outline: 3px solid var(--accent-color) !important;
     outline-offset: 4px !important;
-    box-shadow: 0 0 0 2px var(--accent-color), 0 12px 35px rgba(var(--accent-rgb), 0.55) !important;
+    box-shadow: 0 0 0 2px var(--accent-color), 0 10px 28px rgba(var(--accent-rgb), 0.6) !important;
     border-color: var(--accent-color) !important;
     transform: scale(1.05) translateZ(0) !important;
-    z-index: 20 !important;
+    z-index: 25 !important;
+}
+
+/* Snappy transitions for 60fps (no lag on weak TV CPUs) */
+button,
+[tabindex="0"],
+.menu-tab,
+.app-card,
+.glass-widget,
+.action-btn,
+.subtab-btn,
+.toggle-pill,
+.size-btn,
+.color-swatch-btn,
+.trans-option-btn,
+.anim-option-btn,
+.timeout-btn,
+.ss-wtype-btn,
+.ss-pos-btn,
+.preset-btn,
+.ss-thumb-card,
+.bento-size-card,
+.widget-card-manage {
+    transition: transform 0.09s ease-out, border-color 0.09s ease-out, background-color 0.09s ease-out !important;
+    will-change: transform;
 }
 
 /* Fast / instant animation toggle */
@@ -82,14 +111,14 @@ body.anim-fast * {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: background-image 0.8s ease-in-out, opacity 0.8s ease;
+    transition: background-image 0.5s ease-out;
 }
 
 .ambient-vignette {
     position: fixed;
     inset: 0;
     z-index: 1;
-    background: radial-gradient(circle at center, rgba(5, 7, 14, 0.25) 0%, rgba(5, 7, 14, 0.82) 100%);
+    background: radial-gradient(circle at center, rgba(5, 7, 14, 0.25) 0%, rgba(5, 7, 14, 0.85) 100%);
     pointer-events: none;
 }
 
@@ -107,16 +136,16 @@ body.anim-fast * {
    ========================================================================== */
 .tv-sidebar {
     width: 280px;
-    background: rgba(10, 14, 26, 0.42);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    background: rgba(10, 14, 26, 0.45);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     padding: 24px 16px;
     flex-shrink: 0;
     box-shadow: 8px 0 35px rgba(0, 0, 0, 0.35);
-    transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: width 0.18s ease-out, padding 0.18s ease-out;
     overflow: hidden;
     z-index: 10;
 }
@@ -130,7 +159,7 @@ body.anim-fast * {
 .tv-sidebar.collapsed .tab-label,
 .tv-sidebar.collapsed .tab-badge,
 .tv-sidebar.collapsed .quick-screensaver-btn span:last-child,
-.tv-sidebar.collapsed .quick-exit-msx-btn span:last-child,
+.tv-sidebar.collapsed .quick-restart-btn span:last-child,
 .tv-sidebar.collapsed .sidebar-status span:last-child {
     display: none !important;
 }
@@ -146,7 +175,7 @@ body.anim-fast * {
 }
 
 .tv-sidebar.collapsed .quick-screensaver-btn,
-.tv-sidebar.collapsed .quick-exit-msx-btn {
+.tv-sidebar.collapsed .quick-restart-btn {
     justify-content: center;
     padding: 12px 0;
 }
@@ -209,7 +238,6 @@ body.anim-fast * {
     cursor: pointer;
     text-align: left;
     outline: none;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .menu-tab:hover, .menu-tab:focus {
@@ -260,10 +288,9 @@ body.anim-fast * {
     font-weight: 700;
     cursor: pointer;
     outline: none;
-    transition: all 0.22s ease;
 }
 
-.quick-exit-msx-btn {
+.quick-restart-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -278,7 +305,6 @@ body.anim-fast * {
     font-weight: 600;
     cursor: pointer;
     outline: none;
-    transition: all 0.22s ease;
 }
 
 .sidebar-status {
@@ -313,16 +339,10 @@ body.anim-fast * {
     display: none;
     flex-direction: column;
     flex-grow: 1;
-    animation: fadeIn 0.25s ease;
 }
 
 .tab-pane.active {
     display: flex;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .tab-header {
@@ -343,11 +363,6 @@ body.anim-fast * {
     color: var(--text-dim);
 }
 
-.header-actions {
-    display: flex;
-    gap: 12px;
-}
-
 .action-btn {
     display: inline-flex;
     align-items: center;
@@ -363,7 +378,6 @@ body.anim-fast * {
     font-weight: 600;
     cursor: pointer;
     outline: none;
-    transition: all 0.22s ease;
 }
 
 .action-primary {
@@ -374,10 +388,15 @@ body.anim-fast * {
 
 /* ==========================================================================
    MODULAR BENTO BOX GRID FOR WIDGETS
+   User-requested sizes:
+   1 cell = 1x1 (1 col, 1 row)
+   2 cells = 2x1 (2 cols horizontal, 1 row)
+   4 cells = 2x2 (2 cols horizontal, 2 rows vertical)
    ========================================================================== */
 .widgets-bento-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 175px;
     gap: 16px;
     width: 100%;
     grid-auto-flow: dense;
@@ -391,19 +410,54 @@ body.anim-fast * {
     border: 1px solid var(--glass-border);
     border-radius: 18px;
     padding: 16px 20px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
     outline: none;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 170px;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+    overflow: hidden;
 }
 
-/* Span classes */
-.glass-widget.span-1 { grid-column: span 1; }
-.glass-widget.span-2 { grid-column: span 2; }
-.glass-widget.span-4 { grid-column: span 4; }
+/* Span classes: 1x1, 2x1, 2x2 */
+.glass-widget.span-1 {
+    grid-column: span 1;
+    grid-row: span 1;
+    min-height: 175px;
+}
+
+.glass-widget.span-2 {
+    grid-column: span 2;
+    grid-row: span 1;
+    min-height: 175px;
+}
+
+.glass-widget.span-4 {
+    grid-column: span 2;
+    grid-row: span 2;
+    min-height: 366px; /* 175 + 175 + 16 */
+}
+
+/* Dynamic inside styling for 4-cell (2x2) mode */
+.glass-widget.span-4 .analog-face {
+    width: 195px;
+    height: 195px;
+}
+.glass-widget.span-4 .hour-hand { height: 50px; width: 4.5px; }
+.glass-widget.span-4 .min-hand  { height: 75px; width: 3px; }
+.glass-widget.span-4 .sec-hand  { height: 88px; width: 2px; }
+.glass-widget.span-4 .w-digital-time {
+    font-size: 4.5rem;
+}
+.glass-widget.span-4 .modern-time-val {
+    font-size: 4.5rem;
+}
+.glass-widget.span-4 .cal-cells .cell {
+    height: 38px;
+    font-size: 0.95rem;
+}
+.glass-widget.span-4 .compact-day-big {
+    font-size: 5rem;
+}
 
 /* Transparency Modes */
 body.trans-transparent .glass-widget {
@@ -422,17 +476,17 @@ body.trans-frosted .glass-widget {
 }
 
 body.trans-dark .glass-widget {
-    background: rgba(8, 12, 20, 0.72) !important;
+    background: rgba(8, 12, 20, 0.75) !important;
     backdrop-filter: blur(30px) !important;
     -webkit-backdrop-filter: blur(30px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
 }
 
 .w-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .w-icon {
@@ -469,7 +523,7 @@ body.trans-dark .glass-widget {
     align-items: baseline;
     gap: 4px;
     text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.35);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .w-digital-time .colon {
@@ -496,14 +550,14 @@ body.trans-dark .glass-widget {
 
 /* Analog Clock */
 .analog-face {
-    width: 125px;
-    height: 125px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.15);
     background: radial-gradient(circle at 35% 35%, rgba(30, 40, 70, 0.5) 0%, rgba(8, 12, 22, 0.85) 100%);
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 8px 20px rgba(0, 0, 0, 0.4);
     position: relative;
-    margin: 4px auto 8px auto;
+    margin: 2px auto 6px auto;
 }
 
 .face-numbers span {
@@ -598,7 +652,7 @@ body.trans-dark .glass-widget {
     font-size: 0.68rem;
     font-weight: 700;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .cal-days-head .we { color: #f87171; }
@@ -610,7 +664,7 @@ body.trans-dark .glass-widget {
 }
 
 .cal-cells .cell {
-    height: 26px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -659,7 +713,7 @@ body.trans-dark .glass-widget {
 .events-stack {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
 }
 
 .ev-item {
@@ -667,7 +721,7 @@ body.trans-dark .glass-widget {
     align-items: center;
     gap: 10px;
     background: rgba(255, 255, 255, 0.04);
-    padding: 7px 10px;
+    padding: 6px 10px;
     border-radius: 8px;
     border-left: 3px solid transparent;
 }
@@ -688,82 +742,74 @@ body.trans-dark .glass-widget {
 .ev-sub   { font-size: 0.68rem; color: var(--text-muted); display: block; }
 
 /* ==========================================================================
-   TAB 2: APPS GRID (COMPACT & CLEAN)
+   TAB 2: COMPACT PHONE-LIKE APPS GRID (6-7 PER ROW)
    ========================================================================== */
 .apps-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px 14px;
+    padding: 10px 4px;
+    align-items: start;
 }
 
 .app-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    overflow: hidden;
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     cursor: pointer;
     outline: none;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
+    border-radius: 16px;
+    padding: 10px 8px;
 }
 
-.app-card-img-wrap {
-    width: 100%;
-    height: 88px;
+.app-icon-squircle {
+    width: 76px;
+    height: 76px;
+    border-radius: 20px;
+    background: rgba(14, 20, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     overflow: hidden;
     position: relative;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
 }
 
-.app-card-img {
+.app-icon-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.35s ease;
-}
-
-.app-card:hover .app-card-img, .app-card:focus .app-card-img {
-    transform: scale(1.08);
 }
 
 .app-card-badge {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    background: rgba(0, 0, 0, 0.75);
+    top: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.8);
     color: var(--accent-color);
-    font-size: 0.62rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.app-card-body {
-    padding: 10px 12px;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
 }
 
 .app-card-name {
-    font-size: 0.88rem;
-    font-weight: 700;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: #ffffff;
-    margin-bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.app-card-name .material-icons {
-    font-size: 16px;
-    color: var(--accent-color);
-}
-
-.app-card-sub {
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    white-space: nowrap;
+    max-width: 115px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
 }
 
 /* ==========================================================================
@@ -786,7 +832,6 @@ body.trans-dark .glass-widget {
     font-weight: 600;
     cursor: pointer;
     outline: none;
-    transition: all 0.22s ease;
 }
 
 .subtab-btn.active {
@@ -799,7 +844,7 @@ body.trans-dark .glass-widget {
     display: none;
     flex-direction: column;
     gap: 16px;
-    max-width: 950px;
+    max-width: 980px;
 }
 
 .settings-subpane.active {
@@ -847,7 +892,6 @@ body.trans-dark .glass-widget {
     font-weight: 600;
     cursor: pointer;
     outline: none;
-    transition: all 0.2s ease;
 }
 
 .color-swatch-btn .dot {
@@ -881,7 +925,6 @@ body.trans-dark .glass-widget {
     font-weight: 600;
     cursor: pointer;
     outline: none;
-    transition: all 0.2s ease;
 }
 
 .trans-option-btn.active, .anim-option-btn.active {
@@ -891,79 +934,288 @@ body.trans-dark .glass-widget {
     font-weight: 700;
 }
 
-/* Widget Configuration Stack */
-.widget-config-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.widget-config-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--glass-border);
-    padding: 10px 16px;
-    border-radius: 12px;
+/* ==========================================================================
+   WIDGETS MANAGEMENT VIEW & DETAIL VIEW IN SETTINGS
+   ========================================================================== */
+.widgets-manage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 14px;
 }
 
-.toggle-pill {
+.widget-card-manage {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
+    justify-content: space-between;
     outline: none;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text-dim);
+    cursor: pointer;
 }
 
-.toggle-pill.checked {
+.wcm-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wcm-icon {
+    font-size: 24px;
+    color: var(--accent-color);
+}
+
+.wcm-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+}
+
+.wcm-size-badge {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 2px;
+}
+
+.btn-manage-cfg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(var(--accent-rgb), 0.15);
+    border: 1px solid rgba(var(--accent-rgb), 0.35);
+    color: var(--accent-color);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+}
+
+/* Detail view inside Settings */
+.detail-top-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 12px;
+}
+
+.detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.detail-widget-badge {
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--accent-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.detail-section h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.bento-size-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.bento-size-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.bento-size-card.active {
+    border-color: var(--accent-color);
+    background: rgba(var(--accent-rgb), 0.18);
+}
+
+.bento-visual {
+    width: 64px;
+    height: 52px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.bento-visual span {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.bento-visual span.cell-active {
+    background: var(--accent-color);
+    box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.6);
+}
+
+.size-2-visual span:nth-child(1),
+.size-2-visual span:nth-child(2) {
+    background: var(--accent-color);
+}
+
+.size-4-visual span {
+    background: var(--accent-color) !important;
+}
+
+.bento-size-name {
+    font-size: 0.9rem;
+    font-weight: 700;
     color: #ffffff;
 }
 
-.toggle-check {
-    font-weight: 800;
-    color: var(--accent-color);
-    margin-left: 6px;
+.bento-size-desc {
+    font-size: 0.72rem;
+    color: var(--text-dim);
 }
 
-.size-selector {
+/* ==========================================================================
+   SCREENSAVER SETTINGS SELECTORS (WIDGET TYPE & POSITION)
+   ========================================================================== */
+.ss-widget-type-selector,
+.ss-position-selector {
     display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ss-wtype-btn,
+.ss-pos-btn {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-}
-
-.size-label {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-right: 4px;
-}
-
-.size-btn {
+    gap: 8px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--glass-border);
     color: var(--text-dim);
-    padding: 6px 12px;
-    border-radius: 8px;
+    padding: 9px 16px;
+    border-radius: 10px;
     font-family: inherit;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     outline: none;
-    transition: all 0.2s ease;
 }
 
-.size-btn.active {
+.ss-wtype-btn.active,
+.ss-pos-btn.active {
     background: var(--accent-color);
     color: #070914;
     border-color: var(--accent-color);
     font-weight: 700;
 }
 
-/* Add App Form */
+.ss-thumbs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.ss-thumb-card {
+    border: 2px solid var(--glass-border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #000;
+    outline: none;
+}
+
+.ss-thumb-card.selected {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.6);
+}
+
+.ss-img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+}
+
+.ss-title {
+    display: block;
+    padding: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-dim);
+}
+
+.timeout-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.timeout-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.timeout-btn.active {
+    background: var(--accent-color);
+    color: #070914;
+    border-color: var(--accent-color);
+    font-weight: 700;
+}
+
+.btn-launch-big {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--accent-color), #0070f3);
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+}
+
 .add-app-inline-form {
     display: flex;
     flex-wrap: wrap;
@@ -1040,6 +1292,7 @@ body.trans-dark .glass-widget {
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
+    outline: none;
 }
 
 .btn-reset-all {
@@ -1050,85 +1303,7 @@ body.trans-dark .glass-widget {
     border-radius: 8px;
     font-size: 0.8rem;
     cursor: pointer;
-}
-
-/* Screensaver Settings Gallery */
-.btn-launch-big {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, var(--accent-color), #0070f3);
-    color: #ffffff;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.ss-thumbs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-}
-
-.ss-thumb-card {
-    border: 2px solid var(--glass-border);
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    background: #000;
     outline: none;
-    transition: all 0.2s ease;
-}
-
-.ss-thumb-card.selected {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.6);
-}
-
-.ss-img {
-    width: 100%;
-    height: 80px;
-    object-fit: cover;
-    display: block;
-}
-
-.ss-title {
-    display: block;
-    padding: 5px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-align: center;
-    color: var(--text-dim);
-}
-
-.timeout-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.timeout-btn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--glass-border);
-    color: var(--text-dim);
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    outline: none;
-}
-
-.timeout-btn.active {
-    background: var(--accent-color);
-    color: #070914;
-    border-color: var(--accent-color);
-    font-weight: 700;
 }
 
 .code-box-display {
@@ -1141,9 +1316,6 @@ body.trans-dark .glass-widget {
     border: 1px dashed rgba(var(--accent-rgb), 0.4);
 }
 
-/* ==========================================================================
-   TAB 4: INFO CARDS
-   ========================================================================== */
 .info-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1164,85 +1336,35 @@ body.trans-dark .glass-widget {
 .host-badge { color: var(--accent-color); font-family: 'JetBrains Mono', monospace; }
 
 /* ==========================================================================
-   IN-APP FULLSCREEN APP VIEWER
+   IN-APP FULLSCREEN APP VIEWER (NO ON-SCREEN BARS OR BUTTONS!)
+   Takes 100vw, 100vh immediately; remote Back button exits
    ========================================================================== */
 .app-viewer-modal {
     position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 10000;
-    background: #000;
+    background: #000000;
     display: none;
-    flex-direction: column;
+    border: none;
+    margin: 0;
+    padding: 0;
 }
 
 .app-viewer-modal.active {
-    display: flex;
+    display: block;
 }
 
-.app-viewer-header {
-    height: 52px;
-    background: rgba(8, 12, 22, 0.95);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    flex-shrink: 0;
-}
-
-.btn-app-exit {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(var(--accent-rgb), 0.15);
-    border: 1px solid rgba(var(--accent-rgb), 0.4);
-    color: var(--accent-color);
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-family: inherit;
-    font-size: 0.88rem;
-    font-weight: 700;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.app-viewer-info {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.btn-direct-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.08);
-    padding: 6px 14px;
-    border-radius: 8px;
-    outline: none;
-}
-
-.app-frame-container {
-    flex-grow: 1;
-    width: 100%;
-    height: calc(100% - 52px);
-    background: #000;
-}
-
-.app-frame-container iframe {
-    width: 100%;
-    height: 100%;
+.app-viewer-modal iframe {
+    width: 100vw;
+    height: 100vh;
     border: none;
+    display: block;
 }
 
 /* ==========================================================================
-   FULLSCREEN 4K SCREENSAVER OVERLAY
+   FULLSCREEN 4K SCREENSAVER OVERLAY WITH SELECTABLE POSITIONS
    ========================================================================== */
 .screensaver-layer {
     position: fixed;
@@ -1251,7 +1373,7 @@ body.trans-dark .glass-widget {
     background: #030509;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.5s ease-out;
     overflow: hidden;
 }
 
@@ -1262,7 +1384,7 @@ body.trans-dark .glass-widget {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: background-image 0.8s ease-in-out;
+    transition: background-image 0.5s ease-out;
 }
 
 .ss-ambient-overlay {
@@ -1320,66 +1442,101 @@ body.trans-dark .glass-widget {
     background: radial-gradient(circle at center, transparent 40%, rgba(3, 5, 9, 0.6) 100%);
 }
 
-.ss-top-bar, .ss-bottom-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.ss-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-}
-
-.ss-hint-pill {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 6px 16px;
-    border-radius: 99px;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-}
-
-.ss-center-clock {
+/* Screensaver Widgets Container & Positions */
+.ss-widgets-container {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
+    gap: 20px;
+    z-index: 4;
+}
+
+/* Positioning classes */
+.ss-widgets-container.pos-center {
+    justify-content: center;
     align-items: center;
     text-align: center;
 }
 
+.ss-widgets-container.pos-top-left {
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.ss-widgets-container.pos-top-center {
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+}
+
+.ss-widgets-container.pos-top-right {
+    justify-content: flex-start;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.ss-widgets-container.pos-bottom-left {
+    justify-content: flex-end;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.ss-widgets-container.pos-bottom-center {
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+}
+
+.ss-widgets-container.pos-bottom-right {
+    justify-content: flex-end;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.ss-widget-block {
+    background: rgba(10, 15, 28, 0.45);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 24px 32px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    display: inline-flex;
+    flex-direction: column;
+}
+
 .ss-clock-time {
-    font-size: clamp(6rem, 16vw, 13rem);
+    font-size: clamp(4.5rem, 11vw, 9rem);
     font-weight: 200;
     line-height: 1;
     letter-spacing: -2px;
     color: #ffffff;
-    text-shadow: 0 15px 60px rgba(var(--accent-rgb), 0.4);
-    margin-bottom: 10px;
+    text-shadow: 0 12px 50px rgba(var(--accent-rgb), 0.4);
+    margin-bottom: 8px;
 }
 
 .ss-clock-date {
-    font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+    font-size: clamp(1rem, 2vw, 1.6rem);
     color: #94a3b8;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .ss-mode-badge {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: rgba(var(--accent-rgb), 0.1);
     border: 1px solid rgba(var(--accent-rgb), 0.3);
-    padding: 8px 24px;
+    padding: 6px 18px;
     border-radius: 99px;
     color: var(--accent-color);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    align-self: center;
 }
 
 .ss-pulse-point {
@@ -1390,25 +1547,73 @@ body.trans-dark .glass-widget {
     box-shadow: 0 0 10px var(--accent-color);
 }
 
-.ss-music-info {
+/* Screensaver Mini Calendar */
+.ss-calendar-block {
+    min-width: 320px;
+    max-width: 380px;
+}
+
+.ss-cal-head {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    letter-spacing: 1.5px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.ss-cal-days-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.ss-cal-days-row .we { color: #f87171; }
+
+.ss-cal-cells-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+
+.ss-cal-cells-grid .cell {
+    height: 24px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px 20px;
-    border-radius: 14px;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    color: var(--text-dim);
 }
 
-.ss-disc {
-    color: var(--accent-color);
-    font-size: 26px;
-    animation: spinDisc 8s linear infinite;
+.ss-cal-cells-grid .cell.today {
+    background: var(--accent-color);
+    color: #070914;
+    font-weight: 800;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
 }
 
-@keyframes spinDisc {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
+.ss-cal-cells-grid .cell.we { color: #fca5a5; }
+.ss-cal-cells-grid .cell.empty { opacity: 0; pointer-events: none; }
 
-.ss-m-title { font-size: 0.9rem; font-weight: 600; color: #fff; }
-.ss-m-sub   { font-size: 0.75rem; color: var(--text-muted); }
+.ss-bottom-hint {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 18px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    backdrop-filter: blur(10px);
+}
