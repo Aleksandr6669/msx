@@ -1,0 +1,33 @@
+{
+  "headline": "MX STATION PLAYER",
+  "logo": "{PREFIX}{SERVER}/static/images/logo.svg",
+  "logoSize": "small",
+  "background": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
+  "color": "msx-glass",
+  "start": "link:{PREFIX}{SERVER}/",
+  "ready": {
+    "action": "link:{PREFIX}{SERVER}/"
+  },
+  "menu": [
+    {
+      "icon": "dashboard",
+      "label": "Виджеты & Время",
+      "action": "link:{PREFIX}{SERVER}/?tab=widgets"
+    },
+    {
+      "icon": "apps",
+      "label": "Программы",
+      "action": "link:{PREFIX}{SERVER}/?tab=apps"
+    },
+    {
+      "icon": "settings",
+      "label": "Настройки",
+      "action": "link:{PREFIX}{SERVER}/?tab=settings"
+    },
+    {
+      "icon": "info",
+      "label": "О приложении",
+      "action": "link:{PREFIX}{SERVER}/?tab=info"
+    }
+  ]
+}

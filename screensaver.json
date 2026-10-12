@@ -1,0 +1,30 @@
+{
+  "headline": "4K Заставка Media Station X",
+  "items": [
+    {
+      "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90",
+      "title": "Космическая Аврора 4K",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90",
+      "title": "Ночной Киберпанк Город",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
+      "title": "Горные Вершины на Закате",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
+      "title": "Океанский Прибой & Закат",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90",
+      "title": "Теплый Огонь Камина",
+      "duration": 8
+    }
+  ]
+}

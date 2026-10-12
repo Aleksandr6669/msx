@@ -121,7 +121,8 @@ def add_cors_headers(response):
 # ---------------------------------------------------------------------------
 # MEDIA STATION X ENTRYPOINT
 # When user enters <domain> into MSX, MSX automatically fetches /msx/start.json.
-# This Start Object launches the full HTML5 TV application in fullscreen via link: action!
+# MSX strictly requires parameter to start with 'menu:' or 'content:'.
+# Our menu.json provides the 4 clean sections and immediately executes link: on start!
 # ---------------------------------------------------------------------------
 
 @app.route('/msx/start.json')
@@ -130,14 +131,15 @@ def msx_start():
     base_url = get_base_url()
     return jsonify({
         "name": "MX Station Portal",
-        "version": "2.2.0",
-        "parameter": f"link:{base_url}/",
+        "version": "2.3.0",
+        "parameter": f"menu:{base_url}/menu.json",
         "background": SECTION_WALLPAPERS["widgets"],
         "logo": f"{base_url}/static/images/logo.svg"
     })
 
-# If opened via MSX menu mode
+# MSX Menu Mode
 @app.route('/menu.json')
+@app.route('/msx/menu.json')
 def msx_menu():
     base_url = get_base_url()
     return jsonify({
@@ -146,10 +148,14 @@ def msx_menu():
         "logoSize": "small",
         "background": SECTION_WALLPAPERS["widgets"],
         "color": "msx-glass",
+        "start": f"link:{base_url}/",
+        "ready": {
+            "action": f"link:{base_url}/"
+        },
         "menu": [
             {
                 "icon": "dashboard",
-                "label": "Виджеты",
+                "label": "Виджеты & Время",
                 "action": f"link:{base_url}/?tab=widgets"
             },
             {
@@ -203,7 +209,7 @@ def web_index():
 
 if __name__ == '__main__':
     print("=" * 65)
-    print("  MX Station Player v2.2 — HTML5 Portal for Media Station X")
+    print("  MX Station Player v2.3 — HTML5 Portal for Media Station X")
     print("  В MSX на ТВ введите адрес:")
     print("  <IP_ЭТОГО_КОМПЬЮТЕРА>:5000")
     print("=" * 65)
