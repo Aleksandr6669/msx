@@ -67,15 +67,53 @@ body.tv-mode {
    SIDEBAR (4 MENU ITEMS)
    ========================================================================== */
 .tv-sidebar {
-    width: 290px;
-    background: rgba(10, 14, 26, 0.82);
-    backdrop-filter: blur(35px);
-    border-right: 1px solid var(--glass-border);
+    width: 280px;
+    background: rgba(10, 14, 26, 0.42);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    padding: 28px 18px;
+    padding: 24px 16px;
     flex-shrink: 0;
-    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 8px 0 35px rgba(0, 0, 0, 0.35);
+    transition: width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow: hidden;
+    z-index: 10;
+}
+
+.tv-sidebar.collapsed {
+    width: 76px;
+    padding: 24px 10px;
+}
+
+.tv-sidebar.collapsed .logo-title,
+.tv-sidebar.collapsed .tab-label,
+.tv-sidebar.collapsed .tab-badge,
+.tv-sidebar.collapsed .quick-screensaver-btn span:last-child,
+.tv-sidebar.collapsed .quick-exit-msx-btn span:last-child,
+.tv-sidebar.collapsed .sidebar-status span:last-child {
+    display: none !important;
+}
+
+.tv-sidebar.collapsed .sidebar-logo {
+    justify-content: center;
+    padding-bottom: 16px;
+}
+
+.tv-sidebar.collapsed .menu-tab {
+    justify-content: center;
+    padding: 14px 0;
+}
+
+.tv-sidebar.collapsed .quick-screensaver-btn,
+.tv-sidebar.collapsed .quick-exit-msx-btn {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.tv-sidebar.collapsed .sidebar-status {
+    justify-content: center;
 }
 
 .sidebar-logo {
@@ -350,7 +388,7 @@ body.tv-mode {
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    padding: 24px 28px;
+    padding: 18px 22px;
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
     outline: none;
     transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
@@ -397,7 +435,7 @@ body.tv-mode {
 
 .w-digital-time {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 4.4rem;
+    font-size: 3.5rem;
     font-weight: 700;
     line-height: 1;
     color: #ffffff;
@@ -432,15 +470,15 @@ body.tv-mode {
 
 /* Analog Clock */
 .widget-clock-analog {
-    width: 280px;
+    width: 230px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .analog-face {
-    width: 170px;
-    height: 170px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.15);
     background: radial-gradient(circle at 35% 35%, rgba(30, 40, 70, 0.6) 0%, rgba(8, 12, 22, 0.85) 100%);
@@ -650,31 +688,31 @@ body.tv-mode {
    ========================================================================== */
 .apps-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 16px;
 }
 
 .app-card {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
-    border-radius: 18px;
+    border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
     outline: none;
-    transition: all 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     position: relative;
 }
 
 .app-card:hover, .app-card:focus {
     transform: scale(1.05);
     border-color: var(--glass-border-focus);
-    box-shadow: 0 15px 35px rgba(0, 210, 255, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 210, 255, 0.35);
 }
 
 .app-card-img-wrap {
     width: 100%;
-    height: 120px;
+    height: 88px;
     overflow: hidden;
     position: relative;
 }
@@ -692,38 +730,38 @@ body.tv-mode {
 
 .app-card-badge {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0, 0, 0, 0.8);
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.75);
     color: var(--accent-cyan);
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 2px 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .app-card-body {
-    padding: 14px;
+    padding: 10px 12px;
 }
 
 .app-card-name {
-    font-size: 1rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .app-card-name .material-icons {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--accent-cyan);
 }
 
 .app-card-sub {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-dim);
     white-space: nowrap;
     overflow: hidden;
@@ -781,7 +819,7 @@ body.tv-mode {
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    padding: 24px 28px;
+    padding: 18px 22px;
 }
 
 .setting-card h3 {
@@ -1172,6 +1210,24 @@ body.tv-mode {
     overflow: hidden;
 }
 
+.ss-bg-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.8s ease-in-out;
+}
+
+.ss-ambient-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at center, rgba(3, 5, 9, 0.25) 0%, rgba(3, 5, 9, 0.75) 100%);
+    pointer-events: none;
+}
+
 .screensaver-layer.active {
     opacity: 1;
     pointer-events: auto;
@@ -1180,16 +1236,16 @@ body.tv-mode {
 #ssStarsCanvas {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 2;
 }
 
 .ss-ambient-nebula {
     position: absolute;
     border-radius: 50%;
     filter: blur(90px);
-    opacity: 0.5;
+    opacity: 0.35;
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
 }
 
 .ss-neb-1 {
@@ -1211,7 +1267,7 @@ body.tv-mode {
 .ss-content-wrap {
     position: absolute;
     inset: 0;
-    z-index: 2;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1313,4 +1369,3 @@ body.tv-mode {
 
 .ss-m-title { font-size: 0.9rem; font-weight: 600; color: #fff; }
 .ss-m-sub   { font-size: 0.75rem; color: var(--text-muted); }
-.ss-clock-zone { font-size: 0.85rem; color: var(--text-dim); }
