@@ -28,6 +28,15 @@ let ssSlideshowIndex = 0;
 
 const DEFAULT_APPS_LIST = [
     {
+        id: "app_filmix",
+        name: "Filmix",
+        url: "http://filmix.tv",
+        sub: "Онлайн-кинотеатр и сериалы",
+        icon: "movie_filter",
+        badge: "CINEMA",
+        image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80"
+    },
+    {
         id: "app_lampa",
         name: "Lampa",
         url: "http://lampa.mx",
@@ -140,6 +149,12 @@ let state = {
     animations: localStorage.getItem('hp_animations') || "snappy",
     idleTimeoutSec: parseInt(localStorage.getItem('hp_idle_sec') || "120", 10),
     screensaverBg: localStorage.getItem('hp_ss_bg') || "ss_all",
+    sidebarPos: localStorage.getItem('hp_sidebar_pos') || "left", // left or right
+    ssMediaType: localStorage.getItem('hp_ss_mtype') || "photo", // photo, youtube, video
+    ssYoutubeId: localStorage.getItem('hp_ss_ytid') || "L_LUpnjgPso",
+    ssVideoUrl: localStorage.getItem('hp_ss_vurl') || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    ssPhotoAnim: localStorage.getItem('hp_ss_photo_anim') !== 'false', // true by default, can be toggled
+    ssWidgetOpacity: localStorage.getItem('hp_ss_wopacity') || "ultra", // none, ultra, glass
     ssWidgetType: localStorage.getItem('hp_ss_wtype') || "both", // both, clock, calendar, none
     ssPosition: localStorage.getItem('hp_ss_pos') || "center", // center, top-left, top-right, etc.
     widgets: JSON.parse(localStorage.getItem('hp_widgets') || JSON.stringify({
@@ -164,6 +179,18 @@ let state = {
 
 // Auto-heal stored apps from localStorage (downgrades any stored https:// URLs to http:// to prevent SSL handshake errors on TV)
 if (Array.isArray(state.apps)) {
+    // Inject Filmix if not already in user's saved apps
+    if (!state.apps.some(a => a && (a.id === 'app_filmix' || (a.name && a.name.toLowerCase() === 'filmix')))) {
+        state.apps.unshift({
+            id: "app_filmix",
+            name: "Filmix",
+            url: "http://filmix.tv",
+            sub: "Онлайн-кинотеатр и сериалы",
+            icon: "movie_filter",
+            badge: "CINEMA",
+            image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80"
+        });
+    }
     let appsChanged = false;
     state.apps.forEach(app => {
         if (!app || !app.url) return;
@@ -184,6 +211,7 @@ window.addEventListener('pageshow', () => {
     const loader = document.getElementById('appNavLoader');
     if (loader) loader.classList.remove('active');
 });
+
 
 // ---------------------------------------------------------------------------
 // 1. THEME, ACCENT COLOR & TRANSPARENCY CONTROLLER
@@ -206,6 +234,25 @@ function applyThemeSettings() {
     localStorage.setItem('hp_animations', state.animations);
 }
 applyThemeSettings();
+
+// Sidebar Left/Right Position Controller
+function applySidebarPosition() {
+    if (!tvShell) return;
+    tvShell.classList.toggle('sidebar-right', state.sidebarPos === 'right');
+    localStorage.setItem('hp_sidebar_pos', state.sidebarPos);
+}
+applySidebarPosition();
+
+const sidebarPosBtns = document.querySelectorAll('.sidebar-pos-btn');
+sidebarPosBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        sidebarPosBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.sidebarPos = btn.getAttribute('data-pos') || 'left';
+        applySidebarPosition();
+    });
+});
+sidebarPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.sidebarPos));
 
 // ---------------------------------------------------------------------------
 // 2. COLLAPSIBLE SIDEBAR & TAB SWITCHING
@@ -674,6 +721,7 @@ function normalizeUrl(url) {
     url = url.trim();
 
     // Critical for Smart TV: Use pure HTTP for TV services to avoid SSL Handshake failures
+    if (/filmix/i.test(url)) return 'http://filmix.tv';
     if (/lampa\.mx/i.test(url)) return 'http://lampa.mx';
     if (/msx\.benzac\.de\/plugins\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
     if (/msx\.benzac\.de\/plugins\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
@@ -724,6 +772,8 @@ function handleTvBackButton(e) {
         e.preventDefault();
         e.stopPropagation();
     }
+
+
 
     // 0. If App loader is active -> hide it
     const appLoader = document.getElementById('appNavLoader');
@@ -801,11 +851,24 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// Browser History popstate handler
+// Tizen hardware key listener
+document.addEventListener('tizenhwkey', (e) => {
+    if (e.keyName === 'back') {
+        handleTvBackButton(e);
+    }
+});
+
+// History trap to prevent TV browser from exiting
+function pushTrapHistory() {
+    try {
+        window.history.pushState({ trap: true }, '', window.location.pathname + window.location.search);
+    } catch (err) {}
+}
+pushTrapHistory();
+
 window.addEventListener('popstate', (e) => {
-    const loader = document.getElementById('appNavLoader');
-    if (loader) loader.classList.remove('active');
-    handleTvBackButton(null);
+    pushTrapHistory();
+    handleTvBackButton(e);
 });
 
 // ---------------------------------------------------------------------------
@@ -813,42 +876,57 @@ window.addEventListener('popstate', (e) => {
 // ---------------------------------------------------------------------------
 const appsGrid = document.getElementById('appsGrid');
 const appsCountBadge = document.getElementById('appsCountBadge');
+const installedAppsManageList = document.getElementById('installedAppsManageList');
 
 function renderApps() {
-    if (!appsGrid) return;
-    appsGrid.innerHTML = '';
+    if (appsCountBadge) appsCountBadge.textContent = state.apps.length;
 
-    if (appsCountBadge) {
-        appsCountBadge.textContent = `${state.apps.length} программ`;
+    if (appsGrid) {
+        appsGrid.innerHTML = '';
+        state.apps.forEach(app => {
+            const card = document.createElement('div');
+            card.className = 'app-card';
+            card.tabIndex = 0;
+
+            const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
+            card.innerHTML = `
+                <div class="app-icon-squircle">
+                    <img src="${imgUrl}" alt="${app.name}" class="app-icon-img" loading="lazy">
+                    <span class="app-card-badge">${app.badge || 'APP'}</span>
+                </div>
+                <div class="app-card-name">${app.name}</div>
+            `;
+
+            card.addEventListener('click', () => openApp(app));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    openApp(app);
+                }
+            });
+
+            appsGrid.appendChild(card);
+        });
     }
 
-    state.apps.forEach(app => {
-        const card = document.createElement('div');
-        card.className = 'app-card';
-        card.tabIndex = 0;
-        card.setAttribute('data-id', app.id);
-
-        const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
-        card.innerHTML = `
-            <div class="app-icon-squircle">
-                <img src="${imgUrl}" alt="${app.name}" class="app-icon-img" loading="lazy">
-                <span class="app-card-badge">${app.badge || 'APP'}</span>
-            </div>
-            <div class="app-card-name">${app.name}</div>
-        `;
-
-        card.addEventListener('click', () => openApp(app));
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-                openApp(app);
-            }
+    if (installedAppsManageList) {
+        installedAppsManageList.innerHTML = '';
+        state.apps.forEach((app, index) => {
+            const item = document.createElement('div');
+            item.className = 'installed-item';
+            item.innerHTML = `
+                <span><strong>${app.name}</strong> (${app.url})</span>
+                <button class="btn-del-app" data-index="${index}" tabindex="0">Удалить</button>
+            `;
+            const delBtn = item.querySelector('.btn-del-app');
+            delBtn.addEventListener('click', () => {
+                state.apps.splice(index, 1);
+                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+                renderApps();
+            });
+            installedAppsManageList.appendChild(item);
         });
-
-        appsGrid.appendChild(card);
-    });
-
-    renderSettingsAppsList();
+    }
 }
 renderApps();
 
@@ -856,14 +934,12 @@ renderApps();
 const btnSaveApp = document.getElementById('btnSaveApp');
 const inputAppName = document.getElementById('inputAppName');
 const inputAppUrl = document.getElementById('inputAppUrl');
-const inputAppBadge = document.getElementById('inputAppBadge');
 const selectAppIcon = document.getElementById('selectAppIcon');
 
 if (btnSaveApp && inputAppName && inputAppUrl) {
     btnSaveApp.addEventListener('click', () => {
         const name = inputAppName.value.trim();
-        const url = normalizeUrl(inputAppUrl.value.trim());
-        const badge = inputAppBadge ? inputAppBadge.value.trim().toUpperCase() : 'APP';
+        const url = inputAppUrl.value.trim();
         const icon = selectAppIcon ? selectAppIcon.value : 'launch';
 
         if (!name || !url) {
@@ -871,17 +947,16 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
             return;
         }
 
-        const newApp = {
-            id: 'app_user_' + Date.now(),
+        state.apps.push({
+            id: `app_custom_${Date.now()}`,
             name: name,
             url: url,
-            sub: 'Пользовательская ссылка',
+            sub: 'Пользовательский ярлык',
             icon: icon,
-            badge: badge || 'APP',
-            image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500'
-        };
+            badge: 'CUSTOM',
+            image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500'
+        });
 
-        state.apps.push(newApp);
         localStorage.setItem('hp_apps', JSON.stringify(state.apps));
         inputAppName.value = '';
         inputAppUrl.value = '';
@@ -890,60 +965,23 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
     });
 }
 
-function renderSettingsAppsList() {
-    const list = document.getElementById('settingsAppsList');
-    if (!list) return;
-    list.innerHTML = '';
-
-    state.apps.forEach((app, idx) => {
-        const item = document.createElement('div');
-        item.className = 'app-manage-item';
-        item.innerHTML = `
-            <div class="ami-left">
-                <span class="material-icons">${app.icon || 'launch'}</span>
-                <div>
-                    <span class="ami-name">${app.name}</span>
-                    <span class="ami-url">${app.url}</span>
-                </div>
-            </div>
-            <button class="btn-delete-app" tabindex="0" data-idx="${idx}">
-                <span class="material-icons">delete</span>
-            </button>
-        `;
-
-        const btnDel = item.querySelector('.btn-delete-app');
-        if (btnDel) {
-            btnDel.addEventListener('click', () => {
-                state.apps.splice(idx, 1);
-                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-                renderApps();
-            });
-        }
-
-        list.appendChild(item);
-    });
-}
-
-// Preset Quick-Add App Buttons
-const presetBtns = document.querySelectorAll('.btn-add-preset');
+// Preset Quick Add Buttons
+const presetBtns = document.querySelectorAll('.preset-btn');
 presetBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const name = btn.getAttribute('data-name');
-        const url = normalizeUrl(btn.getAttribute('data-url'));
-        const badge = btn.getAttribute('data-badge') || 'APP';
-        const icon = btn.getAttribute('data-icon') || 'launch';
-        const img = btn.getAttribute('data-img') || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
+        const url = btn.getAttribute('data-url');
+        const icon = btn.getAttribute('data-icon');
 
-        const exists = state.apps.some(a => a.name.toLowerCase() === name.toLowerCase());
-        if (!exists) {
+        if (!state.apps.some(a => a.url === url)) {
             state.apps.push({
-                id: 'app_pre_' + Date.now(),
+                id: `app_${name.toLowerCase()}`,
                 name: name,
                 url: url,
-                sub: 'Предустановленная программа',
+                sub: 'Популярное ТВ-приложение',
                 icon: icon,
-                badge: badge,
-                image: img
+                badge: 'APP',
+                image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500'
             });
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
             renderApps();
@@ -954,14 +992,13 @@ presetBtns.forEach(btn => {
     });
 });
 
-// Reset Default Apps
+// Reset Apps Button
 const btnResetDefaultApps = document.getElementById('btnResetDefaultApps');
 if (btnResetDefaultApps) {
     btnResetDefaultApps.addEventListener('click', () => {
         state.apps = JSON.parse(JSON.stringify(DEFAULT_APPS_LIST));
         localStorage.setItem('hp_apps', JSON.stringify(state.apps));
         renderApps();
-        alert('Список программ сброшен к исходному виду.');
     });
 }
 
@@ -995,44 +1032,115 @@ function applyScreensaverWidgetsAndPosition() {
     if (!ssWidgetsContainer) return;
 
     // Apply position class
-    const validPositions = ['center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
-    validPositions.forEach(p => ssWidgetsContainer.classList.remove(`pos-${p}`));
-    ssWidgetsContainer.classList.add(`pos-${state.ssPosition || 'center'}`);
+    ssWidgetsContainer.className = `ss-widgets-container pos-${state.ssPosition || 'center'}`;
 
     // Apply widget type visibility
     const type = state.ssWidgetType || 'both';
     if (ssClockBlock) {
-        ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'flex' : 'none';
+        ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'inline-flex' : 'none';
     }
     if (ssCalendarBlock) {
-        ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'flex' : 'none';
+        ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'inline-flex' : 'none';
+    }
+}
+const applyScreensaverLayout = applyScreensaverWidgetsAndPosition;
+
+function updateScreensaverWallpaper() {
+    const bgLayer = document.getElementById('ssBgImage');
+    if (!bgLayer) return;
+
+    if (ssSlideshowInterval) {
+        clearInterval(ssSlideshowInterval);
+        ssSlideshowInterval = null;
     }
 
-    localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
-    localStorage.setItem('hp_ss_pos', state.ssPosition);
+    const currentBg = state.screensaverBg || 'ss_all';
+
+    if (currentBg === 'ss_all') {
+        const nextImg = SS_SLIDESHOW_LIST[ssSlideshowIndex % SS_SLIDESHOW_LIST.length];
+        bgLayer.style.backgroundImage = `url('${nextImg}')`;
+        ssSlideshowInterval = setInterval(() => {
+            ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
+            bgLayer.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
+        }, 8000);
+    } else {
+        const bgUrl = SCREENSAVER_IMAGES[currentBg] || currentBg;
+        bgLayer.style.backgroundImage = `url('${bgUrl}')`;
+    }
+}
+
+function extractYouTubeId(urlOrId) {
+    if (!urlOrId) return '';
+    const trimmed = urlOrId.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+    const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
+    return match ? match[1] : trimmed;
+}
+
+function applyScreensaverWidgetOpacity() {
+    const blocks = document.querySelectorAll('.ss-widget-block');
+    blocks.forEach(b => {
+        b.classList.remove('trans-none', 'trans-ultra', 'trans-glass');
+        b.classList.add(`trans-${state.ssWidgetOpacity || 'ultra'}`);
+    });
+    localStorage.setItem('hp_ss_wopacity', state.ssWidgetOpacity);
 }
 
 function showScreensaver() {
     if (!screensaverLayer) return;
 
     applyScreensaverWidgetsAndPosition();
+    applyScreensaverWidgetOpacity();
 
-    // Select background
-    if (state.screensaverBg === 'ss_all') {
-        ssSlideshowIndex = 0;
-        if (ssBgImage) ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[0]}')`;
+    const ssBgImage = document.getElementById('ssBgImage');
+    const ssBgVideo = document.getElementById('ssBgVideo');
+    const ssBgYoutubeWrap = document.getElementById('ssBgYoutubeWrap');
+    const ssBgYoutubeIframe = document.getElementById('ssBgYoutubeIframe');
 
-        if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
-        ssSlideshowInterval = setInterval(() => {
-            ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
-            if (ssBgImage) {
-                ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
-            }
-        }, 7000);
+    // Reset media layers
+    if (ssBgImage) ssBgImage.style.display = 'none';
+    if (ssBgVideo) {
+        ssBgVideo.style.display = 'none';
+        try { ssBgVideo.pause(); } catch (e) {}
+    }
+    if (ssBgYoutubeWrap) {
+        ssBgYoutubeWrap.style.display = 'none';
+        if (ssBgYoutubeIframe) ssBgYoutubeIframe.src = 'about:blank';
+    }
+
+    if (state.ssMediaType === 'youtube') {
+        const ytId = extractYouTubeId(state.ssYoutubeId || 'L_LUpnjgPso');
+        if (ssBgYoutubeWrap && ssBgYoutubeIframe) {
+            ssBgYoutubeWrap.style.display = 'block';
+            ssBgYoutubeIframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1`;
+        }
+    } else if (state.ssMediaType === 'video') {
+        if (ssBgVideo) {
+            ssBgVideo.style.display = 'block';
+            ssBgVideo.src = state.ssVideoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+            ssBgVideo.play().catch(() => {});
+        }
     } else {
-        if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
-        const bgUrl = SCREENSAVER_IMAGES[state.screensaverBg] || SCREENSAVER_IMAGES.ss_space;
-        if (ssBgImage) ssBgImage.style.backgroundImage = `url('${bgUrl}')`;
+        // Photo mode
+        if (ssBgImage) {
+            ssBgImage.style.display = 'block';
+            ssBgImage.classList.toggle('animated', !!state.ssPhotoAnim);
+
+            if (state.screensaverBg === 'ss_all') {
+                ssSlideshowIndex = 0;
+                ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[0]}')`;
+
+                if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
+                ssSlideshowInterval = setInterval(() => {
+                    ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
+                    ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
+                }, 7000);
+            } else {
+                if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
+                const bgUrl = SCREENSAVER_IMAGES[state.screensaverBg] || SCREENSAVER_IMAGES.ss_space;
+                ssBgImage.style.backgroundImage = `url('${bgUrl}')`;
+            }
+        }
     }
 
     screensaverLayer.classList.add('active');
@@ -1043,6 +1151,21 @@ function showScreensaver() {
 function hideScreensaver() {
     if (!screensaverLayer) return;
     screensaverLayer.classList.remove('active');
+
+    const ssBgVideo = document.getElementById('ssBgVideo');
+    const ssBgYoutubeWrap = document.getElementById('ssBgYoutubeWrap');
+    const ssBgYoutubeIframe = document.getElementById('ssBgYoutubeIframe');
+
+    if (ssBgVideo) {
+        try { ssBgVideo.pause(); } catch (e) {}
+        ssBgVideo.src = '';
+        ssBgVideo.style.display = 'none';
+    }
+    if (ssBgYoutubeWrap && ssBgYoutubeIframe) {
+        ssBgYoutubeIframe.src = 'about:blank';
+        ssBgYoutubeWrap.style.display = 'none';
+    }
+
     if (ssSlideshowInterval) {
         clearInterval(ssSlideshowInterval);
         ssSlideshowInterval = null;
@@ -1059,71 +1182,237 @@ function resetIdleTimer() {
     }
 }
 
-// Any user activity resets the idle timer or dismisses screensaver
-['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
-    window.addEventListener(evt, () => {
-        if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-            hideScreensaver();
-        } else {
-            resetIdleTimer();
-        }
-    }, { passive: true });
+// Reset idle timer on any user activity
+window.addEventListener('keydown', (e) => {
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        hideScreensaver();
+        switchTab('widgets');
+        e.preventDefault();
+        return;
+    }
+    resetIdleTimer();
 });
+
+window.addEventListener('mousemove', () => {
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        hideScreensaver();
+        switchTab('widgets');
+        return;
+    }
+    resetIdleTimer();
+});
+
 resetIdleTimer();
 
-// Screensaver Settings Controls in UI
-const ssTimeBtns = document.querySelectorAll('.ss-time-btn');
-ssTimeBtns.forEach(btn => {
+// Manual screensaver triggers
+const startScreensaverBtn = document.getElementById('startScreensaverBtn');
+if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', showScreensaver);
+
+const btnTestScreensaver = document.getElementById('btnTestScreensaver');
+if (btnTestScreensaver) btnTestScreensaver.addEventListener('click', showScreensaver);
+
+// Screensaver Wallpaper Picker
+const ssThumbCards = document.querySelectorAll('.ss-thumb-card');
+ssThumbCards.forEach(card => {
+    card.addEventListener('click', () => {
+        ssThumbCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.screensaverBg = card.getAttribute('data-id');
+        const customUrl = card.getAttribute('data-url');
+        if (customUrl && state.screensaverBg !== 'ss_all') {
+            SCREENSAVER_IMAGES[state.screensaverBg] = customUrl;
+        }
+        localStorage.setItem('hp_ss_bg', state.screensaverBg);
+        updateScreensaverWallpaper();
+    });
+});
+
+ssThumbCards.forEach(card => {
+    if (card.getAttribute('data-id') === state.screensaverBg) {
+        card.classList.add('selected');
+    } else {
+        card.classList.remove('selected');
+    }
+});
+
+// Timeout selector buttons (30s, 1m, 2m, 3m, 5m, 10m, 15m, 0)
+const timeoutBtns = document.querySelectorAll('.timeout-btn');
+timeoutBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-        ssTimeBtns.forEach(b => b.classList.remove('active'));
+        timeoutBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.idleTimeoutSec = parseInt(btn.getAttribute('data-sec'), 10);
+        state.idleTimeoutSec = parseInt(btn.getAttribute('data-time'), 10);
         localStorage.setItem('hp_idle_sec', String(state.idleTimeoutSec));
         resetIdleTimer();
     });
 });
-ssTimeBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-sec'), 10) === state.idleTimeoutSec));
+timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-time'), 10) === state.idleTimeoutSec));
 
-// Screensaver Wallpaper Picker
-const ssBgCards = document.querySelectorAll('.ss-bg-card');
-ssBgCards.forEach(card => {
-    card.addEventListener('click', () => {
-        ssBgCards.forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        state.screensaverBg = card.getAttribute('data-bg');
-        localStorage.setItem('hp_ss_bg', state.screensaverBg);
-    });
-});
-ssBgCards.forEach(c => c.classList.toggle('active', c.getAttribute('data-bg') === state.screensaverBg));
-
-// Screensaver Widget Type Buttons
-const ssTypeBtns = document.querySelectorAll('.ss-type-btn');
-ssTypeBtns.forEach(btn => {
+// Screensaver Widget Type Selector (both, clock, calendar, none)
+const ssWTypeBtns = document.querySelectorAll('.ss-wtype-btn');
+ssWTypeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-        ssTypeBtns.forEach(b => b.classList.remove('active'));
+        ssWTypeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.ssWidgetType = btn.getAttribute('data-type');
-        applyScreensaverWidgetsAndPosition();
+        state.ssWidgetType = btn.getAttribute('data-wtype');
+        localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
+        applyScreensaverLayout();
     });
 });
-ssTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-type') === state.ssWidgetType));
+ssWTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-wtype') === state.ssWidgetType));
 
-// Screensaver Position Buttons
+// Screensaver Position Selector (center, top-left, top-right, bottom-left, bottom-right, etc.)
 const ssPosBtns = document.querySelectorAll('.ss-pos-btn');
 ssPosBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         ssPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPosition = btn.getAttribute('data-pos');
-        applyScreensaverWidgetsAndPosition();
+        localStorage.setItem('hp_ss_pos', state.ssPosition);
+        applyScreensaverLayout();
     });
 });
 ssPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.ssPosition));
 
-// Test Screensaver Button
-const btnPreviewScreensaver = document.getElementById('btnPreviewScreensaver');
-if (btnPreviewScreensaver) {
-    btnPreviewScreensaver.addEventListener('click', () => {
-        showScreensaver();
+// Canvas Stars Particles for Screensaver
+const canvas = document.getElementById('ssStarsCanvas');
+if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    for (let i = 0; i < 75; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2 + 0.5,
+            alpha: Math.random() * 0.7 + 0.3,
+            dx: (Math.random() - 0.5) * 0.35,
+            dy: (Math.random() - 0.5) * 0.35
+        });
+    }
+
+    function renderParticles() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(180, 220, 255, ${p.alpha})`;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = state.themeColor;
+            ctx.fill();
+        Clockwise:
+            p.x += p.dx;
+            p.y += p.dy;
+
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+        });
+        requestAnimationFrame(renderParticles);
+    }
+    renderParticles();
+}
+
+
+// Screensaver Media Type Selector (Photo / YouTube / Video)
+const ssMediaBtns = document.querySelectorAll('.ss-media-btn');
+ssMediaBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssMediaBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssMediaType = btn.getAttribute('data-media') || 'photo';
+        localStorage.setItem('hp_ss_mtype', state.ssMediaType);
+    });
+});
+ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+
+// Screensaver Photo Animation Toggle (Ken Burns on/off)
+const ssAnimBtns = document.querySelectorAll('.ss-anim-btn');
+ssAnimBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssAnimBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssPhotoAnim = btn.getAttribute('data-anim') === 'on';
+        localStorage.setItem('hp_ss_photo_anim', String(state.ssPhotoAnim));
+    });
+});
+ssAnimBtns.forEach(b => b.classList.toggle('active', (b.getAttribute('data-anim') === 'on') === !!state.ssPhotoAnim));
+
+// Screensaver Video Presets (Fireplace, Aquarium, Ocean, Space)
+const ssVpresetBtns = document.querySelectorAll('.ss-vpreset-btn');
+ssVpresetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssVpresetBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const vtype = btn.getAttribute('data-type');
+        if (vtype === 'youtube') {
+            state.ssMediaType = 'youtube';
+            state.ssYoutubeId = btn.getAttribute('data-id');
+            localStorage.setItem('hp_ss_mtype', 'youtube');
+            localStorage.setItem('hp_ss_ytid', state.ssYoutubeId);
+        } else if (vtype === 'video') {
+            state.ssMediaType = 'video';
+            state.ssVideoUrl = btn.getAttribute('data-url');
+            localStorage.setItem('hp_ss_mtype', 'video');
+            localStorage.setItem('hp_ss_vurl', state.ssVideoUrl);
+        }
+
+        // Update media selector active state
+        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+        alert('Заставка переключена на видео!');
+    });
+});
+
+// Custom YouTube / Video URL Input
+const inputCustomVideo = document.getElementById('inputCustomVideo');
+const btnApplyCustomVideo = document.getElementById('btnApplyCustomVideo');
+if (btnApplyCustomVideo && inputCustomVideo) {
+    btnApplyCustomVideo.addEventListener('click', () => {
+        const val = inputCustomVideo.value.trim();
+        if (!val) {
+            alert('Пожалуйста, введите ссылку на YouTube или MP4.');
+            return;
+        }
+
+        if (/\.(mp4|webm|m3u8)(\?.*)?$/i.test(val)) {
+            state.ssMediaType = 'video';
+            state.ssVideoUrl = val;
+            localStorage.setItem('hp_ss_mtype', 'video');
+            localStorage.setItem('hp_ss_vurl', val);
+        } else {
+            const ytId = extractYouTubeId(val);
+            if (!ytId) {
+                alert('Не удалось распознать ссылку на YouTube.');
+                return;
+            }
+            state.ssMediaType = 'youtube';
+            state.ssYoutubeId = ytId;
+            localStorage.setItem('hp_ss_mtype', 'youtube');
+            localStorage.setItem('hp_ss_ytid', ytId);
+        }
+
+        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+        alert('Пользовательское видео успешно сохранено для заставки!');
     });
 }
+
+// Screensaver Widget Transparency Selector
+const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
+ssOpacityBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssOpacityBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssWidgetOpacity = btn.getAttribute('data-opacity') || 'ultra';
+        applyScreensaverWidgetOpacity();
+    });
+});
+ssOpacityBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-opacity') === state.ssWidgetOpacity));
