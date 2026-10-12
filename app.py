@@ -32,7 +32,7 @@ SCREENSAVER_WALLPAPERS = [
     },
     {
         "id": "ss_space",
-        "name": "Космическая Аврора 4K",
+        "name": "Космическая Аврора & Звёзды",
         "thumb": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop&q=80",
         "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90"
     },
@@ -50,15 +50,45 @@ SCREENSAVER_WALLPAPERS = [
     },
     {
         "id": "ss_ocean",
-        "name": "Океанский Прибой & Закат",
+        "name": "Океанский Прибой & Золотой Пляж",
         "thumb": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80",
         "url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90"
     },
     {
         "id": "ss_fireplace",
-        "name": "Теплый Огонь Камина",
+        "name": "Тёплый Огонь Камина",
         "thumb": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&auto=format&fit=crop&q=80",
         "url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90"
+    },
+    {
+        "id": "ss_forest",
+        "name": "Туманный Хвойный Лес",
+        "thumb": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&auto=format&fit=crop&q=90"
+    },
+    {
+        "id": "ss_lake",
+        "name": "Осеннее Горное Озеро",
+        "thumb": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=90"
+    },
+    {
+        "id": "ss_nebula",
+        "name": "Неоновые Космические Волны",
+        "thumb": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=90"
+    },
+    {
+        "id": "ss_waterfall",
+        "name": "Живописный Водопад в Джунглях",
+        "thumb": "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1920&auto=format&fit=crop&q=90"
+    },
+    {
+        "id": "ss_city_night",
+        "name": "Футуристический Мегаполис в Ночи",
+        "thumb": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1920&auto=format&fit=crop&q=90"
     }
 ]
 

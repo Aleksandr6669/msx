@@ -3,7 +3,7 @@
   "items": [
     {
       "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90",
-      "title": "Космическая Аврора 4K",
+      "title": "Космическая Аврора & Звёзды",
       "duration": 8
     },
     {
@@ -18,12 +18,37 @@
     },
     {
       "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
-      "title": "Океанский Прибой & Закат",
+      "title": "Океанский Прибой & Золотой Пляж",
       "duration": 8
     },
     {
       "image": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90",
-      "title": "Теплый Огонь Камина",
+      "title": "Тёплый Огонь Камина",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&auto=format&fit=crop&q=90",
+      "title": "Туманный Хвойный Лес",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=90",
+      "title": "Осеннее Горное Озеро",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=90",
+      "title": "Неоновые Космические Волны",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1920&auto=format&fit=crop&q=90",
+      "title": "Живописный Водопад в Джунглях",
+      "duration": 8
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1920&auto=format&fit=crop&q=90",
+      "title": "Футуристический Мегаполис в Ночи",
       "duration": 8
     }
   ]
