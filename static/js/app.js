@@ -9,6 +9,17 @@ const SECTION_WALLPAPERS = {
     info: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=85"
 };
 
+const SCREENSAVER_IMAGES = {
+    ss_space: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90",
+    ss_cyber: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90",
+    ss_mountains: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
+    ss_ocean: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
+    ss_fireplace: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90"
+};
+const SS_SLIDESHOW_LIST = Object.values(SCREENSAVER_IMAGES);
+let ssSlideshowInterval = null;
+let ssSlideshowIndex = 0;
+
 const DEFAULT_APPS_LIST = [
     {
         id: "app_lampa",
@@ -76,9 +87,12 @@ let state = {
 };
 
 // ---------------------------------------------------------------------------
-// 1. WALLPAPERS & TAB SWITCHING
+// 1. COLLAPSIBLE SIDEBAR & TAB SWITCHING
 // ---------------------------------------------------------------------------
 const bgWallpaper = document.getElementById('bgWallpaper');
+const tvSidebar = document.getElementById('tvSidebar');
+const tvShell = document.getElementById('tvShell');
+const tvStage = document.getElementById('tvStage');
 const menuTabs = document.querySelectorAll('.menu-tab');
 const tabPanes = {
     widgets: document.getElementById('tabWidgets'),
@@ -86,6 +100,35 @@ const tabPanes = {
     settings: document.getElementById('tabSettings'),
     info: document.getElementById('tabInfo')
 };
+
+function expandSidebar(expand) {
+    if (!tvSidebar) return;
+    if (expand) {
+        tvSidebar.classList.remove('collapsed');
+        if (tvShell) tvShell.classList.remove('sidebar-collapsed');
+    } else {
+        tvSidebar.classList.add('collapsed');
+        if (tvShell) tvShell.classList.add('sidebar-collapsed');
+    }
+}
+
+if (tvSidebar) {
+    tvSidebar.addEventListener('focusin', () => expandSidebar(true));
+    tvSidebar.addEventListener('mouseenter', () => expandSidebar(true));
+}
+if (tvStage) {
+    tvStage.addEventListener('focusin', () => expandSidebar(false));
+    tvStage.addEventListener('mouseenter', () => expandSidebar(false));
+}
+
+function focusCurrentTabContent() {
+    const activePane = tabPanes[state.activeTab];
+    if (!activePane) return;
+    const focusable = activePane.querySelectorAll('button, [tabindex="0"], input, select');
+    if (focusable.length > 0) {
+        focusable[0].focus();
+    }
+}
 
 function switchTab(tabId) {
     state.activeTab = tabId;
@@ -112,7 +155,11 @@ function switchTab(tabId) {
 menuTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         const target = tab.getAttribute('data-tab');
-        if (target) switchTab(target);
+        if (target) {
+            switchTab(target);
+            expandSidebar(false);
+            focusCurrentTabContent();
+        }
     });
 });
 
@@ -190,10 +237,8 @@ function updateClocks() {
     // Screensaver Clocks
     const ssTimeText = document.getElementById('ssTimeText');
     const ssDateText = document.getElementById('ssDateText');
-    const ssCityTime = document.getElementById('ssCityTime');
     if (ssTimeText) ssTimeText.textContent = `${hStr}:${mStr}`;
     if (ssDateText) ssDateText.textContent = fullDateStr;
-    if (ssCityTime) ssCityTime.textContent = `Точное время: ${hStr}:${mStr}:${sStr}`;
 }
 
 function clockLoop() {
@@ -262,7 +307,6 @@ const wCalCompact = document.getElementById('wCalCompact');
 const wCalEvents = document.getElementById('wCalEvents');
 
 function applyWidgetsLayout() {
-    // 1. Toggles
     if (wClockDigital) wClockDigital.style.display = state.widgets.clock_digital ? 'block' : 'none';
     if (wClockAnalog) wClockAnalog.style.display = state.widgets.clock_analog ? 'flex' : 'none';
     if (wClockModern) wClockModern.style.display = state.widgets.clock_modern ? 'block' : 'none';
@@ -271,12 +315,10 @@ function applyWidgetsLayout() {
     if (wCalCompact) wCalCompact.style.display = state.widgets.calendar_compact ? 'block' : 'none';
     if (wCalEvents) wCalEvents.style.display = state.widgets.calendar_events ? 'block' : 'none';
 
-    // 2. Position
     if (widgetsWrapper) {
         widgetsWrapper.className = `widgets-wrapper pos-${state.widgetsPos}`;
     }
 
-    // 3. Blur
     const root = document.documentElement;
     if (state.blur === 'light') root.style.setProperty('--glass-blur', '14px');
     else if (state.blur === 'heavy') root.style.setProperty('--glass-blur', '38px');
@@ -313,11 +355,11 @@ const gotoWidgetSettingsBtn = document.getElementById('gotoWidgetSettingsBtn');
 if (gotoWidgetSettingsBtn) {
     gotoWidgetSettingsBtn.addEventListener('click', () => {
         switchTab('settings');
-        // Activate sub-widgets tab
         subtabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-subtab') === 'sub-widgets'));
         Object.keys(subpanes).forEach(k => {
             if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-widgets');
         });
+        expandSidebar(false);
     });
 }
 
@@ -395,14 +437,12 @@ function openAppViewer(app) {
         appViewerModal.classList.add('active');
     }
 
-    // Push state into browser history so that TV back button triggers popstate
     try {
         window.history.pushState({ appViewerOpen: true, appName: app.name }, '', '#app-' + (app.id || 'view'));
     } catch (err) {
         console.warn('History pushState error:', err);
     }
 
-    // Focus the exit button so TV remote can immediately trigger Return / OK
     setTimeout(() => {
         if (btnExitAppViewer) {
             btnExitAppViewer.focus();
@@ -418,7 +458,6 @@ function closeAppViewer(triggerHistoryBack = true) {
         appViewerFrame.src = 'about:blank';
     }
 
-    // Pop the history entry if needed
     if (triggerHistoryBack && window.location.hash.startsWith('#app-')) {
         try {
             window.history.back();
@@ -427,7 +466,6 @@ function closeAppViewer(triggerHistoryBack = true) {
         }
     }
 
-    // Restore focus back to the originating element
     if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
         lastFocusedElement.focus();
     }
@@ -437,57 +475,56 @@ if (btnExitAppViewer) {
     btnExitAppViewer.addEventListener('click', (e) => {
         e.preventDefault();
         closeAppViewer(true);
+        switchTab('widgets');
     });
 }
 
 // ---------------------------------------------------------------------------
 // 6. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
-// Handles: Samsung Tizen (10009 / tizenhwkey), LG webOS (461), Android TV (4),
-// Escape (27), Backspace (8), and browser popstate.
+// Guarantees: Always returns to main screen (widgets) and NEVER exits app!
 // ---------------------------------------------------------------------------
 function handleTvBackButton(e) {
-    // 1. If App Viewer is open -> close it and return to the portal
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // 1. If App Viewer (iframe) is active -> close it and return to widgets!
     if (appViewerModal && appViewerModal.classList.contains('active')) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
         closeAppViewer(true);
-        return true;
-    }
-
-    // 2. If Screensaver is active -> hide it and return
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        hideScreensaver();
-        return true;
-    }
-
-    // 3. If in another tab (Apps, Settings, Info) -> return to Widgets tab
-    if (state.activeTab !== 'widgets') {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
         switchTab('widgets');
-        const widgetsTabBtn = document.querySelector('.menu-tab[data-tab="widgets"]');
-        if (widgetsTabBtn) widgetsTabBtn.focus();
+        expandSidebar(false);
+        focusCurrentTabContent();
         return true;
     }
 
-    // 4. If already on Widgets tab and user presses Back -> exit cleanly to MSX root
-    // Only if explicitly triggered
-    return false;
+    // 2. If Screensaver is active -> hide it and return directly to widgets!
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        hideScreensaver();
+        switchTab('widgets');
+        expandSidebar(false);
+        focusCurrentTabContent();
+        return true;
+    }
+
+    // 3. If in Apps, Settings, or Info -> return directly to widgets tab!
+    if (state.activeTab !== 'widgets') {
+        switchTab('widgets');
+        expandSidebar(false);
+        focusCurrentTabContent();
+        return true;
+    }
+
+    // 4. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
+    expandSidebar(false);
+    return true;
 }
 
 window.addEventListener('keydown', (e) => {
     const key = e.key;
     const keyCode = e.keyCode;
 
-    // Samsung Tizen (10009), LG webOS (461), Android TV (4), Escape (27), Backspace (8)
+    // Check for Back key on TV remotes: Samsung (10009), LG (461), Android (4), ESC (27), Backspace (8)
     const isBackKey = (
         keyCode === 10009 ||
         keyCode === 461 ||
@@ -500,10 +537,28 @@ window.addEventListener('keydown', (e) => {
     );
 
     if (isBackKey) {
-        const handled = handleTvBackButton(e);
-        if (handled && e) {
+        handleTvBackButton(e);
+        return;
+    }
+
+    // Sidebar D-pad navigation (ArrowRight to enter content, ArrowLeft to return to menu)
+    const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
+
+    if (e.key === 'ArrowRight' && inSidebar) {
+        e.preventDefault();
+        expandSidebar(false);
+        focusCurrentTabContent();
+    } else if (e.key === 'ArrowLeft' && !inSidebar && !appViewerModal?.classList.contains('active') && !screensaverLayer?.classList.contains('active')) {
+        const activeEl = document.activeElement;
+        const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
+        const isHeaderBtn = activeEl && (activeEl.id === 'gotoWidgetSettingsBtn' || activeEl.id === 'openAddAppModalBtn' || activeEl.classList.contains('subtab-btn'));
+        const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === widgetsWrapper?.firstElementChild;
+
+        if (isFirstAppCard || isHeaderBtn || isFirstWidget || activeEl === document.body || !activeEl) {
             e.preventDefault();
-            e.stopPropagation();
+            expandSidebar(true);
+            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`);
+            if (activeTabBtn) activeTabBtn.focus();
         }
     }
 });
@@ -515,11 +570,17 @@ document.addEventListener('tizenhwkey', (e) => {
     }
 });
 
-// Browser PopState Listener (triggers when TV browser navigates back)
-window.addEventListener('popstate', () => {
-    if (appViewerModal && appViewerModal.classList.contains('active')) {
-        closeAppViewer(false);
-    }
+// Trap browser history to prevent TV browser from exiting on back
+function pushTrapHistory() {
+    try {
+        window.history.pushState({ trap: true }, '', window.location.pathname + window.location.search);
+    } catch (err) {}
+}
+pushTrapHistory();
+
+window.addEventListener('popstate', (e) => {
+    pushTrapHistory();
+    handleTvBackButton(e);
 });
 
 // ---------------------------------------------------------------------------
@@ -532,7 +593,6 @@ const installedAppsManageList = document.getElementById('installedAppsManageList
 function renderApps() {
     if (appsCountBadge) appsCountBadge.textContent = state.apps.length;
 
-    // Render Main Grid (Tab 2)
     if (appsGrid) {
         appsGrid.innerHTML = '';
         state.apps.forEach(app => {
@@ -555,7 +615,6 @@ function renderApps() {
                 </div>
             `;
 
-            // Open in In-App Viewer with top return button & Back key capture
             card.addEventListener('click', () => {
                 openAppViewer(app);
             });
@@ -571,7 +630,6 @@ function renderApps() {
         });
     }
 
-    // Render Management List in Settings
     if (installedAppsManageList) {
         installedAppsManageList.innerHTML = '';
         state.apps.forEach((app, index) => {
@@ -673,6 +731,7 @@ if (openAddAppModalBtn) {
         Object.keys(subpanes).forEach(k => {
             if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-apps');
         });
+        expandSidebar(false);
     });
 }
 
@@ -685,13 +744,39 @@ if (exitToMsxBtn) {
 }
 
 // ---------------------------------------------------------------------------
-// 8. 4K SCREENSAVER ENGINE (IDLE TIMER & MANUAL START)
+// 8. 4K SCREENSAVER ENGINE (WALLPAPER PICKER & AUTO-RUN)
 // ---------------------------------------------------------------------------
 const screensaverLayer = document.getElementById('screensaverLayer');
+const ssBgImage = document.getElementById('ssBgImage');
 let idleTimer = null;
+
+function updateScreensaverWallpaper() {
+    const bgLayer = document.getElementById('ssBgImage');
+    if (!bgLayer) return;
+
+    if (ssSlideshowInterval) {
+        clearInterval(ssSlideshowInterval);
+        ssSlideshowInterval = null;
+    }
+
+    const currentBg = state.screensaverBg || 'ss_all';
+
+    if (currentBg === 'ss_all') {
+        const nextImg = SS_SLIDESHOW_LIST[ssSlideshowIndex % SS_SLIDESHOW_LIST.length];
+        bgLayer.style.backgroundImage = `url('${nextImg}')`;
+        ssSlideshowInterval = setInterval(() => {
+            ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
+            bgLayer.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
+        }, 8000);
+    } else {
+        const bgUrl = SCREENSAVER_IMAGES[currentBg] || currentBg;
+        bgLayer.style.backgroundImage = `url('${bgUrl}')`;
+    }
+}
 
 function showScreensaver() {
     if (screensaverLayer) {
+        updateScreensaverWallpaper();
         screensaverLayer.classList.add('active');
     }
 }
@@ -699,6 +784,10 @@ function showScreensaver() {
 function hideScreensaver() {
     if (screensaverLayer && screensaverLayer.classList.contains('active')) {
         screensaverLayer.classList.remove('active');
+        if (ssSlideshowInterval) {
+            clearInterval(ssSlideshowInterval);
+            ssSlideshowInterval = null;
+        }
         resetIdleTimer();
     }
 }
@@ -712,10 +801,11 @@ function resetIdleTimer() {
     }
 }
 
-// Reset idle timer on any user activity (mouse / remote)
+// Reset idle timer on any user activity
 window.addEventListener('keydown', (e) => {
     if (screensaverLayer && screensaverLayer.classList.contains('active')) {
         hideScreensaver();
+        switchTab('widgets');
         e.preventDefault();
         return;
     }
@@ -725,6 +815,7 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('mousemove', () => {
     if (screensaverLayer && screensaverLayer.classList.contains('active')) {
         hideScreensaver();
+        switchTab('widgets');
         return;
     }
     resetIdleTimer();
@@ -749,8 +840,22 @@ ssThumbCards.forEach(card => {
         ssThumbCards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         state.screensaverBg = card.getAttribute('data-id');
+        const customUrl = card.getAttribute('data-url');
+        if (customUrl && state.screensaverBg !== 'ss_all') {
+            SCREENSAVER_IMAGES[state.screensaverBg] = customUrl;
+        }
         localStorage.setItem('mx_ss_bg', state.screensaverBg);
+        updateScreensaverWallpaper();
     });
+});
+
+// Highlight initial selected card
+ssThumbCards.forEach(card => {
+    if (card.getAttribute('data-id') === state.screensaverBg) {
+        card.classList.add('selected');
+    } else {
+        card.classList.remove('selected');
+    }
 });
 
 // Timeout selector buttons
@@ -779,7 +884,7 @@ if (canvas) {
     });
 
     const particles = [];
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 75; i++) {
         particles.push({
             x: Math.random() * width,
             y: Math.random() * height,
