@@ -4,17 +4,27 @@ from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
+def get_base_url():
+    """
+    Dynamically resolve the base URL.
+    Works seamlessly on local development (http://localhost:5000),
+    local Wi-Fi IP (http://192.168.x.x:5000), and Vercel cloud (https://*.vercel.app).
+    """
+    proto = request.headers.get('X-Forwarded-Proto', request.scheme)
+    host = request.headers.get('X-Forwarded-Host', request.host)
+    return f"{proto}://{host}"
+
 # Persistent runtime settings (can be modified via API or UI)
 current_settings = {
-    "background_type": "image",  # "image" or "gradient"
+    "background_type": "image",
     "background_id": "bg_space",
     "background_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
-    "clock_widget": "digital",   # "digital", "modern", "analog", "both"
-    "calendar_widget": "grid",   # "grid", "compact", "events"
-    "widgets_position": "center", # "center", "left", "right", "top", "bottom"
+    "clock_widget": "digital",
+    "calendar_widget": "grid",
+    "widgets_position": "center",
     "show_clock": True,
     "show_calendar": True,
-    "glass_blur": "medium"       # "light", "medium", "heavy"
+    "glass_blur": "medium"
 }
 
 PRESET_BACKGROUNDS = [
@@ -73,7 +83,6 @@ PRESET_BACKGROUNDS = [
     }
 ]
 
-# Media Catalog
 MOVIES = [
     {
         "id": "mov_1",
@@ -148,11 +157,7 @@ def add_cors_headers(response):
 
 @app.route('/start.json')
 def msx_start():
-    """
-    Entry point for Media Station X.
-    Configured in MSX: Settings -> Start Parameter -> Setup -> http://<IP>:5000/start.json
-    """
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     return jsonify({
         "name": "MX Station Glass Portal",
         "version": "1.2.0",
@@ -163,11 +168,7 @@ def msx_start():
 
 @app.route('/menu.json')
 def msx_menu():
-    """
-    MSX Sidebar Menu (Menu Root Object).
-    Provides native navigation with icons and actions.
-    """
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     return jsonify({
         "headline": "MX STATION PLAYER",
         "logo": f"{base_url}/static/images/logo.svg",
@@ -220,8 +221,7 @@ def msx_menu():
 
 @app.route('/content/portal.json')
 def msx_content_portal():
-    """Interactive Hub with options to launch full web app or customize widgets"""
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     return jsonify({
         "type": "list",
         "headline": "Интерактивный Портал с Виджетами",
@@ -255,7 +255,7 @@ def msx_content_portal():
 
 @app.route('/content/home.json')
 def msx_content_home():
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     items = [
         {
             "id": "feat_banner",
@@ -333,8 +333,7 @@ def msx_content_tv():
 
 @app.route('/content/customize.json')
 def msx_content_customize():
-    """Menu to switch background wallpaper directly inside MSX on TV"""
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     items = []
     for bg in PRESET_BACKGROUNDS:
         if bg["type"] == "image":
@@ -357,11 +356,6 @@ def msx_content_customize():
 
 @app.route('/slideshow.json')
 def msx_slideshow():
-    """
-    Standard Slideshow Playlist for Media Station X Native Screensaver!
-    Configure in MSX on TV:
-    Settings -> Screensaver -> Screensaver Parameter / URL -> http://<IP>:5000/slideshow.json
-    """
     return jsonify({
         "headline": "4K Заставка Media Station X",
         "items": [
@@ -395,7 +389,7 @@ def msx_slideshow():
 
 @app.route('/content/info.json')
 def msx_content_info():
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     return jsonify({
         "type": "list",
         "headline": "О приложении и настройка заставки",
@@ -449,7 +443,7 @@ def api_set_background(bg_id):
 
 @app.route('/')
 def web_index():
-    base_url = request.host_url.rstrip('/')
+    base_url = get_base_url()
     return render_template(
         'index.html',
         base_url=base_url,
