@@ -30,7 +30,7 @@ const DEFAULT_APPS_LIST = [
     {
         id: "app_lampa",
         name: "Lampa",
-        url: "https://lampa.mx",
+        url: "http://lampa.mx",
         sub: "Онлайн-кинотеатр",
         icon: "movie",
         badge: "FILMS",
@@ -39,7 +39,7 @@ const DEFAULT_APPS_LIST = [
     {
         id: "app_youtube",
         name: "YouTube",
-        url: "https://msx.benzac.de/plugins/youtube.html",
+        url: "http://msx.benzac.de/plugins/youtube.html",
         sub: "Видео и стримы",
         icon: "play_circle",
         badge: "VIDEO",
@@ -84,7 +84,7 @@ const DEFAULT_APPS_LIST = [
     {
         id: "app_twitch",
         name: "Twitch",
-        url: "https://msx.benzac.de/plugins/twitch.html",
+        url: "http://msx.benzac.de/plugins/twitch.html",
         sub: "Игровые трансляции",
         icon: "videogame_asset",
         badge: "GAMES",
@@ -161,6 +161,29 @@ let state = {
     apps: JSON.parse(localStorage.getItem('hp_apps') || JSON.stringify(DEFAULT_APPS_LIST)),
     currentEditingWidget: null
 };
+
+// Auto-heal stored apps from localStorage (downgrades any stored https:// URLs to http:// to prevent SSL handshake errors on TV)
+if (Array.isArray(state.apps)) {
+    let appsChanged = false;
+    state.apps.forEach(app => {
+        if (!app || !app.url) return;
+        const normalized = normalizeUrl(app.url);
+        if (normalized !== app.url) {
+            app.url = normalized;
+            appsChanged = true;
+        }
+    });
+    if (appsChanged) {
+        try {
+            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+        } catch (e) {}
+    }
+}
+
+window.addEventListener('pageshow', () => {
+    const loader = document.getElementById('appNavLoader');
+    if (loader) loader.classList.remove('active');
+});
 
 // ---------------------------------------------------------------------------
 // 1. THEME, ACCENT COLOR & TRANSPARENCY CONTROLLER
@@ -646,17 +669,22 @@ renderWidgetsManageGrid();
 // 8. DIRECT FULLSCREEN WEBSITE LAUNCHER & HISTORY PRESERVATION
 // In Smart TV & MSX, external web applications must be launched directly (top-level)
 // rather than in an iframe to avoid X-Frame-Options, CSP, and Mixed Content blocking!
-// ---------------------------------------------------------------------------
 function normalizeUrl(url) {
     if (!url) return '';
     url = url.trim();
+
+    // Critical for Smart TV: Use pure HTTP for TV services to avoid SSL Handshake failures
+    if (/lampa\.mx/i.test(url)) return 'http://lampa.mx';
+    if (/msx\.benzac\.de\/plugins\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
+    if (/msx\.benzac\.de\/plugins\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
+    if (/deeplex\.cc/i.test(url)) return 'http://deeplex.cc';
+    if (/obovse\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
+
+    // If protocol missing, default to http:// on Smart TV for maximum compatibility
     if (!/^https?:\/\//i.test(url)) {
-        return 'https://' + url;
+        return 'http://' + url;
     }
-    // Upgrade known HTTP endpoints to HTTPS where valid
-    if (url === 'http://lampa.mx') return 'https://lampa.mx';
-    if (url === 'http://msx.benzac.de/plugins/youtube.html') return 'https://msx.benzac.de/plugins/youtube.html';
-    if (url === 'http://msx.benzac.de/plugins/twitch.html') return 'https://msx.benzac.de/plugins/twitch.html';
+
     return url;
 }
 
@@ -697,6 +725,13 @@ function handleTvBackButton(e) {
         e.stopPropagation();
     }
 
+    // 0. If App loader is active -> hide it
+    const appLoader = document.getElementById('appNavLoader');
+    if (appLoader && appLoader.classList.contains('active')) {
+        appLoader.classList.remove('active');
+        return true;
+    }
+
     // 1. If Screensaver is active -> hide it and return directly to widgets!
     if (screensaverLayer && screensaverLayer.classList.contains('active')) {
         hideScreensaver();
@@ -706,13 +741,13 @@ function handleTvBackButton(e) {
         return true;
     }
 
-    // 2. If in widget detail view -> go back to widgets list
+    // 3. If in widget detail view -> go back to widgets list
     if (state.activeTab === 'settings' && widgetDetailView && widgetDetailView.style.display !== 'none') {
         showWidgetsListView();
         return true;
     }
 
-    // 3. If in Apps, Settings, or Info -> return directly to widgets tab!
+    // 4. If in Apps, Settings, or Info -> return directly to widgets tab!
     if (state.activeTab !== 'widgets') {
         switchTab('widgets');
         expandSidebar(false);
@@ -720,7 +755,7 @@ function handleTvBackButton(e) {
         return true;
     }
 
-    // 4. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
+    // 5. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
     expandSidebar(false);
     return true;
 }
@@ -766,24 +801,11 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// Tizen hardware key listener
-document.addEventListener('tizenhwkey', (e) => {
-    if (e.keyName === 'back') {
-        handleTvBackButton(e);
-    }
-});
-
-// History trap to prevent TV browser from exiting
-function pushTrapHistory() {
-    try {
-        window.history.pushState({ trap: true }, '', window.location.pathname + window.location.search);
-    } catch (err) {}
-}
-pushTrapHistory();
-
+// Browser History popstate handler
 window.addEventListener('popstate', (e) => {
-    pushTrapHistory();
-    handleTvBackButton(e);
+    const loader = document.getElementById('appNavLoader');
+    if (loader) loader.classList.remove('active');
+    handleTvBackButton(null);
 });
 
 // ---------------------------------------------------------------------------
@@ -791,57 +813,42 @@ window.addEventListener('popstate', (e) => {
 // ---------------------------------------------------------------------------
 const appsGrid = document.getElementById('appsGrid');
 const appsCountBadge = document.getElementById('appsCountBadge');
-const installedAppsManageList = document.getElementById('installedAppsManageList');
 
 function renderApps() {
-    if (appsCountBadge) appsCountBadge.textContent = state.apps.length;
+    if (!appsGrid) return;
+    appsGrid.innerHTML = '';
 
-    if (appsGrid) {
-        appsGrid.innerHTML = '';
-        state.apps.forEach(app => {
-            const card = document.createElement('div');
-            card.className = 'app-card';
-            card.tabIndex = 0;
-
-            const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
-            card.innerHTML = `
-                <div class="app-icon-squircle">
-                    <img src="${imgUrl}" alt="${app.name}" class="app-icon-img" loading="lazy">
-                    <span class="app-card-badge">${app.badge || 'APP'}</span>
-                </div>
-                <div class="app-card-name">${app.name}</div>
-            `;
-
-            card.addEventListener('click', () => openApp(app));
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.keyCode === 13) {
-                    e.preventDefault();
-                    openApp(app);
-                }
-            });
-
-            appsGrid.appendChild(card);
-        });
+    if (appsCountBadge) {
+        appsCountBadge.textContent = `${state.apps.length} программ`;
     }
 
-    if (installedAppsManageList) {
-        installedAppsManageList.innerHTML = '';
-        state.apps.forEach((app, index) => {
-            const item = document.createElement('div');
-            item.className = 'installed-item';
-            item.innerHTML = `
-                <span><strong>${app.name}</strong> (${app.url})</span>
-                <button class="btn-del-app" data-index="${index}" tabindex="0">Удалить</button>
-            `;
-            const delBtn = item.querySelector('.btn-del-app');
-            delBtn.addEventListener('click', () => {
-                state.apps.splice(index, 1);
-                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-                renderApps();
-            });
-            installedAppsManageList.appendChild(item);
+    state.apps.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.tabIndex = 0;
+        card.setAttribute('data-id', app.id);
+
+        const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
+        card.innerHTML = `
+            <div class="app-icon-squircle">
+                <img src="${imgUrl}" alt="${app.name}" class="app-icon-img" loading="lazy">
+                <span class="app-card-badge">${app.badge || 'APP'}</span>
+            </div>
+            <div class="app-card-name">${app.name}</div>
+        `;
+
+        card.addEventListener('click', () => openApp(app));
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                openApp(app);
+            }
         });
-    }
+
+        appsGrid.appendChild(card);
+    });
+
+    renderSettingsAppsList();
 }
 renderApps();
 
@@ -849,12 +856,14 @@ renderApps();
 const btnSaveApp = document.getElementById('btnSaveApp');
 const inputAppName = document.getElementById('inputAppName');
 const inputAppUrl = document.getElementById('inputAppUrl');
+const inputAppBadge = document.getElementById('inputAppBadge');
 const selectAppIcon = document.getElementById('selectAppIcon');
 
 if (btnSaveApp && inputAppName && inputAppUrl) {
     btnSaveApp.addEventListener('click', () => {
         const name = inputAppName.value.trim();
-        const url = inputAppUrl.value.trim();
+        const url = normalizeUrl(inputAppUrl.value.trim());
+        const badge = inputAppBadge ? inputAppBadge.value.trim().toUpperCase() : 'APP';
         const icon = selectAppIcon ? selectAppIcon.value : 'launch';
 
         if (!name || !url) {
@@ -862,16 +871,17 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
             return;
         }
 
-        state.apps.push({
-            id: `app_custom_${Date.now()}`,
+        const newApp = {
+            id: 'app_user_' + Date.now(),
             name: name,
             url: url,
-            sub: 'Пользовательский ярлык',
+            sub: 'Пользовательская ссылка',
             icon: icon,
-            badge: 'CUSTOM',
-            image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500'
-        });
+            badge: badge || 'APP',
+            image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500'
+        };
 
+        state.apps.push(newApp);
         localStorage.setItem('hp_apps', JSON.stringify(state.apps));
         inputAppName.value = '';
         inputAppUrl.value = '';
@@ -880,23 +890,60 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
     });
 }
 
-// Preset Quick Add Buttons
-const presetBtns = document.querySelectorAll('.preset-btn');
+function renderSettingsAppsList() {
+    const list = document.getElementById('settingsAppsList');
+    if (!list) return;
+    list.innerHTML = '';
+
+    state.apps.forEach((app, idx) => {
+        const item = document.createElement('div');
+        item.className = 'app-manage-item';
+        item.innerHTML = `
+            <div class="ami-left">
+                <span class="material-icons">${app.icon || 'launch'}</span>
+                <div>
+                    <span class="ami-name">${app.name}</span>
+                    <span class="ami-url">${app.url}</span>
+                </div>
+            </div>
+            <button class="btn-delete-app" tabindex="0" data-idx="${idx}">
+                <span class="material-icons">delete</span>
+            </button>
+        `;
+
+        const btnDel = item.querySelector('.btn-delete-app');
+        if (btnDel) {
+            btnDel.addEventListener('click', () => {
+                state.apps.splice(idx, 1);
+                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+                renderApps();
+            });
+        }
+
+        list.appendChild(item);
+    });
+}
+
+// Preset Quick-Add App Buttons
+const presetBtns = document.querySelectorAll('.btn-add-preset');
 presetBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const name = btn.getAttribute('data-name');
-        const url = btn.getAttribute('data-url');
-        const icon = btn.getAttribute('data-icon');
+        const url = normalizeUrl(btn.getAttribute('data-url'));
+        const badge = btn.getAttribute('data-badge') || 'APP';
+        const icon = btn.getAttribute('data-icon') || 'launch';
+        const img = btn.getAttribute('data-img') || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
 
-        if (!state.apps.some(a => a.url === url)) {
+        const exists = state.apps.some(a => a.name.toLowerCase() === name.toLowerCase());
+        if (!exists) {
             state.apps.push({
-                id: `app_${name.toLowerCase()}`,
+                id: 'app_pre_' + Date.now(),
                 name: name,
                 url: url,
-                sub: 'Популярное ТВ-приложение',
+                sub: 'Предустановленная программа',
                 icon: icon,
-                badge: 'APP',
-                image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500'
+                badge: badge,
+                image: img
             });
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
             renderApps();
@@ -907,13 +954,14 @@ presetBtns.forEach(btn => {
     });
 });
 
-// Reset Apps Button
+// Reset Default Apps
 const btnResetDefaultApps = document.getElementById('btnResetDefaultApps');
 if (btnResetDefaultApps) {
     btnResetDefaultApps.addEventListener('click', () => {
         state.apps = JSON.parse(JSON.stringify(DEFAULT_APPS_LIST));
         localStorage.setItem('hp_apps', JSON.stringify(state.apps));
         renderApps();
+        alert('Список программ сброшен к исходному виду.');
     });
 }
 
@@ -943,64 +991,63 @@ const ssClockBlock = document.getElementById('ssClockBlock');
 const ssCalendarBlock = document.getElementById('ssCalendarBlock');
 let idleTimer = null;
 
-function applyScreensaverLayout() {
+function applyScreensaverWidgetsAndPosition() {
     if (!ssWidgetsContainer) return;
 
     // Apply position class
-    ssWidgetsContainer.className = `ss-widgets-container pos-${state.ssPosition || 'center'}`;
+    const validPositions = ['center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
+    validPositions.forEach(p => ssWidgetsContainer.classList.remove(`pos-${p}`));
+    ssWidgetsContainer.classList.add(`pos-${state.ssPosition || 'center'}`);
 
     // Apply widget type visibility
     const type = state.ssWidgetType || 'both';
     if (ssClockBlock) {
-        ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'inline-flex' : 'none';
+        ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'flex' : 'none';
     }
     if (ssCalendarBlock) {
-        ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'inline-flex' : 'none';
+        ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'flex' : 'none';
     }
+
+    localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
+    localStorage.setItem('hp_ss_pos', state.ssPosition);
 }
 
-function updateScreensaverWallpaper() {
-    const bgLayer = document.getElementById('ssBgImage');
-    if (!bgLayer) return;
+function showScreensaver() {
+    if (!screensaverLayer) return;
 
+    applyScreensaverWidgetsAndPosition();
+
+    // Select background
+    if (state.screensaverBg === 'ss_all') {
+        ssSlideshowIndex = 0;
+        if (ssBgImage) ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[0]}')`;
+
+        if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
+        ssSlideshowInterval = setInterval(() => {
+            ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
+            if (ssBgImage) {
+                ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
+            }
+        }, 7000);
+    } else {
+        if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
+        const bgUrl = SCREENSAVER_IMAGES[state.screensaverBg] || SCREENSAVER_IMAGES.ss_space;
+        if (ssBgImage) ssBgImage.style.backgroundImage = `url('${bgUrl}')`;
+    }
+
+    screensaverLayer.classList.add('active');
+    updateClocks();
+    renderCalendars();
+}
+
+function hideScreensaver() {
+    if (!screensaverLayer) return;
+    screensaverLayer.classList.remove('active');
     if (ssSlideshowInterval) {
         clearInterval(ssSlideshowInterval);
         ssSlideshowInterval = null;
     }
-
-    const currentBg = state.screensaverBg || 'ss_all';
-
-    if (currentBg === 'ss_all') {
-        const nextImg = SS_SLIDESHOW_LIST[ssSlideshowIndex % SS_SLIDESHOW_LIST.length];
-        bgLayer.style.backgroundImage = `url('${nextImg}')`;
-        ssSlideshowInterval = setInterval(() => {
-            ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
-            bgLayer.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
-        }, 8000);
-    } else {
-        const bgUrl = SCREENSAVER_IMAGES[currentBg] || currentBg;
-        bgLayer.style.backgroundImage = `url('${bgUrl}')`;
-    }
-}
-
-function showScreensaver() {
-    if (screensaverLayer) {
-        updateScreensaverWallpaper();
-        applyScreensaverLayout();
-        renderCalendars();
-        screensaverLayer.classList.add('active');
-    }
-}
-
-function hideScreensaver() {
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        screensaverLayer.classList.remove('active');
-        if (ssSlideshowInterval) {
-            clearInterval(ssSlideshowInterval);
-            ssSlideshowInterval = null;
-        }
-        resetIdleTimer();
-    }
+    resetIdleTimer();
 }
 
 function resetIdleTimer() {
@@ -1012,141 +1059,71 @@ function resetIdleTimer() {
     }
 }
 
-// Reset idle timer on any user activity
-window.addEventListener('keydown', (e) => {
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        hideScreensaver();
-        switchTab('widgets');
-        e.preventDefault();
-        return;
-    }
-    resetIdleTimer();
+// Any user activity resets the idle timer or dismisses screensaver
+['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, () => {
+        if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+            hideScreensaver();
+        } else {
+            resetIdleTimer();
+        }
+    }, { passive: true });
 });
-
-window.addEventListener('mousemove', () => {
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        hideScreensaver();
-        switchTab('widgets');
-        return;
-    }
-    resetIdleTimer();
-});
-
 resetIdleTimer();
 
-// Manual screensaver triggers
-const startScreensaverBtn = document.getElementById('startScreensaverBtn');
-if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', showScreensaver);
-
-const btnTestScreensaver = document.getElementById('btnTestScreensaver');
-if (btnTestScreensaver) btnTestScreensaver.addEventListener('click', showScreensaver);
-
-// Screensaver Wallpaper Picker
-const ssThumbCards = document.querySelectorAll('.ss-thumb-card');
-ssThumbCards.forEach(card => {
-    card.addEventListener('click', () => {
-        ssThumbCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        state.screensaverBg = card.getAttribute('data-id');
-        const customUrl = card.getAttribute('data-url');
-        if (customUrl && state.screensaverBg !== 'ss_all') {
-            SCREENSAVER_IMAGES[state.screensaverBg] = customUrl;
-        }
-        localStorage.setItem('hp_ss_bg', state.screensaverBg);
-        updateScreensaverWallpaper();
-    });
-});
-
-ssThumbCards.forEach(card => {
-    if (card.getAttribute('data-id') === state.screensaverBg) {
-        card.classList.add('selected');
-    } else {
-        card.classList.remove('selected');
-    }
-});
-
-// Timeout selector buttons (30s, 1m, 2m, 3m, 5m, 10m, 15m, 0)
-const timeoutBtns = document.querySelectorAll('.timeout-btn');
-timeoutBtns.forEach(btn => {
+// Screensaver Settings Controls in UI
+const ssTimeBtns = document.querySelectorAll('.ss-time-btn');
+ssTimeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-        timeoutBtns.forEach(b => b.classList.remove('active'));
+        ssTimeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.idleTimeoutSec = parseInt(btn.getAttribute('data-time'), 10);
+        state.idleTimeoutSec = parseInt(btn.getAttribute('data-sec'), 10);
         localStorage.setItem('hp_idle_sec', String(state.idleTimeoutSec));
         resetIdleTimer();
     });
 });
-timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-time'), 10) === state.idleTimeoutSec));
+ssTimeBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-sec'), 10) === state.idleTimeoutSec));
 
-// Screensaver Widget Type Selector (both, clock, calendar, none)
-const ssWTypeBtns = document.querySelectorAll('.ss-wtype-btn');
-ssWTypeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        ssWTypeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.ssWidgetType = btn.getAttribute('data-wtype');
-        localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
-        applyScreensaverLayout();
+// Screensaver Wallpaper Picker
+const ssBgCards = document.querySelectorAll('.ss-bg-card');
+ssBgCards.forEach(card => {
+    card.addEventListener('click', () => {
+        ssBgCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        state.screensaverBg = card.getAttribute('data-bg');
+        localStorage.setItem('hp_ss_bg', state.screensaverBg);
     });
 });
-ssWTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-wtype') === state.ssWidgetType));
+ssBgCards.forEach(c => c.classList.toggle('active', c.getAttribute('data-bg') === state.screensaverBg));
 
-// Screensaver Position Selector (center, top-left, top-right, bottom-left, bottom-right, etc.)
+// Screensaver Widget Type Buttons
+const ssTypeBtns = document.querySelectorAll('.ss-type-btn');
+ssTypeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssTypeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssWidgetType = btn.getAttribute('data-type');
+        applyScreensaverWidgetsAndPosition();
+    });
+});
+ssTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-type') === state.ssWidgetType));
+
+// Screensaver Position Buttons
 const ssPosBtns = document.querySelectorAll('.ss-pos-btn');
 ssPosBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         ssPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPosition = btn.getAttribute('data-pos');
-        localStorage.setItem('hp_ss_pos', state.ssPosition);
-        applyScreensaverLayout();
+        applyScreensaverWidgetsAndPosition();
     });
 });
 ssPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.ssPosition));
 
-// Canvas Stars Particles for Screensaver
-const canvas = document.getElementById('ssStarsCanvas');
-if (canvas) {
-    const ctx = canvas.getContext('2d');
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+// Test Screensaver Button
+const btnPreviewScreensaver = document.getElementById('btnPreviewScreensaver');
+if (btnPreviewScreensaver) {
+    btnPreviewScreensaver.addEventListener('click', () => {
+        showScreensaver();
     });
-
-    const particles = [];
-    for (let i = 0; i < 75; i++) {
-        particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            radius: Math.random() * 2 + 0.5,
-            alpha: Math.random() * 0.7 + 0.3,
-            dx: (Math.random() - 0.5) * 0.35,
-            dy: (Math.random() - 0.5) * 0.35
-        });
-    }
-
-    function renderParticles() {
-        ctx.clearRect(0, 0, width, height);
-        particles.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(180, 220, 255, ${p.alpha})`;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = state.themeColor;
-            ctx.fill();
-
-            p.x += p.dx;
-            p.y += p.dy;
-
-            if (p.x < 0) p.x = width;
-            if (p.x > width) p.x = 0;
-            if (p.y < 0) p.y = height;
-            if (p.y > height) p.y = 0;
-        });
-        requestAnimationFrame(renderParticles);
-    }
-    renderParticles();
 }
