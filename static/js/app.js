@@ -1,13 +1,13 @@
 // ==========================================================================
 // HOME PORTAL TV — CLIENT ENGINE FOR SMART TV & MEDIA STATION X
-// Optimized for 60fps, TV Remote D-Pad Navigation, Bento 2x2 Grid
+// Optimized for 60fps, TV Remote D-Pad Navigation, Bento Grid
 // ==========================================================================
 
 const SECTION_WALLPAPERS = {
     widgets: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
-    apps: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=85",
-    settings: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85",
-    info: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=85"
+    apps: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&auto=format&fit=crop&q=85",
+    settings: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=85",
+    info: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85"
 };
 
 const SCREENSAVER_IMAGES = {
@@ -15,12 +15,7 @@ const SCREENSAVER_IMAGES = {
     ss_cyber: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90",
     ss_mountains: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
     ss_ocean: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
-    ss_fireplace: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90",
-    ss_forest: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&auto=format&fit=crop&q=90",
-    ss_lake: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=90",
-    ss_nebula: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=90",
-    ss_waterfall: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1920&auto=format&fit=crop&q=90",
-    ss_city_night: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1920&auto=format&fit=crop&q=90"
+    ss_fireplace: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90"
 };
 const SS_SLIDESHOW_LIST = Object.values(SCREENSAVER_IMAGES);
 let ssSlideshowInterval = null;
@@ -64,24 +59,6 @@ const DEFAULT_APPS_LIST = [
         image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
     },
     {
-        id: "app_iptv",
-        name: "IPTV HD",
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        sub: "Телеканалы",
-        icon: "live_tv",
-        badge: "LIVE",
-        image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-        id: "app_music",
-        name: "Lo-Fi Radio",
-        url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        sub: "Релакс музыка",
-        icon: "music_note",
-        badge: "CHILL",
-        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80"
-    },
-    {
         id: "app_deeplex",
         name: "Deeplex 4K",
         url: "http://deeplex.cc",
@@ -89,6 +66,15 @@ const DEFAULT_APPS_LIST = [
         icon: "theaters",
         badge: "CINEMA",
         image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_iptv",
+        name: "IPTV HD",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        sub: "Телеканалы",
+        icon: "live_tv",
+        badge: "LIVE",
+        image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&auto=format&fit=crop&q=80"
     },
     {
         id: "app_twitch",
@@ -140,46 +126,73 @@ const WIDGETS_METADATA = {
     }
 };
 
+// Safe localStorage helper
+function safeGetStorage(key, defaultVal) {
+    try {
+        const val = localStorage.getItem(key);
+        return val !== null ? val : defaultVal;
+    } catch (e) {
+        return defaultVal;
+    }
+}
+
 // App State
 let state = {
     activeTab: "widgets",
-    themeColor: localStorage.getItem('hp_theme_color') || "#00d2ff",
-    themeRgb: localStorage.getItem('hp_theme_rgb') || "0, 210, 255",
-    transparency: localStorage.getItem('hp_transparency') || "frosted",
-    animations: localStorage.getItem('hp_animations') || "snappy",
-    idleTimeoutSec: parseInt(localStorage.getItem('hp_idle_sec') || "120", 10),
-    screensaverBg: localStorage.getItem('hp_ss_bg') || "ss_all",
-    sidebarPos: localStorage.getItem('hp_sidebar_pos') || "left", // left or right
-    ssMediaType: localStorage.getItem('hp_ss_mtype') || "photo", // photo, youtube, video
-    ssYoutubeId: localStorage.getItem('hp_ss_ytid') || "L_LUpnjgPso",
-    ssVideoUrl: localStorage.getItem('hp_ss_vurl') || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    ssPhotoAnim: localStorage.getItem('hp_ss_photo_anim') !== 'false', // true by default, can be toggled
-    ssWidgetOpacity: localStorage.getItem('hp_ss_wopacity') || "ultra", // none, ultra, glass
-    ssWidgetType: localStorage.getItem('hp_ss_wtype') || "both", // both, clock, calendar, none
-    ssPosition: localStorage.getItem('hp_ss_pos') || "center", // center, top-left, top-right, etc.
-    widgets: JSON.parse(localStorage.getItem('hp_widgets') || JSON.stringify({
+    themeColor: safeGetStorage('hp_theme_color', "#00d2ff"),
+    themeRgb: safeGetStorage('hp_theme_rgb', "0, 210, 255"),
+    transparency: safeGetStorage('hp_transparency', "frosted"),
+    animations: safeGetStorage('hp_animations', "snappy"),
+    idleTimeoutSec: parseInt(safeGetStorage('hp_idle_sec', "120"), 10),
+    screensaverBg: safeGetStorage('hp_ss_bg', "ss_all"),
+    sidebarPos: safeGetStorage('hp_sidebar_pos', "right"), // DEFAULT RIGHT as requested by user!
+    ssMediaType: safeGetStorage('hp_ss_mtype', "photo"), // photo, youtube, video
+    ssYoutubeId: safeGetStorage('hp_ss_ytid', "L_LUpnjgPso"),
+    ssVideoUrl: safeGetStorage('hp_ss_vurl', "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"),
+    ssPhotoAnim: safeGetStorage('hp_ss_photo_anim', 'true') !== 'false',
+    ssWidgetOpacity: safeGetStorage('hp_ss_wopacity', "ultra"), // none, ultra, glass
+    ssWidgetType: safeGetStorage('hp_ss_wtype', "both"), // both, clock, calendar, none
+    ssPosition: safeGetStorage('hp_ss_pos', "center"), // center, top-left, top-right, etc.
+    widgets: JSON.parse(safeGetStorage('hp_widgets', JSON.stringify({
         clock_digital: true,
         clock_analog: true,
         clock_modern: false,
         calendar_grid: true,
         calendar_compact: false,
         calendar_events: true
-    })),
-    widgetSizes: JSON.parse(localStorage.getItem('hp_widget_sizes') || JSON.stringify({
+    }))),
+    widgetSizes: JSON.parse(safeGetStorage('hp_widget_sizes', JSON.stringify({
         clock_digital: 2,
         clock_analog: 1,
         clock_modern: 1,
-        calendar_grid: 4, // 2x2 = 4 cells!
+        calendar_grid: 2,
         calendar_compact: 1,
         calendar_events: 2
-    })),
-    apps: JSON.parse(localStorage.getItem('hp_apps') || JSON.stringify(DEFAULT_APPS_LIST)),
+    }))),
+    apps: JSON.parse(safeGetStorage('hp_apps', JSON.stringify(DEFAULT_APPS_LIST))),
     currentEditingWidget: null
 };
 
-// Auto-heal stored apps from localStorage (downgrades any stored https:// URLs to http:// to prevent SSL handshake errors on TV)
+// URL Normalizer (Ensures TV services stay on HTTP to prevent SSL failures)
+function normalizeUrl(url) {
+    if (!url) return '';
+    url = url.trim();
+
+    if (/filmix/i.test(url)) return 'http://filmix.tv';
+    if (/lampa\\.mx/i.test(url)) return 'http://lampa.mx';
+    if (/msx\\.benzac\\.de\\/plugins\\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
+    if (/msx\\.benzac\\.de\\/plugins\\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
+    if (/deeplex\\.cc/i.test(url)) return 'http://deeplex.cc';
+    if (/obovse\\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
+
+    if (!/^https?:\\/\\//i.test(url)) {
+        return 'http://' + url;
+    }
+    return url;
+}
+
+// Auto-heal stored apps from localStorage
 if (Array.isArray(state.apps)) {
-    // Inject Filmix if not already in user's saved apps
     if (!state.apps.some(a => a && (a.id === 'app_filmix' || (a.name && a.name.toLowerCase() === 'filmix')))) {
         state.apps.unshift({
             id: "app_filmix",
@@ -212,55 +225,44 @@ window.addEventListener('pageshow', () => {
     if (loader) loader.classList.remove('active');
 });
 
-
 // ---------------------------------------------------------------------------
-// 1. THEME, ACCENT COLOR & TRANSPARENCY CONTROLLER
+// 1. THEME, ACCENT COLOR, TRANSPARENCY & SIDEBAR POSITION
 // ---------------------------------------------------------------------------
 function applyThemeSettings() {
     const root = document.documentElement;
-    root.style.setProperty('--accent-color', state.themeColor);
-    root.style.setProperty('--accent-rgb', state.themeRgb);
+    if (root) {
+        root.style.setProperty('--accent-color', state.themeColor);
+        root.style.setProperty('--accent-rgb', state.themeRgb);
+    }
 
-    // Apply transparency class to body
-    document.body.classList.remove('trans-frosted', 'trans-transparent', 'trans-dark');
-    document.body.classList.add(`trans-${state.transparency}`);
+    if (document.body) {
+        document.body.classList.remove('trans-frosted', 'trans-transparent', 'trans-dark');
+        document.body.classList.add(`trans-${state.transparency}`);
+        document.body.classList.toggle('anim-fast', state.animations === 'fast');
+    }
 
-    // Apply animation mode to body
-    document.body.classList.toggle('anim-fast', state.animations === 'fast');
-
-    localStorage.setItem('hp_theme_color', state.themeColor);
-    localStorage.setItem('hp_theme_rgb', state.themeRgb);
-    localStorage.setItem('hp_transparency', state.transparency);
-    localStorage.setItem('hp_animations', state.animations);
+    try {
+        localStorage.setItem('hp_theme_color', state.themeColor);
+        localStorage.setItem('hp_theme_rgb', state.themeRgb);
+        localStorage.setItem('hp_transparency', state.transparency);
+        localStorage.setItem('hp_animations', state.animations);
+    } catch (e) {}
 }
-applyThemeSettings();
 
-// Sidebar Left/Right Position Controller
 function applySidebarPosition() {
-    if (!tvShell) return;
-    tvShell.classList.toggle('sidebar-right', state.sidebarPos === 'right');
-    localStorage.setItem('hp_sidebar_pos', state.sidebarPos);
+    const shell = document.getElementById('tvShell');
+    if (!shell) return;
+    shell.classList.toggle('sidebar-right', state.sidebarPos === 'right');
+    try {
+        localStorage.setItem('hp_sidebar_pos', state.sidebarPos);
+    } catch (e) {}
 }
-applySidebarPosition();
-
-const sidebarPosBtns = document.querySelectorAll('.sidebar-pos-btn');
-sidebarPosBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        sidebarPosBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.sidebarPos = btn.getAttribute('data-pos') || 'left';
-        applySidebarPosition();
-    });
-});
-sidebarPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.sidebarPos));
 
 // ---------------------------------------------------------------------------
 // 2. COLLAPSIBLE SIDEBAR & TAB SWITCHING
 // ---------------------------------------------------------------------------
 const bgWallpaper = document.getElementById('bgWallpaper');
 const tvSidebar = document.getElementById('tvSidebar');
-const tvShell = document.getElementById('tvShell');
-const tvStage = document.getElementById('tvStage');
 const menuTabs = document.querySelectorAll('.menu-tab');
 const tabPanes = {
     widgets: document.getElementById('tabWidgets'),
@@ -271,34 +273,29 @@ const tabPanes = {
 
 function expandSidebar(expand) {
     if (!tvSidebar) return;
-    if (expand) {
-        tvSidebar.classList.remove('collapsed');
-        if (tvShell) tvShell.classList.remove('sidebar-collapsed');
-    } else {
-        tvSidebar.classList.add('collapsed');
-        if (tvShell) tvShell.classList.add('sidebar-collapsed');
-    }
-}
-
-if (tvSidebar) {
-    tvSidebar.addEventListener('focusin', () => expandSidebar(true));
-    tvSidebar.addEventListener('mouseenter', () => expandSidebar(true));
-}
-if (tvStage) {
-    tvStage.addEventListener('focusin', () => expandSidebar(false));
-    tvStage.addEventListener('mouseenter', () => expandSidebar(false));
+    tvSidebar.classList.toggle('collapsed', !expand);
 }
 
 function focusCurrentTabContent() {
-    const activePane = tabPanes[state.activeTab];
-    if (!activePane) return;
-    const focusable = activePane.querySelectorAll('button, [tabindex="0"], input, select');
-    if (focusable.length > 0) {
-        focusable[0].focus();
-    }
+    setTimeout(() => {
+        if (state.activeTab === 'widgets') {
+            const firstWidget = document.querySelector('.glass-widget:not([style*="display: none"])');
+            if (firstWidget) firstWidget.focus();
+        } else if (state.activeTab === 'apps') {
+            const firstApp = document.querySelector('.app-card');
+            if (firstApp) firstApp.focus();
+        } else if (state.activeTab === 'settings') {
+            const firstSubtab = document.querySelector('.subtab-btn.active') || document.querySelector('.subtab-btn');
+            if (firstSubtab) firstSubtab.focus();
+        } else if (state.activeTab === 'info') {
+            const firstInfo = document.querySelector('.info-card');
+            if (firstInfo) firstInfo.focus();
+        }
+    }, 100);
 }
 
 function switchTab(tabId) {
+    if (!tabPanes[tabId]) tabId = 'widgets';
     state.activeTab = tabId;
 
     menuTabs.forEach(tab => {
@@ -320,20 +317,17 @@ function switchTab(tabId) {
 menuTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         const target = tab.getAttribute('data-tab');
-        if (target) {
-            switchTab(target);
-            expandSidebar(false);
-            focusCurrentTabContent();
-        }
+        switchTab(target);
+        expandSidebar(false);
+        focusCurrentTabContent();
+    });
+    tab.addEventListener('focus', () => {
+        expandSidebar(true);
     });
 });
 
-const urlParams = new URLSearchParams(window.location.search);
-const initialTab = urlParams.get('tab') || sessionStorage.getItem('hp_active_tab') || 'widgets';
-switchTab(initialTab);
-
 // ---------------------------------------------------------------------------
-// 3. REAL-TIME CLOCKS ENGINE
+// 3. REAL-TIME CLOCKS & DATES ENGINE (60 FPS)
 // ---------------------------------------------------------------------------
 function updateClocks() {
     const now = new Date();
@@ -346,63 +340,72 @@ function updateClocks() {
     const mStr = String(m).padStart(2, '0');
     const sStr = String(s).padStart(2, '0');
 
-    // Digital Clock
+    // 1. Digital Clock
     const elH = document.getElementById('digH');
     const elM = document.getElementById('digM');
     const elS = document.getElementById('digS');
-    if (elH && elM && elS) {
-        elH.textContent = hStr;
-        elM.textContent = mStr;
-        elS.textContent = sStr;
+    if (elH) elH.textContent = hStr;
+    if (elM) elM.textContent = mStr;
+    if (elS) elS.textContent = sStr;
+
+    // Digital Full Date string
+    const elDigDate = document.getElementById('digFullDate');
+    if (elDigDate) {
+        const dateOpts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const ds = now.toLocaleDateString('ru-RU', dateOpts);
+        elDigDate.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
     }
 
-    // Modern Clock
+    // 2. Modern Clock
     const elModTime = document.getElementById('modTimeVal');
     const elModWeek = document.getElementById('modWeekdayVal');
     const elModMonth = document.getElementById('modMonthVal');
-    if (elModTime) {
-        elModTime.textContent = `${hStr}:${mStr}`;
+    if (elModTime) elModTime.textContent = `${hStr}:${mStr}`;
+    if (elModWeek) {
+        const days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+        elModWeek.textContent = days[now.getDay()].toUpperCase();
+    }
+    if (elModMonth) {
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        elModMonth.textContent = `${months[now.getMonth()].toUpperCase()} ${now.getFullYear()}`;
     }
 
-    // Analog Clock
+    // 3. Analog Clock (Always perfect circle with smooth sweep hands)
     const hHand = document.getElementById('handHour');
     const mHand = document.getElementById('handMin');
     const sHand = document.getElementById('handSec');
     if (hHand && mHand && sHand) {
-        const secDeg = (s + ms / 1000) * 6;
-        const minDeg = (m + s / 60) * 6;
-        const hourDeg = ((h % 12) + m / 60) * 30;
-
-        sHand.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
-        mHand.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
-        hHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+        const sDeg = (s + ms / 1000) * 6;
+        const mDeg = m * 6 + (s / 60) * 6;
+        const hDeg = (h % 12) * 30 + (m / 60) * 30;
+        hHand.style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
+        mHand.style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
+        sHand.style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
     }
 
-    // Dates
-    const ruMonths = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", 
-                     "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
-    const ruWeekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
-    const fullDateStr = `${ruWeekdays[(now.getDay() + 6) % 7]}, ${now.getDate()} ${ruMonths[now.getMonth()]} ${now.getFullYear()}`;
-
-    const digFullDate = document.getElementById('digFullDate');
-    if (digFullDate) digFullDate.textContent = fullDateStr;
-
-    if (elModWeek) elModWeek.textContent = ruWeekdays[(now.getDay() + 6) % 7].toUpperCase();
-    if (elModMonth) elModMonth.textContent = `${ruMonths[now.getMonth()].toUpperCase()} ${now.getFullYear()}`;
-
-    // Compact Card
-    const compDayNum = document.getElementById('compDayNum');
+    // 4. Compact Date Card
+    const compDay = document.getElementById('compDayNum');
     const compMonth = document.getElementById('compMonth');
     const compWeek = document.getElementById('compWeek');
-    if (compDayNum) compDayNum.textContent = String(now.getDate());
-    if (compMonth) compMonth.textContent = `${ruMonths[now.getMonth()]} ${now.getFullYear()}`;
-    if (compWeek) compWeek.textContent = ruWeekdays[(now.getDay() + 6) % 7];
+    if (compDay) compDay.textContent = String(now.getDate());
+    if (compMonth) {
+        const mNames = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+        compMonth.textContent = `${mNames[now.getMonth()]} ${now.getFullYear()}`;
+    }
+    if (compWeek) {
+        const wDays = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+        compWeek.textContent = wDays[now.getDay()];
+    }
 
-    // Screensaver Clocks
-    const ssTimeText = document.getElementById('ssTimeText');
-    const ssDateText = document.getElementById('ssDateText');
-    if (ssTimeText) ssTimeText.textContent = `${hStr}:${mStr}`;
-    if (ssDateText) ssDateText.textContent = fullDateStr;
+    // 5. Screensaver Clock & Date
+    const ssTime = document.getElementById('ssClockTime');
+    const ssDate = document.getElementById('ssClockDate');
+    if (ssTime) ssTime.textContent = `${hStr}:${mStr}:${sStr}`;
+    if (ssDate) {
+        const dateOpts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const ds = now.toLocaleDateString('ru-RU', dateOpts);
+        ssDate.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
+    }
 }
 
 function clockLoop() {
@@ -412,7 +415,7 @@ function clockLoop() {
 requestAnimationFrame(clockLoop);
 
 // ---------------------------------------------------------------------------
-// 4. DYNAMIC CALENDAR ENGINE (MAIN GRID & SCREENSAVER MINI-GRID)
+// 4. DYNAMIC CALENDAR ENGINE
 // ---------------------------------------------------------------------------
 function renderCalendars() {
     const calCells = document.getElementById('calCellsGrid');
@@ -435,7 +438,7 @@ function renderCalendars() {
     if (ssCalHeader) ssCalHeader.textContent = monthTitle;
 
     const firstDay = new Date(curYear, curMonth, 1).getDay();
-    const startOffset = (firstDay + 6) % 7;
+    const startOffset = (firstDay + 6) % 7; // Monday is 0
     const totalDays = new Date(curYear, curMonth + 1, 0).getDate();
 
     function fillGrid(gridElement) {
@@ -471,9 +474,6 @@ renderCalendars();
 
 // ---------------------------------------------------------------------------
 // 5. MODULAR BENTO GRID & WIDGET SIZING ENGINE
-// 1 cell = 1x1 (span-1)
-// 2 cells = 2x1 (span-2)
-// 4 cells = 2x2 (span-4: 2 cols x 2 rows)
 // ---------------------------------------------------------------------------
 const widgetElements = {
     clock_digital: document.getElementById('wClockDigital'),
@@ -489,18 +489,18 @@ function applyWidgetSizesAndToggles() {
         const el = widgetElements[key];
         if (!el) return;
 
-        // Toggle visibility
         const isVisible = !!state.widgets[key];
         el.style.display = isVisible ? 'flex' : 'none';
 
-        // Apply grid column & row span (1, 2, or 4 cells)
         const size = state.widgetSizes[key] || 2;
         el.classList.remove('span-1', 'span-2', 'span-4');
         el.classList.add(`span-${size}`);
     });
 
-    localStorage.setItem('hp_widgets', JSON.stringify(state.widgets));
-    localStorage.setItem('hp_widget_sizes', JSON.stringify(state.widgetSizes));
+    try {
+        localStorage.setItem('hp_widgets', JSON.stringify(state.widgets));
+        localStorage.setItem('hp_widget_sizes', JSON.stringify(state.widgetSizes));
+    } catch (e) {}
 }
 applyWidgetSizesAndToggles();
 
@@ -519,7 +519,6 @@ subtabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         subtabBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
         const target = btn.getAttribute('data-subtab');
         Object.keys(subpanes).forEach(k => {
             if (subpanes[k]) subpanes[k].classList.toggle('active', k === target);
@@ -556,7 +555,19 @@ transBtns.forEach(btn => {
 });
 transBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-trans') === state.transparency));
 
-// Animation Modes (snappy vs fast)
+// Sidebar Position Selector
+const sidebarPosBtns = document.querySelectorAll('.sidebar-pos-btn');
+sidebarPosBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        sidebarPosBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.sidebarPos = btn.getAttribute('data-pos') || 'right';
+        applySidebarPosition();
+    });
+});
+sidebarPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.sidebarPos));
+
+// Animation Modes
 const animBtns = document.querySelectorAll('.anim-option-btn');
 animBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -569,7 +580,7 @@ animBtns.forEach(btn => {
 animBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-anim') === state.animations));
 
 // ---------------------------------------------------------------------------
-// 7. DEDICATED WIDGETS MANAGER IN SETTINGS (Cards -> Detail Configurator)
+// 7. WIDGETS MANAGER IN SETTINGS (Cards -> Detail Configurator)
 // ---------------------------------------------------------------------------
 const widgetsListView = document.getElementById('widgetsListView');
 const widgetDetailView = document.getElementById('widgetDetailView');
@@ -713,167 +724,28 @@ if (btnSaveWidgetDetail) {
 renderWidgetsManageGrid();
 
 // ---------------------------------------------------------------------------
-// 8. DIRECT FULLSCREEN WEBSITE LAUNCHER & HISTORY PRESERVATION
-// In Smart TV & MSX, external web applications must be launched directly (top-level)
-// rather than in an iframe to avoid X-Frame-Options, CSP, and Mixed Content blocking!
-function normalizeUrl(url) {
-    if (!url) return '';
-    url = url.trim();
-
-    // Critical for Smart TV: Use pure HTTP for TV services to avoid SSL Handshake failures
-    if (/filmix/i.test(url)) return 'http://filmix.tv';
-    if (/lampa\.mx/i.test(url)) return 'http://lampa.mx';
-    if (/msx\.benzac\.de\/plugins\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
-    if (/msx\.benzac\.de\/plugins\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
-    if (/deeplex\.cc/i.test(url)) return 'http://deeplex.cc';
-    if (/obovse\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
-
-    // If protocol missing, default to http:// on Smart TV for maximum compatibility
-    if (!/^https?:\/\//i.test(url)) {
-        return 'http://' + url;
-    }
-
-    return url;
-}
-
+// 8. DIRECT WEBSITE LAUNCHER & APPS MANAGEMENT
+// ---------------------------------------------------------------------------
 function openApp(app) {
     if (!app || !app.url) return;
     const targetUrl = normalizeUrl(app.url);
 
-    // Save active tab state so returning via remote Back button opens the Apps screen
-    try {
-        sessionStorage.setItem('hp_active_tab', 'apps');
-        sessionStorage.setItem('hp_last_app_id', app.id || '');
-        window.history.replaceState(null, '', '/?tab=apps');
-    } catch (e) {}
-
-    // Show smooth transition indicator
     const loader = document.getElementById('appNavLoader');
     const loaderText = document.getElementById('loaderText');
-    if (loaderText) {
-        loaderText.textContent = `Запуск: ${app.name || 'Веб-сайт'}...`;
-    }
     if (loader) {
+        if (loaderText) loaderText.textContent = `Запуск ${app.name}...`;
         loader.classList.add('active');
     }
 
-    // Direct navigation into the website!
+    try {
+        window.history.pushState({ appOpen: true, appName: app.name, url: targetUrl }, '', window.location.pathname + window.location.search);
+    } catch (err) {}
+
     setTimeout(() => {
         window.location.href = targetUrl;
     }, 120);
 }
 
-// ---------------------------------------------------------------------------
-// 9. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
-// Guarantees: ALWAYS returns to main screen (Widgets) and NEVER exits app!
-// ---------------------------------------------------------------------------
-function handleTvBackButton(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-
-
-    // 0. If App loader is active -> hide it
-    const appLoader = document.getElementById('appNavLoader');
-    if (appLoader && appLoader.classList.contains('active')) {
-        appLoader.classList.remove('active');
-        return true;
-    }
-
-    // 1. If Screensaver is active -> hide it and return directly to widgets!
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        hideScreensaver();
-        switchTab('widgets');
-        expandSidebar(false);
-        focusCurrentTabContent();
-        return true;
-    }
-
-    // 3. If in widget detail view -> go back to widgets list
-    if (state.activeTab === 'settings' && widgetDetailView && widgetDetailView.style.display !== 'none') {
-        showWidgetsListView();
-        return true;
-    }
-
-    // 4. If in Apps, Settings, or Info -> return directly to widgets tab!
-    if (state.activeTab !== 'widgets') {
-        switchTab('widgets');
-        expandSidebar(false);
-        focusCurrentTabContent();
-        return true;
-    }
-
-    // 5. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
-    expandSidebar(false);
-    return true;
-}
-
-window.addEventListener('keydown', (e) => {
-    const key = e.key;
-    const keyCode = e.keyCode;
-
-    const isBackKey = (
-        keyCode === 10009 ||
-        keyCode === 461 ||
-        keyCode === 4 ||
-        keyCode === 27 ||
-        key === 'Escape' ||
-        key === 'Back' ||
-        key === 'GoBack' ||
-        (keyCode === 8 && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')
-    );
-
-    if (isBackKey) {
-        handleTvBackButton(e);
-        return;
-    }
-
-    // Sidebar D-pad navigation
-    const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
-
-    if (e.key === 'ArrowRight' && inSidebar) {
-        e.preventDefault();
-        expandSidebar(false);
-        focusCurrentTabContent();
-    } else if (e.key === 'ArrowLeft' && !inSidebar && !screensaverLayer?.classList.contains('active')) {
-        const activeEl = document.activeElement;
-        const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
-        const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === widgetsWrapper?.firstElementChild;
-
-        if (isFirstAppCard || isFirstWidget || activeEl === document.body || !activeEl) {
-            e.preventDefault();
-            expandSidebar(true);
-            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`);
-            if (activeTabBtn) activeTabBtn.focus();
-        }
-    }
-});
-
-// Tizen hardware key listener
-document.addEventListener('tizenhwkey', (e) => {
-    if (e.keyName === 'back') {
-        handleTvBackButton(e);
-    }
-});
-
-// History trap to prevent TV browser from exiting
-function pushTrapHistory() {
-    try {
-        window.history.pushState({ trap: true }, '', window.location.pathname + window.location.search);
-    } catch (err) {}
-}
-pushTrapHistory();
-
-window.addEventListener('popstate', (e) => {
-    pushTrapHistory();
-    handleTvBackButton(e);
-});
-
-// ---------------------------------------------------------------------------
-// 10. COMPACT PHONE-LIKE APPS RENDERING ENGINE (6-7 ICONS PER ROW)
-// ---------------------------------------------------------------------------
 const appsGrid = document.getElementById('appsGrid');
 const appsCountBadge = document.getElementById('appsCountBadge');
 const installedAppsManageList = document.getElementById('installedAppsManageList');
@@ -919,18 +791,22 @@ function renderApps() {
                 <button class="btn-del-app" data-index="${index}" tabindex="0">Удалить</button>
             `;
             const delBtn = item.querySelector('.btn-del-app');
-            delBtn.addEventListener('click', () => {
-                state.apps.splice(index, 1);
-                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-                renderApps();
-            });
+            if (delBtn) {
+                delBtn.addEventListener('click', () => {
+                    state.apps.splice(index, 1);
+                    try {
+                        localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+                    } catch (e) {}
+                    renderApps();
+                });
+            }
             installedAppsManageList.appendChild(item);
         });
     }
 }
 renderApps();
 
-// Add Custom App (In Settings)
+// Add Custom App in Settings
 const btnSaveApp = document.getElementById('btnSaveApp');
 const inputAppName = document.getElementById('inputAppName');
 const inputAppUrl = document.getElementById('inputAppUrl');
@@ -939,7 +815,7 @@ const selectAppIcon = document.getElementById('selectAppIcon');
 if (btnSaveApp && inputAppName && inputAppUrl) {
     btnSaveApp.addEventListener('click', () => {
         const name = inputAppName.value.trim();
-        const url = inputAppUrl.value.trim();
+        const url = normalizeUrl(inputAppUrl.value.trim());
         const icon = selectAppIcon ? selectAppIcon.value : 'launch';
 
         if (!name || !url) {
@@ -957,7 +833,9 @@ if (btnSaveApp && inputAppName && inputAppUrl) {
             image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500'
         });
 
-        localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+        try {
+            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+        } catch (e) {}
         inputAppName.value = '';
         inputAppUrl.value = '';
         renderApps();
@@ -970,10 +848,10 @@ const presetBtns = document.querySelectorAll('.preset-btn');
 presetBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const name = btn.getAttribute('data-name');
-        const url = btn.getAttribute('data-url');
-        const icon = btn.getAttribute('data-icon');
+        const url = normalizeUrl(btn.getAttribute('data-url'));
+        const icon = btn.getAttribute('data-icon') || 'launch';
 
-        if (!state.apps.some(a => a.url === url)) {
+        if (!state.apps.some(a => a.name.toLowerCase() === name.toLowerCase())) {
             state.apps.push({
                 id: `app_${name.toLowerCase()}`,
                 name: name,
@@ -983,7 +861,9 @@ presetBtns.forEach(btn => {
                 badge: 'APP',
                 image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500'
             });
-            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+            try {
+                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+            } catch (e) {}
             renderApps();
             alert(`Программа «${name}» добавлена!`);
         } else {
@@ -997,44 +877,126 @@ const btnResetDefaultApps = document.getElementById('btnResetDefaultApps');
 if (btnResetDefaultApps) {
     btnResetDefaultApps.addEventListener('click', () => {
         state.apps = JSON.parse(JSON.stringify(DEFAULT_APPS_LIST));
-        localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+        try {
+            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+        } catch (e) {}
         renderApps();
+        alert('Список программ сброшен к стандартному.');
     });
 }
 
-// Restart / Exit Portal Button
-// Performs exit to MSX launcher so the application can be re-entered cleanly
+// Restart Portal Button
 const restartPortalBtn = document.getElementById('restartPortalBtn');
 if (restartPortalBtn) {
-    const doExit = () => {
-        window.location.href = "http://msx.benzac.de/exit.html";
-    };
-    restartPortalBtn.addEventListener('click', doExit);
-    restartPortalBtn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            e.preventDefault();
-            doExit();
-        }
+    restartPortalBtn.addEventListener('click', () => {
+        window.location.reload();
     });
 }
 
 // ---------------------------------------------------------------------------
-// 11. ENHANCED 4K SCREENSAVER ENGINE (WALLPAPERS, WIDGET TYPES & POSITIONS)
+// 9. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
+// ---------------------------------------------------------------------------
+function handleTvBackButton(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    const appLoader = document.getElementById('appNavLoader');
+    if (appLoader && appLoader.classList.contains('active')) {
+        appLoader.classList.remove('active');
+        return true;
+    }
+
+    const screensaver = document.getElementById('screensaverLayer');
+    if (screensaver && screensaver.classList.contains('active')) {
+        hideScreensaver();
+        switchTab('widgets');
+        expandSidebar(false);
+        focusCurrentTabContent();
+        return true;
+    }
+
+    if (state.activeTab === 'settings' && widgetDetailView && widgetDetailView.style.display !== 'none') {
+        showWidgetsListView();
+        return true;
+    }
+
+    if (state.activeTab !== 'widgets') {
+        switchTab('widgets');
+        expandSidebar(false);
+        focusCurrentTabContent();
+        return true;
+    }
+
+    expandSidebar(false);
+    return true;
+}
+
+window.addEventListener('keydown', (e) => {
+    const keyCode = e.keyCode;
+    const isBackKey = (
+        keyCode === 10009 || // Samsung Tizen Return
+        keyCode === 461 ||   // LG webOS Back
+        keyCode === 4 ||     // Android TV Back
+        keyCode === 27 ||    // ESC
+        keyCode === 8        // Backspace
+    );
+
+    if (isBackKey) {
+        handleTvBackButton(e);
+        return;
+    }
+
+    // Sidebar D-pad navigation
+    const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
+
+    if (e.key === 'ArrowRight' && inSidebar) {
+        e.preventDefault();
+        expandSidebar(false);
+        focusCurrentTabContent();
+    } else if (e.key === 'ArrowLeft' && !inSidebar && !document.getElementById('screensaverLayer')?.classList.contains('active')) {
+        const activeEl = document.activeElement;
+        const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
+        const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === document.getElementById('widgetsWrapper')?.firstElementChild;
+
+        if (isFirstAppCard || isFirstWidget || activeEl === document.body || !activeEl) {
+            e.preventDefault();
+            expandSidebar(true);
+            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`);
+            if (activeTabBtn) activeTabBtn.focus();
+        }
+    }
+});
+
+document.addEventListener('tizenhwkey', (e) => {
+    if (e.keyName === 'back') {
+        handleTvBackButton(e);
+    }
+});
+
+window.addEventListener('popstate', (e) => {
+    const loader = document.getElementById('appNavLoader');
+    if (loader) loader.classList.remove('active');
+    handleTvBackButton(null);
+});
+
+// ---------------------------------------------------------------------------
+// 10. 4K SCREENSAVER ENGINE (WALLPAPERS, VIDEO, YOUTUBE & KEN BURNS)
 // ---------------------------------------------------------------------------
 const screensaverLayer = document.getElementById('screensaverLayer');
-const ssBgImage = document.getElementById('ssBgImage');
 const ssWidgetsContainer = document.getElementById('ssWidgetsContainer');
 const ssClockBlock = document.getElementById('ssClockBlock');
 const ssCalendarBlock = document.getElementById('ssCalendarBlock');
 let idleTimer = null;
 
-function applyScreensaverWidgetsAndPosition() {
+function applyScreensaverLayout() {
     if (!ssWidgetsContainer) return;
 
-    // Apply position class
-    ssWidgetsContainer.className = `ss-widgets-container pos-${state.ssPosition || 'center'}`;
+    const validPositions = ['center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
+    validPositions.forEach(p => ssWidgetsContainer.classList.remove(`pos-${p}`));
+    ssWidgetsContainer.classList.add(`pos-${state.ssPosition || 'center'}`);
 
-    // Apply widget type visibility
     const type = state.ssWidgetType || 'both';
     if (ssClockBlock) {
         ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'inline-flex' : 'none';
@@ -1043,37 +1005,12 @@ function applyScreensaverWidgetsAndPosition() {
         ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'inline-flex' : 'none';
     }
 }
-const applyScreensaverLayout = applyScreensaverWidgetsAndPosition;
-
-function updateScreensaverWallpaper() {
-    const bgLayer = document.getElementById('ssBgImage');
-    if (!bgLayer) return;
-
-    if (ssSlideshowInterval) {
-        clearInterval(ssSlideshowInterval);
-        ssSlideshowInterval = null;
-    }
-
-    const currentBg = state.screensaverBg || 'ss_all';
-
-    if (currentBg === 'ss_all') {
-        const nextImg = SS_SLIDESHOW_LIST[ssSlideshowIndex % SS_SLIDESHOW_LIST.length];
-        bgLayer.style.backgroundImage = `url('${nextImg}')`;
-        ssSlideshowInterval = setInterval(() => {
-            ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
-            bgLayer.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
-        }, 8000);
-    } else {
-        const bgUrl = SCREENSAVER_IMAGES[currentBg] || currentBg;
-        bgLayer.style.backgroundImage = `url('${bgUrl}')`;
-    }
-}
 
 function extractYouTubeId(urlOrId) {
     if (!urlOrId) return '';
     const trimmed = urlOrId.trim();
     if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
-    const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
+    const match = trimmed.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))([\\w-]{11})/i);
     return match ? match[1] : trimmed;
 }
 
@@ -1083,13 +1020,15 @@ function applyScreensaverWidgetOpacity() {
         b.classList.remove('trans-none', 'trans-ultra', 'trans-glass');
         b.classList.add(`trans-${state.ssWidgetOpacity || 'ultra'}`);
     });
-    localStorage.setItem('hp_ss_wopacity', state.ssWidgetOpacity);
+    try {
+        localStorage.setItem('hp_ss_wopacity', state.ssWidgetOpacity);
+    } catch (e) {}
 }
 
 function showScreensaver() {
     if (!screensaverLayer) return;
 
-    applyScreensaverWidgetsAndPosition();
+    applyScreensaverLayout();
     applyScreensaverWidgetOpacity();
 
     const ssBgImage = document.getElementById('ssBgImage');
@@ -1133,7 +1072,7 @@ function showScreensaver() {
                 if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
                 ssSlideshowInterval = setInterval(() => {
                     ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
-                    ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
+                    if (ssBgImage) ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
                 }, 7000);
             } else {
                 if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
@@ -1182,34 +1121,32 @@ function resetIdleTimer() {
     }
 }
 
-// Reset idle timer on any user activity
-window.addEventListener('keydown', (e) => {
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        hideScreensaver();
-        switchTab('widgets');
-        e.preventDefault();
-        return;
-    }
-    resetIdleTimer();
+// Any key or movement dismisses screensaver or resets idle timer
+['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, () => {
+        if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+            hideScreensaver();
+        } else {
+            resetIdleTimer();
+        }
+    }, { passive: true });
 });
-
-window.addEventListener('mousemove', () => {
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        hideScreensaver();
-        switchTab('widgets');
-        return;
-    }
-    resetIdleTimer();
-});
-
 resetIdleTimer();
 
 // Manual screensaver triggers
 const startScreensaverBtn = document.getElementById('startScreensaverBtn');
-if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', showScreensaver);
+if (startScreensaverBtn) {
+    startScreensaverBtn.addEventListener('click', () => {
+        showScreensaver();
+    });
+}
 
 const btnTestScreensaver = document.getElementById('btnTestScreensaver');
-if (btnTestScreensaver) btnTestScreensaver.addEventListener('click', showScreensaver);
+if (btnTestScreensaver) {
+    btnTestScreensaver.addEventListener('click', () => {
+        showScreensaver();
+    });
+}
 
 // Screensaver Wallpaper Picker
 const ssThumbCards = document.querySelectorAll('.ss-thumb-card');
@@ -1218,61 +1155,167 @@ ssThumbCards.forEach(card => {
         ssThumbCards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         state.screensaverBg = card.getAttribute('data-id');
-        const customUrl = card.getAttribute('data-url');
-        if (customUrl && state.screensaverBg !== 'ss_all') {
-            SCREENSAVER_IMAGES[state.screensaverBg] = customUrl;
-        }
-        localStorage.setItem('hp_ss_bg', state.screensaverBg);
-        updateScreensaverWallpaper();
+        try {
+            localStorage.setItem('hp_ss_bg', state.screensaverBg);
+        } catch (e) {}
     });
 });
-
 ssThumbCards.forEach(card => {
-    if (card.getAttribute('data-id') === state.screensaverBg) {
-        card.classList.add('selected');
-    } else {
-        card.classList.remove('selected');
-    }
+    card.classList.toggle('selected', card.getAttribute('data-id') === state.screensaverBg);
 });
 
-// Timeout selector buttons (30s, 1m, 2m, 3m, 5m, 10m, 15m, 0)
+// Timeout selector buttons
 const timeoutBtns = document.querySelectorAll('.timeout-btn');
 timeoutBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         timeoutBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.idleTimeoutSec = parseInt(btn.getAttribute('data-time'), 10);
-        localStorage.setItem('hp_idle_sec', String(state.idleTimeoutSec));
+        try {
+            localStorage.setItem('hp_idle_sec', String(state.idleTimeoutSec));
+        } catch (e) {}
         resetIdleTimer();
     });
 });
 timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-time'), 10) === state.idleTimeoutSec));
 
-// Screensaver Widget Type Selector (both, clock, calendar, none)
+// Screensaver Widget Type Selector
 const ssWTypeBtns = document.querySelectorAll('.ss-wtype-btn');
 ssWTypeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         ssWTypeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssWidgetType = btn.getAttribute('data-wtype');
-        localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
+        try {
+            localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
+        } catch (e) {}
         applyScreensaverLayout();
     });
 });
 ssWTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-wtype') === state.ssWidgetType));
 
-// Screensaver Position Selector (center, top-left, top-right, bottom-left, bottom-right, etc.)
+// Screensaver Position Selector
 const ssPosBtns = document.querySelectorAll('.ss-pos-btn');
 ssPosBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         ssPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPosition = btn.getAttribute('data-pos');
-        localStorage.setItem('hp_ss_pos', state.ssPosition);
+        try {
+            localStorage.setItem('hp_ss_pos', state.ssPosition);
+        } catch (e) {}
         applyScreensaverLayout();
     });
 });
 ssPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.ssPosition));
+
+// Screensaver Media Type Selector (Photo / YouTube / Video)
+const ssMediaBtns = document.querySelectorAll('.ss-media-btn');
+ssMediaBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssMediaBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssMediaType = btn.getAttribute('data-media') || 'photo';
+        try {
+            localStorage.setItem('hp_ss_mtype', state.ssMediaType);
+        } catch (e) {}
+    });
+});
+ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+
+// Screensaver Photo Animation Toggle (Ken Burns on/off)
+const ssAnimBtns = document.querySelectorAll('.ss-anim-btn');
+ssAnimBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssAnimBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssPhotoAnim = btn.getAttribute('data-anim') === 'on';
+        try {
+            localStorage.setItem('hp_ss_photo_anim', String(state.ssPhotoAnim));
+        } catch (e) {}
+    });
+});
+ssAnimBtns.forEach(b => b.classList.toggle('active', (b.getAttribute('data-anim') === 'on') === !!state.ssPhotoAnim));
+
+// Screensaver Video Presets (Fireplace, Aquarium, Ocean)
+const ssVpresetBtns = document.querySelectorAll('.ss-vpreset-btn');
+ssVpresetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssVpresetBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const vtype = btn.getAttribute('data-type');
+        const vval = btn.getAttribute('data-val');
+
+        if (vtype === 'youtube') {
+            state.ssMediaType = 'youtube';
+            state.ssYoutubeId = vval;
+            try {
+                localStorage.setItem('hp_ss_mtype', 'youtube');
+                localStorage.setItem('hp_ss_ytid', state.ssYoutubeId);
+            } catch (e) {}
+        } else if (vtype === 'video') {
+            state.ssMediaType = 'video';
+            state.ssVideoUrl = vval;
+            try {
+                localStorage.setItem('hp_ss_mtype', 'video');
+                localStorage.setItem('hp_ss_vurl', state.ssVideoUrl);
+            } catch (e) {}
+        }
+
+        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+        alert('Заставка переключена на видео!');
+    });
+});
+
+// Custom YouTube / Video URL Input
+const inputCustomVideo = document.getElementById('inputCustomVideo');
+const btnApplyCustomVideo = document.getElementById('btnApplyCustomVideo');
+if (btnApplyCustomVideo && inputCustomVideo) {
+    btnApplyCustomVideo.addEventListener('click', () => {
+        const val = inputCustomVideo.value.trim();
+        if (!val) {
+            alert('Пожалуйста, введите ссылку на YouTube или MP4.');
+            return;
+        }
+
+        if (/\\.(mp4|webm|m3u8)(\\?.*)?$/i.test(val)) {
+            state.ssMediaType = 'video';
+            state.ssVideoUrl = val;
+            try {
+                localStorage.setItem('hp_ss_mtype', 'video');
+                localStorage.setItem('hp_ss_vurl', val);
+            } catch (e) {}
+        } else {
+            const ytId = extractYouTubeId(val);
+            if (!ytId) {
+                alert('Не удалось распознать ссылку на YouTube.');
+                return;
+            }
+            state.ssMediaType = 'youtube';
+            state.ssYoutubeId = ytId;
+            try {
+                localStorage.setItem('hp_ss_mtype', 'youtube');
+                localStorage.setItem('hp_ss_ytid', ytId);
+            } catch (e) {}
+        }
+
+        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+        alert('Видео сохранено для заставки!');
+    });
+}
+
+// Screensaver Widget Transparency Selector
+const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
+ssOpacityBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        ssOpacityBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ssWidgetOpacity = btn.getAttribute('data-opacity') || 'ultra';
+        applyScreensaverWidgetOpacity();
+    });
+});
+ssOpacityBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-opacity') === state.ssWidgetOpacity));
 
 // Canvas Stars Particles for Screensaver
 const canvas = document.getElementById('ssStarsCanvas');
@@ -1307,7 +1350,7 @@ if (canvas) {
             ctx.shadowBlur = 8;
             ctx.shadowColor = state.themeColor;
             ctx.fill();
-        Clockwise:
+
             p.x += p.dx;
             p.y += p.dy;
 
@@ -1321,98 +1364,7 @@ if (canvas) {
     renderParticles();
 }
 
-
-// Screensaver Media Type Selector (Photo / YouTube / Video)
-const ssMediaBtns = document.querySelectorAll('.ss-media-btn');
-ssMediaBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        ssMediaBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.ssMediaType = btn.getAttribute('data-media') || 'photo';
-        localStorage.setItem('hp_ss_mtype', state.ssMediaType);
-    });
-});
-ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
-
-// Screensaver Photo Animation Toggle (Ken Burns on/off)
-const ssAnimBtns = document.querySelectorAll('.ss-anim-btn');
-ssAnimBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        ssAnimBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.ssPhotoAnim = btn.getAttribute('data-anim') === 'on';
-        localStorage.setItem('hp_ss_photo_anim', String(state.ssPhotoAnim));
-    });
-});
-ssAnimBtns.forEach(b => b.classList.toggle('active', (b.getAttribute('data-anim') === 'on') === !!state.ssPhotoAnim));
-
-// Screensaver Video Presets (Fireplace, Aquarium, Ocean, Space)
-const ssVpresetBtns = document.querySelectorAll('.ss-vpreset-btn');
-ssVpresetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        ssVpresetBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const vtype = btn.getAttribute('data-type');
-        if (vtype === 'youtube') {
-            state.ssMediaType = 'youtube';
-            state.ssYoutubeId = btn.getAttribute('data-id');
-            localStorage.setItem('hp_ss_mtype', 'youtube');
-            localStorage.setItem('hp_ss_ytid', state.ssYoutubeId);
-        } else if (vtype === 'video') {
-            state.ssMediaType = 'video';
-            state.ssVideoUrl = btn.getAttribute('data-url');
-            localStorage.setItem('hp_ss_mtype', 'video');
-            localStorage.setItem('hp_ss_vurl', state.ssVideoUrl);
-        }
-
-        // Update media selector active state
-        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
-        alert('Заставка переключена на видео!');
-    });
-});
-
-// Custom YouTube / Video URL Input
-const inputCustomVideo = document.getElementById('inputCustomVideo');
-const btnApplyCustomVideo = document.getElementById('btnApplyCustomVideo');
-if (btnApplyCustomVideo && inputCustomVideo) {
-    btnApplyCustomVideo.addEventListener('click', () => {
-        const val = inputCustomVideo.value.trim();
-        if (!val) {
-            alert('Пожалуйста, введите ссылку на YouTube или MP4.');
-            return;
-        }
-
-        if (/\.(mp4|webm|m3u8)(\?.*)?$/i.test(val)) {
-            state.ssMediaType = 'video';
-            state.ssVideoUrl = val;
-            localStorage.setItem('hp_ss_mtype', 'video');
-            localStorage.setItem('hp_ss_vurl', val);
-        } else {
-            const ytId = extractYouTubeId(val);
-            if (!ytId) {
-                alert('Не удалось распознать ссылку на YouTube.');
-                return;
-            }
-            state.ssMediaType = 'youtube';
-            state.ssYoutubeId = ytId;
-            localStorage.setItem('hp_ss_mtype', 'youtube');
-            localStorage.setItem('hp_ss_ytid', ytId);
-        }
-
-        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
-        alert('Пользовательское видео успешно сохранено для заставки!');
-    });
-}
-
-// Screensaver Widget Transparency Selector
-const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
-ssOpacityBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        ssOpacityBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.ssWidgetOpacity = btn.getAttribute('data-opacity') || 'ultra';
-        applyScreensaverWidgetOpacity();
-    });
-});
-ssOpacityBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-opacity') === state.ssWidgetOpacity));
+// Initial initialization calls
+applyThemeSettings();
+applySidebarPosition();
+switchTab(state.activeTab);
