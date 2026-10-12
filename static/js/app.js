@@ -30,7 +30,7 @@ const DEFAULT_APPS_LIST = [
     {
         id: "app_lampa",
         name: "Lampa",
-        url: "http://lampa.mx",
+        url: "https://lampa.mx",
         sub: "Онлайн-кинотеатр",
         icon: "movie",
         badge: "FILMS",
@@ -39,7 +39,7 @@ const DEFAULT_APPS_LIST = [
     {
         id: "app_youtube",
         name: "YouTube",
-        url: "http://msx.benzac.de/plugins/youtube.html",
+        url: "https://msx.benzac.de/plugins/youtube.html",
         sub: "Видео и стримы",
         icon: "play_circle",
         badge: "VIDEO",
@@ -84,7 +84,7 @@ const DEFAULT_APPS_LIST = [
     {
         id: "app_twitch",
         name: "Twitch",
-        url: "http://msx.benzac.de/plugins/twitch.html",
+        url: "https://msx.benzac.de/plugins/twitch.html",
         sub: "Игровые трансляции",
         icon: "videogame_asset",
         badge: "GAMES",
@@ -259,7 +259,7 @@ menuTabs.forEach(tab => {
 });
 
 const urlParams = new URLSearchParams(window.location.search);
-const initialTab = urlParams.get('tab') || 'widgets';
+const initialTab = urlParams.get('tab') || sessionStorage.getItem('hp_active_tab') || 'widgets';
 switchTab(initialTab);
 
 // ---------------------------------------------------------------------------
@@ -643,45 +643,48 @@ if (btnSaveWidgetDetail) {
 renderWidgetsManageGrid();
 
 // ---------------------------------------------------------------------------
-// 8. IN-APP FULLSCREEN APP VIEWER (100% FULLSCREEN WITHOUT ON-SCREEN BARS!)
+// 8. DIRECT FULLSCREEN WEBSITE LAUNCHER & HISTORY PRESERVATION
+// In Smart TV & MSX, external web applications must be launched directly (top-level)
+// rather than in an iframe to avoid X-Frame-Options, CSP, and Mixed Content blocking!
 // ---------------------------------------------------------------------------
-const appViewerModal = document.getElementById('appViewerModal');
-const appViewerFrame = document.getElementById('appViewerFrame');
-let lastFocusedElement = null;
-
-function openAppViewer(app) {
-    if (!app || !app.url) return;
-    lastFocusedElement = document.activeElement;
-
-    if (appViewerFrame) {
-        appViewerFrame.src = app.url;
+function normalizeUrl(url) {
+    if (!url) return '';
+    url = url.trim();
+    if (!/^https?:\/\//i.test(url)) {
+        return 'https://' + url;
     }
-    if (appViewerModal) {
-        appViewerModal.classList.add('active');
-    }
-
-    try {
-        window.history.pushState({ appViewerOpen: true, appName: app.name }, '', '#app-' + (app.id || 'view'));
-    } catch (err) {}
+    // Upgrade known HTTP endpoints to HTTPS where valid
+    if (url === 'http://lampa.mx') return 'https://lampa.mx';
+    if (url === 'http://msx.benzac.de/plugins/youtube.html') return 'https://msx.benzac.de/plugins/youtube.html';
+    if (url === 'http://msx.benzac.de/plugins/twitch.html') return 'https://msx.benzac.de/plugins/twitch.html';
+    return url;
 }
 
-function closeAppViewer(triggerHistoryBack = true) {
-    if (!appViewerModal || !appViewerModal.classList.contains('active')) return;
+function openApp(app) {
+    if (!app || !app.url) return;
+    const targetUrl = normalizeUrl(app.url);
 
-    appViewerModal.classList.remove('active');
-    if (appViewerFrame) {
-        appViewerFrame.src = 'about:blank';
+    // Save active tab state so returning via remote Back button opens the Apps screen
+    try {
+        sessionStorage.setItem('hp_active_tab', 'apps');
+        sessionStorage.setItem('hp_last_app_id', app.id || '');
+        window.history.replaceState(null, '', '/?tab=apps');
+    } catch (e) {}
+
+    // Show smooth transition indicator
+    const loader = document.getElementById('appNavLoader');
+    const loaderText = document.getElementById('loaderText');
+    if (loaderText) {
+        loaderText.textContent = `Запуск: ${app.name || 'Веб-сайт'}...`;
+    }
+    if (loader) {
+        loader.classList.add('active');
     }
 
-    if (triggerHistoryBack && window.location.hash.startsWith('#app-')) {
-        try {
-            window.history.back();
-        } catch (err) {}
-    }
-
-    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-        lastFocusedElement.focus();
-    }
+    // Direct navigation into the website!
+    setTimeout(() => {
+        window.location.href = targetUrl;
+    }, 120);
 }
 
 // ---------------------------------------------------------------------------
@@ -694,15 +697,7 @@ function handleTvBackButton(e) {
         e.stopPropagation();
     }
 
-    // 1. If App Viewer (iframe) is active -> close it and return to apps/widgets!
-    if (appViewerModal && appViewerModal.classList.contains('active')) {
-        closeAppViewer(true);
-        expandSidebar(false);
-        focusCurrentTabContent();
-        return true;
-    }
-
-    // 2. If Screensaver is active -> hide it and return directly to widgets!
+    // 1. If Screensaver is active -> hide it and return directly to widgets!
     if (screensaverLayer && screensaverLayer.classList.contains('active')) {
         hideScreensaver();
         switchTab('widgets');
@@ -711,13 +706,13 @@ function handleTvBackButton(e) {
         return true;
     }
 
-    // 3. If in widget detail view -> go back to widgets list
+    // 2. If in widget detail view -> go back to widgets list
     if (state.activeTab === 'settings' && widgetDetailView && widgetDetailView.style.display !== 'none') {
         showWidgetsListView();
         return true;
     }
 
-    // 4. If in Apps, Settings, or Info -> return directly to widgets tab!
+    // 3. If in Apps, Settings, or Info -> return directly to widgets tab!
     if (state.activeTab !== 'widgets') {
         switchTab('widgets');
         expandSidebar(false);
@@ -725,7 +720,7 @@ function handleTvBackButton(e) {
         return true;
     }
 
-    // 5. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
+    // 4. If ALREADY on widgets -> STAY on widgets! NEVER exit to TV desktop!
     expandSidebar(false);
     return true;
 }
@@ -757,7 +752,7 @@ window.addEventListener('keydown', (e) => {
         e.preventDefault();
         expandSidebar(false);
         focusCurrentTabContent();
-    } else if (e.key === 'ArrowLeft' && !inSidebar && !appViewerModal?.classList.contains('active') && !screensaverLayer?.classList.contains('active')) {
+    } else if (e.key === 'ArrowLeft' && !inSidebar && !screensaverLayer?.classList.contains('active')) {
         const activeEl = document.activeElement;
         const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
         const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === widgetsWrapper?.firstElementChild;
@@ -817,11 +812,11 @@ function renderApps() {
                 <div class="app-card-name">${app.name}</div>
             `;
 
-            card.addEventListener('click', () => openAppViewer(app));
+            card.addEventListener('click', () => openApp(app));
             card.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.keyCode === 13) {
                     e.preventDefault();
-                    openAppViewer(app);
+                    openApp(app);
                 }
             });
 
