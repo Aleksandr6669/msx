@@ -121,8 +121,7 @@ def add_cors_headers(response):
 # ---------------------------------------------------------------------------
 # MEDIA STATION X ENTRYPOINT
 # When user enters <domain> into MSX, MSX automatically fetches /msx/start.json.
-# We use content:...>index:0>execute to pass MSX validation while immediately
-# executing the link: action on startup, launching our main HTML5 portal directly!
+# This Start Object launches the full HTML5 TV application in fullscreen via link: action!
 # ---------------------------------------------------------------------------
 
 @app.route('/msx/start.json')
@@ -130,7 +129,7 @@ def add_cors_headers(response):
 def msx_start():
     base_url = get_base_url()
     return jsonify({
-        "name": "MX Station Portal",
+        "name": "Home Portal TV",
         "version": "2.4.0",
         "parameter": f"content:{base_url}/content.json>index:0>execute",
         "background": SECTION_WALLPAPERS["widgets"],
@@ -144,7 +143,7 @@ def msx_content():
     base_url = get_base_url()
     return jsonify({
         "type": "pages",
-        "headline": "MX STATION PLAYER",
+        "headline": "HOME PORTAL TV",
         "background": SECTION_WALLPAPERS["widgets"],
         "color": "msx-glass",
         "start": f"link:{base_url}/",
@@ -160,7 +159,7 @@ def msx_content():
                         "layout": "0,0,12,6",
                         "color": "msx-glass",
                         "icon": "dashboard",
-                        "title": "Главный экран MX Station",
+                        "title": "Главный экран Home Portal",
                         "action": f"link:{base_url}/"
                     }
                 ]
@@ -174,7 +173,7 @@ def msx_content():
 def msx_menu():
     base_url = get_base_url()
     return jsonify({
-        "headline": "MX STATION PLAYER",
+        "headline": "HOME PORTAL TV",
         "logo": f"{base_url}/static/images/logo.svg",
         "logoSize": "small",
         "background": SECTION_WALLPAPERS["widgets"],
@@ -186,7 +185,7 @@ def msx_menu():
         "menu": [
             {
                 "icon": "dashboard",
-                "label": "Виджеты & Время",
+                "label": "Виджеты",
                 "action": f"link:{base_url}/?tab=widgets"
             },
             {
@@ -219,7 +218,7 @@ def msx_screensaver():
             "duration": 8
         })
     return jsonify({
-        "headline": "4K Заставка Media Station X",
+        "headline": "4K Заставка Home Portal",
         "items": items
     })
 
@@ -240,7 +239,7 @@ def web_index():
 
 if __name__ == '__main__':
     print("=" * 65)
-    print("  MX Station Player v2.4 — HTML5 Portal for Media Station X")
+    print("  Home Portal TV v2.4 — HTML5 Portal for Media Station X")
     print("  В MSX на ТВ введите адрес:")
     print("  <IP_ЭТОГО_КОМПЬЮТЕРА>:5000")
     print("=" * 65)
