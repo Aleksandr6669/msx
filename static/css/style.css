@@ -196,6 +196,32 @@ body.tv-mode {
     transform: scale(1.03);
 }
 
+.quick-exit-msx-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-dim);
+    padding: 10px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.25s ease;
+}
+
+.quick-exit-msx-btn:hover, .quick-exit-msx-btn:focus {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    transform: scale(1.02);
+}
+
 .sidebar-status {
     display: flex;
     align-items: center;
@@ -367,9 +393,7 @@ body.tv-mode {
 }
 
 /* Digital Neon Clock */
-.widget-clock-digital {
-    min-width: 340px;
-}
+.widget-clock-digital { min-width: 340px; }
 
 .w-digital-time {
     font-family: 'JetBrains Mono', monospace;
@@ -489,9 +513,7 @@ body.tv-mode {
 }
 
 /* Modern Clock */
-.widget-clock-modern {
-    min-width: 290px;
-}
+.widget-clock-modern { min-width: 290px; }
 
 .modern-time-val {
     font-size: 3.8rem;
@@ -518,9 +540,7 @@ body.tv-mode {
 }
 
 /* Calendar Month Grid */
-.widget-cal-grid {
-    min-width: 320px;
-}
+.widget-cal-grid { min-width: 320px; }
 
 .cal-days-head {
     display: grid;
@@ -1046,6 +1066,97 @@ body.tv-mode {
 .info-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
 .info-card p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; }
 .host-badge { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
+
+/* ==========================================================================
+   IN-APP FULLSCREEN APP VIEWER WITH FLOATING EXIT BUTTON
+   ========================================================================== */
+.app-viewer-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #000;
+    display: none;
+    flex-direction: column;
+}
+
+.app-viewer-modal.active {
+    display: flex;
+}
+
+.app-viewer-header {
+    height: 52px;
+    background: rgba(8, 12, 22, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+}
+
+.btn-app-exit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 210, 255, 0.15);
+    border: 1px solid rgba(0, 210, 255, 0.4);
+    color: var(--accent-cyan);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.btn-app-exit:hover, .btn-app-exit:focus {
+    background: var(--accent-cyan);
+    color: #070914;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
+    transform: scale(1.03);
+}
+
+.app-viewer-info {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.btn-direct-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 8px;
+    outline: none;
+}
+
+.btn-direct-link:hover, .btn-direct-link:focus {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.app-frame-container {
+    flex-grow: 1;
+    width: 100%;
+    height: calc(100% - 52px);
+    background: #000;
+}
+
+.app-frame-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
 
 /* ==========================================================================
    FULLSCREEN 4K SCREENSAVER OVERLAY
