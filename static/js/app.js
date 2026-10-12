@@ -922,11 +922,19 @@ if (btnResetDefaultApps) {
     });
 }
 
-// Restart Portal Button
+// Restart / Exit Portal Button
+// Performs exit to MSX launcher so the application can be re-entered cleanly
 const restartPortalBtn = document.getElementById('restartPortalBtn');
 if (restartPortalBtn) {
-    restartPortalBtn.addEventListener('click', () => {
-        window.location.reload();
+    const doExit = () => {
+        window.location.href = "http://msx.benzac.de/exit.html";
+    };
+    restartPortalBtn.addEventListener('click', doExit);
+    restartPortalBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            doExit();
+        }
     });
 }
 
