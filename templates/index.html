@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MX Station Player — Панель управления & ТВ Симулятор</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="container">
+        <!-- Hero Header -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="badge-live">
+                    <span class="pulse-dot"></span>
+                    Media Station X & MX Player Engine
+                </div>
+                <h1>MX Station Player</h1>
+                <p>
+                    Интерактивный медиасервер с поддержкой Smart TV (Samsung Tizen, LG webOS, Android TV, Fire TV, Apple TV).
+                    Боковая панель навигации, постеры, иконки, видеопотоки и атмосферная 4K заставка.
+                </p>
+                <div class="hero-actions">
+                    <a href="/screensaver" target="_blank" class="btn btn-primary">
+                        <span class="material-icons">nights_stay</span>
+                        Открыть заставку (Screensaver 4K)
+                    </a>
+                    <a href="/start.json" target="_blank" class="btn btn-secondary">
+                        <span class="material-icons">code</span>
+                        Просмотреть start.json
+                    </a>
+                </div>
+            </div>
+            <div class="setup-box">
+                <div class="setup-label">Start Parameter для ввода в ТВ:</div>
+                <div class="url-badge" id="tvUrl" title="Нажмите, чтобы скопировать">{{ base_url }}/start.json</div>
+                <div class="setup-hint">
+                    В приложении <strong>Media Station X</strong> на ТВ откройте:<br>
+                    <code>Settings → Start Parameter → Setup</code>
+                </div>
+            </div>
+        </header>
+
+        <!-- TV Simulator Section -->
+        <section class="simulator-section">
+            <div class="section-header">
+                <div class="title-with-icon">
+                    <span class="material-icons icon-accent">tv</span>
+                    <h2>Интерактивный ТВ-интерфейс (Симулятор)</h2>
+                </div>
+                <span class="hint-tag">Управление: стрелки на клавиатуре или мышь</span>
+            </div>
+
+            <div class="tv-frame">
+                <!-- Sidebar -->
+                <aside class="tv-sidebar">
+                    <div class="tv-logo">
+                        <span class="material-icons logo-icon">play_circle</span>
+                        <div class="logo-text">
+                            <span class="logo-main">MX STATION</span>
+                            <span class="logo-sub">PLAYER PORTAL</span>
+                        </div>
+                    </div>
+
+                    <nav class="tv-menu">
+                        <button class="menu-item active" data-category="home">
+                            <span class="material-icons">home</span>
+                            <span class="label">Главная</span>
+                        </button>
+                        <button class="menu-item" data-category="movies">
+                            <span class="material-icons">movie</span>
+                            <span class="label">Фильмы</span>
+                            <span class="badge">4K</span>
+                        </button>
+                        <button class="menu-item" data-category="series">
+                            <span class="material-icons">video_library</span>
+                            <span class="label">Сериалы</span>
+                        </button>
+                        <button class="menu-item" data-category="tv">
+                            <span class="material-icons">live_tv</span>
+                            <span class="label">ТВ Каналы</span>
+                            <span class="badge badge-live-small">LIVE</span>
+                        </button>
+                        <button class="menu-item" data-category="music">
+                            <span class="material-icons">music_note</span>
+                            <span class="label">Музыка & Радио</span>
+                        </button>
+                        <button class="menu-item" data-category="screensaver">
+                            <span class="material-icons">wallpaper</span>
+                            <span class="label">Заставка & Релакс</span>
+                            <span class="badge">4K</span>
+                        </button>
+                        <button class="menu-item" data-category="info">
+                            <span class="material-icons">settings</span>
+                            <span class="label">Настройки</span>
+                        </button>
+                    </nav>
+
+                    <div class="sidebar-footer">
+                        <div class="status-indicator">
+                            <span class="status-dot"></span>
+                            <span>Сервер активен</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- TV Main Stage -->
+                <main class="tv-stage">
+                    <div class="stage-header">
+                        <h3 id="currentCategoryTitle">Главная — Премьеры и Новинки</h3>
+                        <div class="tv-clock" id="clockDisplay">18:00</div>
+                    </div>
+
+                    <div class="cards-grid" id="contentGrid">
+                        <!-- Cards dynamically rendered by JavaScript or template -->
+                        {% for m in movies %}
+                        <div class="tv-card" tabindex="0">
+                            <div class="card-image-wrap">
+                                <img src="{{ m.image }}" alt="{{ m.title }}" class="card-img" loading="lazy">
+                                <span class="card-badge">{{ m.badge }}</span>
+                                <div class="play-overlay">
+                                    <span class="material-icons play-btn">play_arrow</span>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-sub">{{ m.titleHeader }}</div>
+                                <div class="card-title">{{ m.title }}</div>
+                                <div class="card-meta">{{ m.titleFooter }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- Instructions Guide -->
+        <section class="guide-section">
+            <div class="section-header">
+                <div class="title-with-icon">
+                    <span class="material-icons icon-accent-purple">menu_book</span>
+                    <h2>Инструкция по настройке</h2>
+                </div>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <h3>Установка приложения</h3>
+                    <p>
+                        Установите приложение <strong>Media Station X</strong> из официального магазина (Google Play на Android TV / Google TV, Samsung Smart Hub для Tizen, LG Content Store для webOS).
+                    </p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <h3>Ввод адреса сервера</h3>
+                    <p>
+                        Запустите MSX на ТВ, откройте <strong>Settings → Start Parameter → Setup</strong> и введите URL адрес: <code>{{ base_url }}/start.json</code>.
+                    </p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <h3>Запуск в MX Player</h3>
+                    <p>
+                        Нажмите кнопку OK на пульте для воспроизведения любого фильма или канала. На устройствах Android TV вы также можете запускать поток через внешний плеер <strong>MX Player</strong>.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
