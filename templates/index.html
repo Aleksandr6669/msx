@@ -3,177 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MX Station Player — Панель управления & ТВ Симулятор</title>
+    <title>MX Station Player — Виджеты & Панель Управления</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
-    <div class="ambient-glow"></div>
-    <div class="ambient-glow glow-2"></div>
+<body class="theme-active" id="mainBody">
+    <!-- Background Layer (Image or Gradient) -->
+    <div class="bg-layer" id="bgLayer"></div>
+    <div class="ambient-glow glow-primary"></div>
+    <div class="ambient-glow glow-secondary"></div>
 
-    <div class="container">
-        <!-- Hero Header -->
-        <header class="hero">
-            <div class="hero-content">
-                <div class="badge-live">
-                    <span class="pulse-dot"></span>
-                    Media Station X & MX Player Engine
-                </div>
-                <h1>MX Station Player</h1>
-                <p>
-                    Интерактивный медиасервер с поддержкой Smart TV (Samsung Tizen, LG webOS, Android TV, Fire TV, Apple TV).
-                    Боковая панель навигации, постеры, иконки, видеопотоки и атмосферная 4K заставка.
-                </p>
-                <div class="hero-actions">
-                    <a href="/screensaver" target="_blank" class="btn btn-primary">
-                        <span class="material-icons">nights_stay</span>
-                        Открыть заставку (Screensaver 4K)
-                    </a>
-                    <a href="/start.json" target="_blank" class="btn btn-secondary">
-                        <span class="material-icons">code</span>
-                        Просмотреть start.json
-                    </a>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar-glass" id="appSidebar">
+            <div class="sidebar-brand">
+                <span class="material-icons brand-icon">play_circle_filled</span>
+                <div class="brand-text">
+                    <span class="brand-name">MX STATION</span>
+                    <span class="brand-tag">PORTAL & WIDGETS</span>
                 </div>
             </div>
-            <div class="setup-box">
-                <div class="setup-label">Start Parameter для ввода в ТВ:</div>
-                <div class="url-badge" id="tvUrl" title="Нажмите, чтобы скопировать">{{ base_url }}/start.json</div>
-                <div class="setup-hint">
-                    В приложении <strong>Media Station X</strong> на ТВ откройте:<br>
-                    <code>Settings → Start Parameter → Setup</code>
+
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-view="dashboard">
+                    <span class="material-icons">dashboard</span>
+                    <span class="nav-label">Виджеты</span>
+                </button>
+                <button class="nav-btn" data-view="catalog">
+                    <span class="material-icons">movie</span>
+                    <span class="nav-label">Медиатека</span>
+                    <span class="badge">4K</span>
+                </button>
+                <button class="nav-btn" data-view="settings">
+                    <span class="material-icons">tune</span>
+                    <span class="nav-label">Настройки вида</span>
+                </button>
+                <a href="/screensaver" class="nav-btn" target="_blank">
+                    <span class="material-icons">wallpaper</span>
+                    <span class="nav-label">Заставка 4K</span>
+                    <span class="badge badge-pulse">LIVE</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="msx-connect-pill" id="msxUrlCard" title="Нажмите для копирования URL">
+                    <span class="msx-dot"></span>
+                    <div class="msx-info">
+                        <span class="msx-lbl">Start Parameter для ТВ:</span>
+                        <code class="msx-val">{{ base_url }}/start.json</code>
+                    </div>
                 </div>
             </div>
-        </header>
+        </aside>
 
-        <!-- TV Simulator Section -->
-        <section class="simulator-section">
-            <div class="section-header">
-                <div class="title-with-icon">
-                    <span class="material-icons icon-accent">tv</span>
-                    <h2>Интерактивный ТВ-интерфейс (Симулятор)</h2>
+        <!-- Main Screen Workspace -->
+        <main class="main-viewport" id="mainViewport">
+            <!-- Top Controls Bar -->
+            <header class="top-nav-bar">
+                <div class="quick-info">
+                    <span class="badge-status">Media Station X Mode</span>
+                    <span class="status-text">Smart TV Interface Active</span>
                 </div>
-                <span class="hint-tag">Управление: стрелки на клавиатуре или мышь</span>
-            </div>
 
-            <div class="tv-frame">
-                <!-- Sidebar -->
-                <aside class="tv-sidebar">
-                    <div class="tv-logo">
-                        <span class="material-icons logo-icon">play_circle</span>
-                        <div class="logo-text">
-                            <span class="logo-main">MX STATION</span>
-                            <span class="logo-sub">PLAYER PORTAL</span>
+                <div class="top-actions">
+                    <button class="glass-action-btn" id="openSettingsBtn" title="Настройки виджетов и фона">
+                        <span class="material-icons">palette</span>
+                        <span>Кастомизация</span>
+                    </button>
+                    <button class="glass-action-btn" id="toggleScreensaverBtn" title="Включить полноэкранную заставку">
+                        <span class="material-icons">fullscreen</span>
+                        <span>Заставка</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- VIEW 1: Interactive Widgets Display (Positionable: Center, Left, Right, Top, Bottom) -->
+            <section class="view-section active" id="viewDashboard">
+                <div class="widgets-container pos-center" id="widgetsContainer">
+                    
+                    <!-- WIDGET 1: Digital Neon Clock -->
+                    <div class="glass-widget widget-clock-digital" id="widgetClockDigital">
+                        <div class="widget-header">
+                            <span class="material-icons widget-icon">schedule</span>
+                            <span class="widget-tag">КИБЕР-ВРЕМЯ</span>
+                            <span class="seconds-pulse" id="secondsPulse">SEC</span>
+                        </div>
+                        <div class="digital-time-display">
+                            <span class="time-part" id="digHours">18</span>
+                            <span class="time-colon">:</span>
+                            <span class="time-part" id="digMinutes">45</span>
+                            <span class="time-seconds" id="digSeconds">32</span>
+                        </div>
+                        <div class="digital-date-footer" id="digDateFooter">
+                            Понедельник, 12 Октября 2026
                         </div>
                     </div>
 
-                    <nav class="tv-menu">
-                        <button class="menu-item active" data-category="home">
-                            <span class="material-icons">home</span>
-                            <span class="label">Главная</span>
-                        </button>
-                        <button class="menu-item" data-category="movies">
-                            <span class="material-icons">movie</span>
-                            <span class="label">Фильмы</span>
-                            <span class="badge">4K</span>
-                        </button>
-                        <button class="menu-item" data-category="series">
-                            <span class="material-icons">video_library</span>
-                            <span class="label">Сериалы</span>
-                        </button>
-                        <button class="menu-item" data-category="tv">
-                            <span class="material-icons">live_tv</span>
-                            <span class="label">ТВ Каналы</span>
-                            <span class="badge badge-live-small">LIVE</span>
-                        </button>
-                        <button class="menu-item" data-category="music">
-                            <span class="material-icons">music_note</span>
-                            <span class="label">Музыка & Радио</span>
-                        </button>
-                        <button class="menu-item" data-category="screensaver">
-                            <span class="material-icons">wallpaper</span>
-                            <span class="label">Заставка & Релакс</span>
-                            <span class="badge">4K</span>
-                        </button>
-                        <button class="menu-item" data-category="info">
-                            <span class="material-icons">settings</span>
-                            <span class="label">Настройки</span>
-                        </button>
-                    </nav>
+                    <!-- WIDGET 2: Analog Luxury Clock -->
+                    <div class="glass-widget widget-clock-analog" id="widgetClockAnalog">
+                        <div class="widget-header">
+                            <span class="material-icons widget-icon">watch_later</span>
+                            <span class="widget-tag">АНАЛОГОВЫЙ ЦИФЕРБЛАТ</span>
+                        </div>
+                        <div class="analog-dial">
+                            <div class="dial-marks">
+                                <span class="mark m12">12</span>
+                                <span class="mark m3">3</span>
+                                <span class="mark m6">6</span>
+                                <span class="mark m9">9</span>
+                            </div>
+                            <!-- Clock Hands -->
+                            <div class="hand hand-hour" id="analogHour"></div>
+                            <div class="hand hand-min" id="analogMin"></div>
+                            <div class="hand hand-sec" id="analogSec"></div>
+                            <div class="dial-center"></div>
+                        </div>
+                        <div class="analog-city">MX LUXURY CHRONO</div>
+                    </div>
 
-                    <div class="sidebar-footer">
-                        <div class="status-indicator">
-                            <span class="status-dot"></span>
-                            <span>Сервер активен</span>
+                    <!-- WIDGET 3: Modern Sleek Clock (Minimalist Gradient) -->
+                    <div class="glass-widget widget-clock-modern" id="widgetClockModern">
+                        <div class="widget-header">
+                            <span class="material-icons widget-icon">av_timer</span>
+                            <span class="widget-tag">MINIMAL MODERN</span>
+                        </div>
+                        <div class="modern-time" id="modTime">18:45</div>
+                        <div class="modern-date" id="modDate">ОКТЯБРЬ • 2026</div>
+                        <div class="modern-week-day" id="modDay">ПОНЕДЕЛЬНИК</div>
+                    </div>
+
+                    <!-- WIDGET 4: Interactive Calendar (Month Grid) -->
+                    <div class="glass-widget widget-calendar-grid" id="widgetCalendarGrid">
+                        <div class="widget-header">
+                            <div class="cal-nav">
+                                <span class="material-icons widget-icon">calendar_month</span>
+                                <span class="cal-title" id="calMonthTitle">Октябрь 2026</span>
+                            </div>
+                            <span class="widget-tag">КАЛЕНДАРЬ</span>
+                        </div>
+                        <div class="calendar-days-header">
+                            <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="weekend">СБ</span><span class="weekend">ВС</span>
+                        </div>
+                        <div class="calendar-grid-cells" id="calGridCells">
+                            <!-- Populated dynamically by JavaScript -->
                         </div>
                     </div>
-                </aside>
 
-                <!-- TV Main Stage -->
-                <main class="tv-stage">
-                    <div class="stage-header">
-                        <h3 id="currentCategoryTitle">Главная — Премьеры и Новинки</h3>
-                        <div class="tv-clock" id="clockDisplay">18:00</div>
-                    </div>
-
-                    <div class="cards-grid" id="contentGrid">
-                        <!-- Cards dynamically rendered by JavaScript or template -->
-                        {% for m in movies %}
-                        <div class="tv-card" tabindex="0">
-                            <div class="card-image-wrap">
-                                <img src="{{ m.image }}" alt="{{ m.title }}" class="card-img" loading="lazy">
-                                <span class="card-badge">{{ m.badge }}</span>
-                                <div class="play-overlay">
-                                    <span class="material-icons play-btn">play_arrow</span>
+                    <!-- WIDGET 5: Compact Date & Weather / Mood Card -->
+                    <div class="glass-widget widget-calendar-compact" id="widgetCalendarCompact">
+                        <div class="widget-header">
+                            <span class="material-icons widget-icon">today</span>
+                            <span class="widget-tag">СЕГОДНЯ</span>
+                        </div>
+                        <div class="compact-date-block">
+                            <div class="compact-day-num" id="compactDayNum">12</div>
+                            <div class="compact-details">
+                                <div class="compact-month-year" id="compactMonthYear">Октября 2026</div>
+                                <div class="compact-weekday" id="compactWeekday">Понедельник</div>
+                                <div class="compact-status">
+                                    <span class="material-icons" style="font-size: 16px; color: #fbbf24;">wb_sunny</span>
+                                    <span>Уютный вечер 4K</span>
                                 </div>
                             </div>
-                            <div class="card-info">
-                                <div class="card-sub">{{ m.titleHeader }}</div>
-                                <div class="card-title">{{ m.title }}</div>
-                                <div class="card-meta">{{ m.titleFooter }}</div>
+                        </div>
+                    </div>
+
+                    <!-- WIDGET 6: Schedule & Events Planner Card -->
+                    <div class="glass-widget widget-calendar-events" id="widgetCalendarEvents">
+                        <div class="widget-header">
+                            <span class="material-icons widget-icon">event_note</span>
+                            <span class="widget-tag">ПЛАНИРОВЩИК ТВ</span>
+                        </div>
+                        <div class="events-list">
+                            <div class="event-item active-event">
+                                <span class="event-time">19:00</span>
+                                <div class="event-desc">
+                                    <div class="event-name">Интерстеллар (4K Dolby)</div>
+                                    <div class="event-sub">Семейный просмотр</div>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <span class="event-time">21:30</span>
+                                <div class="event-desc">
+                                    <div class="event-name">Discovery Nature 4K</div>
+                                    <div class="event-sub">Прямой эфир</div>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <span class="event-time">23:00</span>
+                                <div class="event-desc">
+                                    <div class="event-name">Заставка & Lo-Fi Chill</div>
+                                    <div class="event-sub">Ночной релакс</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- VIEW 2: Media Catalog -->
+            <section class="view-section" id="viewCatalog">
+                <div class="catalog-container">
+                    <div class="section-title-wrap">
+                        <h2>Каталог Медиа для Smart TV</h2>
+                        <span class="catalog-hint">Запуск через плеер MSX или MX Player</span>
+                    </div>
+
+                    <div class="media-grid">
+                        {% for m in movies %}
+                        <div class="glass-media-card" tabindex="0">
+                            <div class="media-thumb-wrap">
+                                <img src="{{ m.image }}" alt="{{ m.title }}" class="media-thumb" loading="lazy">
+                                <span class="media-badge">{{ m.badge }}</span>
+                                <div class="play-overlay">
+                                    <span class="material-icons">play_circle_filled</span>
+                                </div>
+                            </div>
+                            <div class="media-details">
+                                <span class="media-cat">{{ m.titleHeader }}</span>
+                                <h4 class="media-title">{{ m.title }}</h4>
+                                <span class="media-sub">{{ m.titleFooter }}</span>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
-                </main>
-            </div>
-        </section>
+                </div>
+            </section>
 
-        <!-- Instructions Guide -->
-        <section class="guide-section">
-            <div class="section-header">
-                <div class="title-with-icon">
-                    <span class="material-icons icon-accent-purple">menu_book</span>
-                    <h2>Инструкция по настройке</h2>
-                </div>
-            </div>
+            <!-- VIEW 3: Settings & Customization Modal/Tab -->
+            <section class="view-section" id="viewSettings">
+                <div class="settings-container">
+                    <div class="settings-card glass-panel">
+                        <h2>
+                            <span class="material-icons" style="color: var(--accent-cyan);">tune</span>
+                            Кастомизация виджетов и фона
+                        </h2>
+                        <p class="settings-desc">
+                            Настройте идеальный экран: выбирайте полупрозрачные виджеты часов и календаря, их взаимное расположение и фоновые 4K обои.
+                        </p>
 
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-num">01</div>
-                    <h3>Установка приложения</h3>
-                    <p>
-                        Установите приложение <strong>Media Station X</strong> из официального магазина (Google Play на Android TV / Google TV, Samsung Smart Hub для Tizen, LG Content Store для webOS).
-                    </p>
+                        <!-- Setting Row 1: Clocks -->
+                        <div class="setting-group">
+                            <label class="setting-label">Виджет времени и часов:</label>
+                            <div class="options-grid" id="clockOptionGroup">
+                                <button class="opt-btn active" data-clock="digital">
+                                    <span class="material-icons">schedule</span>
+                                    <span>Цифровые Неон</span>
+                                </button>
+                                <button class="opt-btn" data-clock="modern">
+                                    <span class="material-icons">av_timer</span>
+                                    <span>Минимал Модерн</span>
+                                </button>
+                                <button class="opt-btn" data-clock="analog">
+                                    <span class="material-icons">watch_later</span>
+                                    <span>Аналоговые стрелочные</span>
+                                </button>
+                                <button class="opt-btn" data-clock="both">
+                                    <span class="material-icons">view_carousel</span>
+                                    <span>Оба стиля часов</span>
+                                </button>
+                                <button class="opt-btn" data-clock="none">
+                                    <span class="material-icons">visibility_off</span>
+                                    <span>Скрыть часы</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Setting Row 2: Calendars -->
+                        <div class="setting-group">
+                            <label class="setting-label">Виджет календаря:</label>
+                            <div class="options-grid" id="calendarOptionGroup">
+                                <button class="opt-btn active" data-calendar="grid">
+                                    <span class="material-icons">calendar_month</span>
+                                    <span>Сетка месяца</span>
+                                </button>
+                                <button class="opt-btn" data-calendar="compact">
+                                    <span class="material-icons">today</span>
+                                    <span>Компактная дата</span>
+                                </button>
+                                <button class="opt-btn" data-calendar="events">
+                                    <span class="material-icons">event_note</span>
+                                    <span>События & Планы</span>
+                                </button>
+                                <button class="opt-btn" data-calendar="both">
+                                    <span class="material-icons">auto_awesome_motion</span>
+                                    <span>Сетка + События</span>
+                                </button>
+                                <button class="opt-btn" data-calendar="none">
+                                    <span class="material-icons">visibility_off</span>
+                                    <span>Скрыть календарь</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Setting Row 3: Positioning -->
+                        <div class="setting-group">
+                            <label class="setting-label">Расположение виджетов на экране:</label>
+                            <div class="position-selector">
+                                <button class="pos-btn active" data-pos="center">
+                                    <span class="material-icons">filter_center_focus</span>
+                                    <span>Посередине</span>
+                                </button>
+                                <button class="pos-btn" data-pos="left">
+                                    <span class="material-icons">format_align_left</span>
+                                    <span>Слева</span>
+                                </button>
+                                <button class="pos-btn" data-pos="right">
+                                    <span class="material-icons">format_align_right</span>
+                                    <span>Справа</span>
+                                </button>
+                                <button class="pos-btn" data-pos="top">
+                                    <span class="material-icons">vertical_align_top</span>
+                                    <span>Сверху</span>
+                                </button>
+                                <button class="pos-btn" data-pos="bottom">
+                                    <span class="material-icons">vertical_align_bottom</span>
+                                    <span>Снизу</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Setting Row 4: Background Selection -->
+                        <div class="setting-group">
+                            <label class="setting-label">Задний фон (готовые 4K картинки или градиенты):</label>
+                            <div class="bg-thumbs-grid" id="bgThumbnails">
+                                {% for bg in backgrounds %}
+                                <div class="bg-thumb-card {% if bg.id == settings.background_id %}selected{% endif %}" 
+                                     data-bg-id="{{ bg.id }}"
+                                     data-bg-type="{{ bg.type }}"
+                                     data-bg-url="{{ bg.url if bg.type == 'image' else '' }}"
+                                     data-bg-css="{{ bg.css if bg.type == 'gradient' else '' }}">
+                                    {% if bg.type == 'image' %}
+                                        <img src="{{ bg.thumb }}" alt="{{ bg.name }}" class="thumb-img">
+                                    {% else %}
+                                        <div class="thumb-grad" style="background: {{ bg.css }};"></div>
+                                    {% endif %}
+                                    <span class="thumb-name">{{ bg.name }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Setting Row 5: Glass Blur Strength -->
+                        <div class="setting-group">
+                            <label class="setting-label">Интенсивность блюра стекла:</label>
+                            <div class="blur-selector">
+                                <button class="blur-btn" data-blur="light">Легкий блюр</button>
+                                <button class="blur-btn active" data-blur="medium">Стандартный (25px)</button>
+                                <button class="blur-btn" data-blur="heavy">Глубокий матовый</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button class="btn btn-primary" id="saveAndBackBtn">
+                                <span class="material-icons">check_circle</span>
+                                <span>Применить и вернуться к виджетам</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="step-card">
-                    <div class="step-num">02</div>
-                    <h3>Ввод адреса сервера</h3>
-                    <p>
-                        Запустите MSX на ТВ, откройте <strong>Settings → Start Parameter → Setup</strong> и введите URL адрес: <code>{{ base_url }}/start.json</code>.
-                    </p>
-                </div>
-                <div class="step-card">
-                    <div class="step-num">03</div>
-                    <h3>Запуск в MX Player</h3>
-                    <p>
-                        Нажмите кнопку OK на пульте для воспроизведения любого фильма или канала. На устройствах Android TV вы также можете запускать поток через внешний плеер <strong>MX Player</strong>.
-                    </p>
-                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Media Station X Setup Instructions Banner for Native Screensaver -->
+    <div class="msx-guide-banner">
+        <div class="guide-box">
+            <span class="material-icons icon-guide">info</span>
+            <div class="guide-text">
+                <strong>Стандартная заставка в Media Station X:</strong> 
+                Откройте на ТВ <code>Настройки → Заставка</code> (Settings → Screensaver) и укажите адрес слайд-шоу: 
+                <span class="code-highlight">{{ base_url }}/slideshow.json</span>
             </div>
-        </section>
+        </div>
     </div>
 
     <script src="/static/js/app.js"></script>
