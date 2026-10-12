@@ -23,7 +23,7 @@
                 <span class="material-icons logo-icon">cottage</span>
                 <div class="logo-title">
                     <span class="logo-brand">HOME PORTAL</span>
-                    <span class="logo-sub">SMART PORTAL</span>
+                    <span class="logo-sub">SMART TV HUB</span>
                 </div>
             </div>
 
@@ -56,16 +56,16 @@
 
             <div class="sidebar-bottom">
                 <button class="quick-screensaver-btn" id="startScreensaverBtn" tabindex="0" title="Включить заставку сейчас">
-                    <span class="material-icons">brightness_3</span>
-                    <span>Включить заставку</span>
+                    <span class="material-icons">wallpaper</span>
+                    <span>Заставка</span>
                 </button>
-                <button class="quick-exit-msx-btn" id="exitToMsxBtn" tabindex="0" title="Выход в меню Media Station X">
-                    <span class="material-icons">exit_to_app</span>
-                    <span>Выход в MSX</span>
+                <button class="quick-restart-btn" id="restartPortalBtn" tabindex="0" title="Перезапустить портал">
+                    <span class="material-icons">refresh</span>
+                    <span>Перезапуск</span>
                 </button>
                 <div class="sidebar-status">
                     <span class="live-dot"></span>
-                    <span>Media Station X Ready</span>
+                    <span>Home Portal v2.4</span>
                 </div>
             </div>
         </aside>
@@ -77,29 +77,19 @@
             <section class="tab-pane active" id="tabWidgets">
                 <div class="tab-header">
                     <div class="header-left">
-                        <h2>Виджеты & Время</h2>
-                        <span class="header-sub">Интерактивные стеклянные виджеты реального времени</span>
-                    </div>
-                    <div class="header-actions">
-                        <button class="action-btn" id="gotoWidgetSettingsBtn" tabindex="0">
-                            <span class="material-icons">tune</span>
-                            <span>Настройки виджетов</span>
-                        </button>
-                        <button class="action-btn action-primary" id="launchScreensaverActionBtn" tabindex="0">
-                            <span class="material-icons">wallpaper</span>
-                            <span>Заставка 4K</span>
-                        </button>
+                        <h2>Виджеты</h2>
+                        <span class="header-sub">Информационная панель реального времени</span>
                     </div>
                 </div>
 
-                <!-- Bento Box Grid of Modular Widgets -->
+                <!-- Bento Box Grid of Modular Widgets (1x1, 2x1, 2x2) -->
                 <div class="widgets-bento-grid" id="widgetsWrapper">
                     
                     <!-- WIDGET: DIGITAL NEON CLOCK -->
                     <div class="glass-widget widget-clock-digital span-2" id="wClockDigital" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">schedule</span>
-                            <span class="w-label">КИБЕР-ВРЕМЯ</span>
+                            <span class="w-label">ЦИФРОВЫЕ ЧАСЫ</span>
                             <span class="w-sec-badge" id="wSecBadge">SEC</span>
                         </div>
                         <div class="w-digital-time">
@@ -113,8 +103,8 @@
                         </div>
                     </div>
 
-                    <!-- WIDGET: ANALOG LUXURY CLOCK (Animated moving hands) -->
-                    <div class="glass-widget widget-clock-analog span-1" id="wClockAnalog" class="glass-widget widget-clock-analog span-1" tabindex="0">
+                    <!-- WIDGET: ANALOG LUXURY CLOCK -->
+                    <div class="glass-widget widget-clock-analog span-1" id="wClockAnalog" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">watch_later</span>
                             <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
@@ -210,23 +200,17 @@
                 </div>
             </section>
 
-            <!-- TAB 2: ПРОГРАММЫ (APPS) -->
+            <!-- TAB 2: ПРОГРАММЫ (APPS) - COMPACT PHONE-LIKE ICONS -->
             <section class="tab-pane" id="tabApps">
                 <div class="tab-header">
                     <div class="header-left">
-                        <h2>Программы & Приложения</h2>
-                        <span class="header-sub">Запуск онлайн-кинотеатров и управление ярлыками</span>
-                    </div>
-                    <div class="header-actions">
-                        <button class="action-btn action-primary" id="openAddAppModalBtn" tabindex="0">
-                            <span class="material-icons">add_circle</span>
-                            <span>+ Добавить программу</span>
-                        </button>
+                        <h2>Программы</h2>
+                        <span class="header-sub">Быстрый запуск сервисов и медиа-порталов</span>
                     </div>
                 </div>
 
                 <div class="apps-grid" id="appsGrid">
-                    <!-- Apps dynamically rendered from localStorage / presets -->
+                    <!-- Apps dynamically rendered as compact phone-like app icons (6-7 per row) -->
                 </div>
             </section>
 
@@ -235,7 +219,7 @@
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>Настройки системы</h2>
-                        <span class="header-sub">Управление виджетами, программами и скринсейвером</span>
+                        <span class="header-sub">Управление темами, размерами виджетов, программами и заставкой</span>
                     </div>
                 </div>
 
@@ -279,109 +263,93 @@
                     </div>
 
                     <div class="setting-card">
-                        <h3>Плавность анимаций интерфейса</h3>
-                        <p class="setting-desc">Настройка плавности переходов и перемещения фокуса:</p>
+                        <h3>Скорость и плавность анимаций</h3>
+                        <p class="setting-desc">Оптимизация отклика пульта для максимальной отзывчивости на ТВ:</p>
                         <div class="anim-selector" id="animSelector">
-                            <button class="anim-option-btn active" data-anim="smooth" tabindex="0">Плавные кинематографичные (60 fps)</button>
-                            <button class="anim-option-btn" data-anim="fast" tabindex="0">Мгновенные (Без анимаций)</button>
+                            <button class="anim-option-btn active" data-anim="snappy" tabindex="0">⚡ Быстрые (100 ms) — Оптимально для ТВ</button>
+                            <button class="anim-option-btn" data-anim="fast" tabindex="0">🚀 Мгновенные (Без анимаций, 0 ms)</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- SUBTAB 2: НАСТРОЙКИ ВИДЖЕТОВ И СЕТКИ -->
                 <div class="settings-subpane" id="sub-widgets">
-                    <div class="setting-card">
-                        <h3>Включение и настройка размеров ячеек в сетке</h3>
-                        <p class="setting-desc">Выберите размер каждого виджета (1 ячейка = 25% экрана, 2 ячейки = 50%, 4 ячейки = вся ширина):</p>
-                        <div class="widget-config-stack" id="widgetConfigStack">
-                            <div class="widget-config-row" data-key="clock_digital">
-                                <label class="toggle-pill" tabindex="0" data-key="clock_digital">
-                                    <span class="material-icons">schedule</span>
-                                    <span>Цифровые часы</span>
-                                    <span class="toggle-check">✓</span>
-                                </label>
-                                <div class="size-selector" data-target="clock_digital">
-                                    <span class="size-label">Размер:</span>
-                                    <button class="size-btn" data-size="1" tabindex="0">1 ячейка</button>
-                                    <button class="size-btn active" data-size="2" tabindex="0">2 ячейки</button>
-                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                    <!-- VIEW A: СПИСОК ВСЕХ ВИДЖЕТОВ -->
+                    <div id="widgetsListView">
+                        <div class="setting-card">
+                            <h3>Категории виджетов & Bento-сетка</h3>
+                            <p class="setting-desc">Выберите виджет и нажмите <strong>«⚙ Настроить»</strong>, чтобы изменить его размер (1, 2 или 4 ячейки) и видимость:</p>
+                            
+                            <div class="widgets-manage-grid" id="widgetsManageGrid">
+                                <!-- Cards generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW B: ДЕТАЛЬНАЯ НАСТРОЙКА ВЫБРАННОГО ВИДЖЕТА -->
+                    <div id="widgetDetailView" style="display: none;">
+                        <div class="setting-card">
+                            <div class="detail-top-nav">
+                                <button class="detail-back-btn" id="btnBackToWidgetsList" tabindex="0">
+                                    <span class="material-icons">arrow_back</span>
+                                    <span>Назад к списку виджетов</span>
+                                </button>
+                                <div class="detail-widget-badge" id="detailWidgetBadge">Виджет</div>
+                            </div>
+
+                            <h3 id="detailWidgetTitle" style="font-size: 1.4rem; margin-top: 14px; margin-bottom: 6px;">Настройка виджета</h3>
+                            <p class="setting-desc" id="detailWidgetDesc">Настройте видимость и размер ячеек в сетке Bento:</p>
+
+                            <div class="detail-section">
+                                <h4>Отображение виджета</h4>
+                                <div class="toggle-pill" id="detailTogglePill" tabindex="0">
+                                    <span class="material-icons" id="detailWidgetIcon">schedule</span>
+                                    <span id="detailToggleLabel">Виджет включен на главном экране</span>
+                                    <span class="toggle-check" id="detailToggleCheck">✓</span>
                                 </div>
                             </div>
 
-                            <div class="widget-config-row" data-key="clock_analog">
-                                <label class="toggle-pill" tabindex="0" data-key="clock_analog">
-                                    <span class="material-icons">watch_later</span>
-                                    <span>Аналоговые стрелочные</span>
-                                    <span class="toggle-check">✓</span>
-                                </label>
-                                <div class="size-selector" data-target="clock_analog">
-                                    <span class="size-label">Размер:</span>
-                                    <button class="size-btn active" data-size="1" tabindex="0">1 ячейка</button>
-                                    <button class="size-btn" data-size="2" tabindex="0">2 ячейки</button>
-                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
+                            <div class="detail-section" style="margin-top: 18px;">
+                                <h4>Размер виджета в сетке</h4>
+                                <p class="setting-desc" style="margin-bottom: 10px;">Выберите один из 3 вариантов компоновки:</p>
+                                <div class="bento-size-options" id="detailSizeOptions">
+                                    <button class="bento-size-card" data-size="1" tabindex="0">
+                                        <div class="bento-visual size-1-visual">
+                                            <span class="cell-active"></span><span></span><span></span><span></span>
+                                        </div>
+                                        <div class="bento-size-name">1 ячейка</div>
+                                        <div class="bento-size-desc">1×1 • Компактный блок</div>
+                                    </button>
+
+                                    <button class="bento-size-card" data-size="2" tabindex="0">
+                                        <div class="bento-visual size-2-visual">
+                                            <span class="cell-active"></span><span class="cell-active"></span><span></span><span></span>
+                                        </div>
+                                        <div class="bento-size-name">2 ячейки</div>
+                                        <div class="bento-size-desc">2×1 • По горизонтали</div>
+                                    </button>
+
+                                    <button class="bento-size-card" data-size="4" tabindex="0">
+                                        <div class="bento-visual size-4-visual">
+                                            <span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span>
+                                        </div>
+                                        <div class="bento-size-name">4 ячейки</div>
+                                        <div class="bento-size-desc">2×2 • 2 по гор. и 2 по верт.</div>
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="widget-config-row" data-key="clock_modern">
-                                <label class="toggle-pill" tabindex="0" data-key="clock_modern">
-                                    <span class="material-icons">av_timer</span>
-                                    <span>Минимал часы</span>
-                                    <span class="toggle-check">✓</span>
-                                </label>
-                                <div class="size-selector" data-target="clock_modern">
-                                    <span class="size-label">Размер:</span>
-                                    <button class="size-btn active" data-size="1" tabindex="0">1 ячейка</button>
-                                    <button class="size-btn" data-size="2" tabindex="0">2 ячейки</button>
-                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
-                                </div>
-                            </div>
-
-                            <div class="widget-config-row" data-key="calendar_grid">
-                                <label class="toggle-pill" tabindex="0" data-key="calendar_grid">
-                                    <span class="material-icons">calendar_month</span>
-                                    <span>Календарь (Сетка месяца)</span>
-                                    <span class="toggle-check">✓</span>
-                                </label>
-                                <div class="size-selector" data-target="calendar_grid">
-                                    <span class="size-label">Размер:</span>
-                                    <button class="size-btn" data-size="1" tabindex="0">1 ячейка</button>
-                                    <button class="size-btn active" data-size="2" tabindex="0">2 ячейки</button>
-                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
-                                </div>
-                            </div>
-
-                            <div class="widget-config-row" data-key="calendar_compact">
-                                <label class="toggle-pill" tabindex="0" data-key="calendar_compact">
-                                    <span class="material-icons">today</span>
-                                    <span>Компактная дата</span>
-                                    <span class="toggle-check">✓</span>
-                                </label>
-                                <div class="size-selector" data-target="calendar_compact">
-                                    <span class="size-label">Размер:</span>
-                                    <button class="size-btn active" data-size="1" tabindex="0">1 ячейка</button>
-                                    <button class="size-btn" data-size="2" tabindex="0">2 ячейки</button>
-                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
-                                </div>
-                            </div>
-
-                            <div class="widget-config-row" data-key="calendar_events">
-                                <label class="toggle-pill" tabindex="0" data-key="calendar_events">
-                                    <span class="material-icons">event_note</span>
-                                    <span>Планировщик ТВ</span>
-                                    <span class="toggle-check">✓</span>
-                                </label>
-                                <div class="size-selector" data-target="calendar_events">
-                                    <span class="size-label">Размер:</span>
-                                    <button class="size-btn" data-size="1" tabindex="0">1 ячейка</button>
-                                    <button class="size-btn active" data-size="2" tabindex="0">2 ячейки</button>
-                                    <button class="size-btn" data-size="4" tabindex="0">4 ячейки</button>
-                                </div>
+                            <div style="margin-top: 22px;">
+                                <button class="action-btn action-primary" id="btnSaveWidgetDetail" tabindex="0">
+                                    <span class="material-icons">check</span>
+                                    <span>Готово</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SUBTAB 2: НАСТРОЙКИ ПРОГРАММ -->
+                <!-- SUBTAB 3: НАСТРОЙКИ ПРОГРАММ -->
                 <div class="settings-subpane" id="sub-apps">
                     <div class="setting-card">
                         <h3>Добавить программу вручную</h3>
@@ -397,7 +365,7 @@
                                 <option value="music_note">Музыка (music)</option>
                                 <option value="star">Избранное (star)</option>
                             </select>
-                            <button class="btn-save-app" id="btnSaveApp" tabindex="0">+ Добавить ярлык</button>
+                            <button class="btn-save-app" id="btnSaveApp" tabindex="0">+ Добавить программу</button>
                         </div>
                     </div>
 
@@ -421,7 +389,7 @@
                     </div>
                 </div>
 
-                <!-- SUBTAB 3: НАСТРОЙКА ЗАСТАВКИ (СКРИНСЕЙВЕРА) -->
+                <!-- SUBTAB 4: НАСТРОЙКА ЗАСТАВКИ (СКРИНСЕЙВЕРА) -->
                 <div class="settings-subpane" id="sub-screensaver">
                     <div class="setting-card">
                         <h3>Ручной запуск заставки</h3>
@@ -433,8 +401,59 @@
                     </div>
 
                     <div class="setting-card">
-                        <h3>Выбор фоновой картинки для заставки</h3>
-                        <p class="setting-desc">Выберите тему для слайд-шоу или конкретное 4K фото:</p>
+                        <h3>Виджеты на заставке</h3>
+                        <p class="setting-desc">Выберите, какую информацию выводить поверх 4K заставки:</p>
+                        <div class="ss-widget-type-selector" id="ssWidgetTypeSelector">
+                            <button class="ss-wtype-btn active" data-wtype="both" tabindex="0">
+                                <span class="material-icons">dashboard</span>
+                                <span>Часы + Календарь</span>
+                            </button>
+                            <button class="ss-wtype-btn" data-wtype="clock" tabindex="0">
+                                <span class="material-icons">schedule</span>
+                                <span>Только часы</span>
+                            </button>
+                            <button class="ss-wtype-btn" data-wtype="calendar" tabindex="0">
+                                <span class="material-icons">calendar_month</span>
+                                <span>Только календарь</span>
+                            </button>
+                            <button class="ss-wtype-btn" data-wtype="none" tabindex="0">
+                                <span class="material-icons">visibility_off</span>
+                                <span>Без виджетов (Чистый экран)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Расположение виджетов на заставке</h3>
+                        <p class="setting-desc">Выберите позицию часов и календаря на экране заставки:</p>
+                        <div class="ss-position-selector" id="ssPositionSelector">
+                            <button class="ss-pos-btn active" data-pos="center" tabindex="0">
+                                <span>По центру</span>
+                            </button>
+                            <button class="ss-pos-btn" data-pos="top-left" tabindex="0">
+                                <span>Сверху слева</span>
+                            </button>
+                            <button class="ss-pos-btn" data-pos="top-center" tabindex="0">
+                                <span>Сверху по центру</span>
+                            </button>
+                            <button class="ss-pos-btn" data-pos="top-right" tabindex="0">
+                                <span>Сверху справа</span>
+                            </button>
+                            <button class="ss-pos-btn" data-pos="bottom-left" tabindex="0">
+                                <span>Снизу слева</span>
+                            </button>
+                            <button class="ss-pos-btn" data-pos="bottom-center" tabindex="0">
+                                <span>Снизу по центру</span>
+                            </button>
+                            <button class="ss-pos-btn" data-pos="bottom-right" tabindex="0">
+                                <span>Снизу справа</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Коллекция 4K заставок</h3>
+                        <p class="setting-desc">Выберите тему для слайд-шоу или конкретную 4K заставку:</p>
                         <div class="ss-thumbs-grid" id="ssThumbsGrid">
                             {% for img in ss_wallpapers %}
                             <div class="ss-thumb-card {% if loop.first %}selected{% endif %}" 
@@ -452,19 +471,20 @@
                         <h3>Автозапуск при бездействии (Таймаут заставки)</h3>
                         <p class="setting-desc">Заставка автоматически включится, если пульт не трогают:</p>
                         <div class="timeout-selector" id="timeoutSelector">
-                            <button class="timeout-btn" data-time="60" tabindex="0">1 минута</button>
-                            <button class="timeout-btn active" data-time="120" tabindex="0">2 минуты</button>
-                            <button class="timeout-btn" data-time="300" tabindex="0">5 минут</button>
-                            <button class="timeout-btn" data-time="600" tabindex="0">10 минут</button>
+                            <button class="timeout-btn" data-time="30" tabindex="0">30 сек</button>
+                            <button class="timeout-btn" data-time="60" tabindex="0">1 мин</button>
+                            <button class="timeout-btn active" data-time="120" tabindex="0">2 мин</button>
+                            <button class="timeout-btn" data-time="180" tabindex="0">3 мин</button>
+                            <button class="timeout-btn" data-time="300" tabindex="0">5 мин</button>
+                            <button class="timeout-btn" data-time="600" tabindex="0">10 мин</button>
+                            <button class="timeout-btn" data-time="900" tabindex="0">15 мин</button>
                             <button class="timeout-btn" data-time="0" tabindex="0">Выключено</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>Штатная заставка Media Station X</h3>
-                        <p class="setting-desc">
-                            Чтобы использовать системную функцию в MSX, укажите в <code>Настройки → Заставка</code> адрес:
-                        </p>
+                        <h3>Адрес заставки для ТВ</h3>
+                        <p class="setting-desc">Прямой системный адрес конфигурации заставки:</p>
                         <div class="code-box-display">{{ base_url }}/screensaver.json</div>
                     </div>
                 </div>
@@ -495,11 +515,11 @@
 
                     <div class="info-card">
                         <span class="material-icons info-icon">keyboard</span>
-                        <h3>Навигация и возврат (Кнопка Назад)</h3>
+                        <h3>Навигация и кнопка Назад</h3>
                         <p>
-                            • Кнопка <strong>Назад / Return / ESC</strong> на пульте мгновенно закрывает открытые сайты и возвращает в портал.<br>
-                            • В меню стрелки <strong>Вверх / Вниз / Влево / Вправо</strong> — перемещение.<br>
-                            • Кнопка <strong>OK / Enter</strong> — запуск выбранного приложения.
+                            • Кнопка <strong>Назад / Return / ESC</strong> на пульте мгновенно закрывает открытые программы и возвращает на главный экран виджетов.<br>
+                            • В меню стрелки <strong>Вверх / Вниз / Влево / Вправо</strong> — перемещение фокуса.<br>
+                            • Кнопка <strong>OK / Enter</strong> — запуск выбранной программы.
                         </p>
                     </div>
                 </div>
@@ -508,27 +528,12 @@
         </main>
     </div>
 
-    <!-- 3. IN-APP FULLSCREEN APP VIEWER WITH FLOATING BACK BUTTON -->
+    <!-- 3. IN-APP FULLSCREEN APP VIEWER (100% FULLSCREEN WITHOUT ON-SCREEN BARS!) -->
     <div class="app-viewer-modal" id="appViewerModal">
-        <header class="app-viewer-header">
-            <button class="btn-app-exit" id="btnExitAppViewer" tabindex="0">
-                <span class="material-icons">arrow_back</span>
-                <span>Назад в Home Portal (ESC / BACK)</span>
-            </button>
-            <div class="app-viewer-info">
-                <span class="viewer-title" id="appViewerTitle">Загрузка приложения...</span>
-            </div>
-            <a href="#" target="_top" id="appViewerDirectLink" class="btn-direct-link" tabindex="0">
-                <span>На весь экран</span>
-                <span class="material-icons" style="font-size: 16px;">open_in_new</span>
-            </a>
-        </header>
-        <div class="app-frame-container">
-            <iframe id="appViewerFrame" src="about:blank" allowfullscreen allow="autoplay; fullscreen"></iframe>
-        </div>
+        <iframe id="appViewerFrame" src="about:blank" allowfullscreen allow="autoplay; fullscreen"></iframe>
     </div>
 
-    <!-- 4. FULLSCREEN 4K SCREENSAVER OVERLAY (Activates on idle or by button) -->
+    <!-- 4. FULLSCREEN 4K SCREENSAVER OVERLAY WITH SELECTABLE WIDGETS & POSITION -->
     <div class="screensaver-layer" id="screensaverLayer">
         <div class="ss-bg-image" id="ssBgImage"></div>
         <div class="ss-ambient-overlay"></div>
@@ -536,34 +541,35 @@
         <div class="ss-ambient-nebula ss-neb-1"></div>
         <div class="ss-ambient-nebula ss-neb-2"></div>
 
-        <div class="ss-content-wrap">
-            <div class="ss-top-bar">
-                <div class="ss-brand">
-                    <span class="material-icons" style="color: #00d2ff;">blur_on</span>
-                    <span>HOME PORTAL • 4K AMBIENT</span>
-                </div>
-                <div class="ss-hint-pill">
-                    Нажмите НАЗАД на пульте для возврата
-                </div>
-            </div>
-
-            <div class="ss-center-clock">
-                <div class="ss-clock-time" id="ssTimeText">18:45</div>
-                <div class="ss-clock-date" id="ssDateText">Понедельник, 12 Октября</div>
-                <div class="ss-mode-badge">
-                    <span class="ss-pulse-point"></span>
-                    <span>Режим отдыха активен</span>
-                </div>
-            </div>
-
-            <div class="ss-bottom-bar">
-                <div class="ss-music-info">
-                    <span class="material-icons ss-disc">music_note</span>
-                    <div>
-                        <div class="ss-m-title">Lo-Fi Ambient Chill</div>
-                        <div class="ss-m-sub">24/7 Релакс-поток</div>
+        <div class="ss-content-wrap" id="ssContentWrap">
+            <!-- Widgets container with dynamic position class (pos-center, pos-top-left, etc.) -->
+            <div class="ss-widgets-container pos-center" id="ssWidgetsContainer">
+                
+                <!-- Screensaver Clock Block -->
+                <div class="ss-widget-block ss-clock-block" id="ssClockBlock">
+                    <div class="ss-clock-time" id="ssTimeText">18:45</div>
+                    <div class="ss-clock-date" id="ssDateText">Понедельник, 12 Октября</div>
+                    <div class="ss-mode-badge" id="ssModeBadge">
+                        <span class="ss-pulse-point"></span>
+                        <span>Режим отдыха</span>
                     </div>
                 </div>
+
+                <!-- Screensaver Calendar Block -->
+                <div class="ss-widget-block ss-calendar-block" id="ssCalendarBlock">
+                    <div class="ss-cal-head" id="ssCalHeader">ОКТЯБРЬ 2026</div>
+                    <div class="ss-cal-days-row">
+                        <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
+                    </div>
+                    <div class="ss-cal-cells-grid" id="ssCalGrid"></div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Floating Hint -->
+            <div class="ss-bottom-hint">
+                <span class="material-icons" style="font-size: 16px;">keyboard_backspace</span>
+                <span>Нажмите НАЗАД на пульте для возврата</span>
             </div>
         </div>
     </div>
