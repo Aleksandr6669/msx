@@ -1336,31 +1336,53 @@ body.trans-dark .glass-widget {
 .host-badge { color: var(--accent-color); font-family: 'JetBrains Mono', monospace; }
 
 /* ==========================================================================
-   IN-APP FULLSCREEN APP VIEWER (NO ON-SCREEN BARS OR BUTTONS!)
-   Takes 100vw, 100vh immediately; remote Back button exits
+   APP TRANSITION LOADER OVERLAY (DIRECT FULLSCREEN NAVIGATION)
    ========================================================================== */
-.app-viewer-modal {
+.app-nav-loader {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     z-index: 10000;
-    background: #000000;
+    background: rgba(4, 7, 15, 0.94);
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
     display: none;
-    border: none;
-    margin: 0;
-    padding: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
 }
 
-.app-viewer-modal.active {
-    display: block;
+.app-nav-loader.active {
+    display: flex;
 }
 
-.app-viewer-modal iframe {
-    width: 100vw;
-    height: 100vh;
-    border: none;
-    display: block;
+.loader-spinner {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 3.5px solid rgba(255, 255, 255, 0.12);
+    border-top-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.55);
+    animation: spinLoader 0.7s linear infinite;
+}
+
+@keyframes spinLoader {
+    to { transform: rotate(360deg); }
+}
+
+.loader-text {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+.loader-sub {
+    font-size: 0.88rem;
+    color: var(--text-dim);
 }
 
 /* ==========================================================================
