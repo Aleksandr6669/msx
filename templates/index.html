@@ -16,7 +16,7 @@
     <div class="ambient-vignette"></div>
 
     <!-- MAIN APP SHELL -->
-    <div class="tv-shell">
+    <div class="tv-shell" id="tvShell">
         <!-- 1. LEFT SIDEBAR (EXACTLY 4 ITEMS) -->
         <aside class="tv-sidebar" id="tvSidebar">
             <div class="sidebar-logo">
@@ -58,6 +58,10 @@
                 <button class="quick-screensaver-btn" id="startScreensaverBtn" tabindex="0" title="Включить заставку сейчас">
                     <span class="material-icons">brightness_3</span>
                     <span>Включить заставку</span>
+                </button>
+                <button class="quick-exit-msx-btn" id="exitToMsxBtn" tabindex="0" title="Выход в меню Media Station X">
+                    <span class="material-icons">exit_to_app</span>
+                    <span>Выход в MSX</span>
                 </button>
                 <div class="sidebar-status">
                     <span class="live-dot"></span>
@@ -415,11 +419,11 @@
 
                     <div class="info-card">
                         <span class="material-icons info-icon">keyboard</span>
-                        <h3>Навигация пультом</h3>
+                        <h3>Навигация и возврат (Кнопка Назад)</h3>
                         <p>
-                            • Стрелки <strong>Вверх / Вниз / Влево / Вправо</strong> — перемещение<br>
-                            • Кнопка <strong>OK / Enter</strong> — выбор действия<br>
-                            • Кнопка <strong>Back / Return / ESC</strong> — выход из заставки или возврат к меню
+                            • Кнопка <strong>Назад / Return / ESC</strong> на пульте мгновенно закрывает открытые сайты и возвращает в портал.<br>
+                            • В меню стрелки <strong>Вверх / Вниз / Влево / Вправо</strong> — перемещение.<br>
+                            • Кнопка <strong>OK / Enter</strong> — запуск выбранного приложения.
                         </p>
                     </div>
                 </div>
@@ -428,7 +432,27 @@
         </main>
     </div>
 
-    <!-- FULLSCREEN 4K SCREENSAVER OVERLAY (Activates on idle or by button) -->
+    <!-- 3. IN-APP FULLSCREEN APP VIEWER WITH FLOATING BACK BUTTON -->
+    <div class="app-viewer-modal" id="appViewerModal">
+        <header class="app-viewer-header">
+            <button class="btn-app-exit" id="btnExitAppViewer" tabindex="0">
+                <span class="material-icons">arrow_back</span>
+                <span>Назад в MX Portal (ESC / BACK)</span>
+            </button>
+            <div class="app-viewer-info">
+                <span class="viewer-title" id="appViewerTitle">Загрузка приложения...</span>
+            </div>
+            <a href="#" target="_top" id="appViewerDirectLink" class="btn-direct-link" tabindex="0">
+                <span>На весь экран</span>
+                <span class="material-icons" style="font-size: 16px;">open_in_new</span>
+            </a>
+        </header>
+        <div class="app-frame-container">
+            <iframe id="appViewerFrame" src="about:blank" allowfullscreen allow="autoplay; fullscreen"></iframe>
+        </div>
+    </div>
+
+    <!-- 4. FULLSCREEN 4K SCREENSAVER OVERLAY (Activates on idle or by button) -->
     <div class="screensaver-layer" id="screensaverLayer">
         <canvas id="ssStarsCanvas"></canvas>
         <div class="ss-ambient-nebula ss-neb-1"></div>
