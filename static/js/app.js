@@ -20,7 +20,7 @@ const DEFAULT_APPS_LIST = [
         image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80"
     },
     {
-        "id": "app_youtube",
+        id: "app_youtube",
         name: "YouTube MSX",
         url: "http://msx.benzac.de/plugins/youtube.html",
         sub: "Видео, клипы и стримы",
@@ -169,7 +169,7 @@ function updateClocks() {
 
     // Dates
     const ruMonths = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", 
-                     "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"] ;
+                     "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
     const ruWeekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
     const fullDateStr = `${ruWeekdays[(now.getDay() + 6) % 7]}, ${now.getDate()} ${ruMonths[now.getMonth()]} ${now.getFullYear()}`;
 
@@ -313,6 +313,7 @@ const gotoWidgetSettingsBtn = document.getElementById('gotoWidgetSettingsBtn');
 if (gotoWidgetSettingsBtn) {
     gotoWidgetSettingsBtn.addEventListener('click', () => {
         switchTab('settings');
+        // Activate sub-widgets tab
         subtabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-subtab') === 'sub-widgets'));
         Object.keys(subpanes).forEach(k => {
             if (subpanes[k]) subpanes[k].classList.toggle('active', k === 'sub-widgets');
@@ -367,7 +368,162 @@ blurBtns.forEach(btn => {
 blurBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-blur') === state.blur));
 
 // ---------------------------------------------------------------------------
-// 5. APPS MANAGEMENT ENGINE
+// 5. IN-APP FULLSCREEN APP VIEWER & SEAMLESS RETURN ENGINE
+// ---------------------------------------------------------------------------
+const appViewerModal = document.getElementById('appViewerModal');
+const appViewerFrame = document.getElementById('appViewerFrame');
+const appViewerTitle = document.getElementById('appViewerTitle');
+const appViewerDirectLink = document.getElementById('appViewerDirectLink');
+const btnExitAppViewer = document.getElementById('btnExitAppViewer');
+let lastFocusedElement = null;
+
+function openAppViewer(app) {
+    if (!app || !app.url) return;
+    lastFocusedElement = document.activeElement;
+
+    if (appViewerTitle) {
+        appViewerTitle.textContent = app.name || 'Приложение';
+    }
+    if (appViewerDirectLink) {
+        appViewerDirectLink.href = app.url;
+        appViewerDirectLink.title = `Открыть ${app.name} напрямую`;
+    }
+    if (appViewerFrame) {
+        appViewerFrame.src = app.url;
+    }
+    if (appViewerModal) {
+        appViewerModal.classList.add('active');
+    }
+
+    // Push state into browser history so that TV back button triggers popstate
+    try {
+        window.history.pushState({ appViewerOpen: true, appName: app.name }, '', '#app-' + (app.id || 'view'));
+    } catch (err) {
+        console.warn('History pushState error:', err);
+    }
+
+    // Focus the exit button so TV remote can immediately trigger Return / OK
+    setTimeout(() => {
+        if (btnExitAppViewer) {
+            btnExitAppViewer.focus();
+        }
+    }, 150);
+}
+
+function closeAppViewer(triggerHistoryBack = true) {
+    if (!appViewerModal || !appViewerModal.classList.contains('active')) return;
+
+    appViewerModal.classList.remove('active');
+    if (appViewerFrame) {
+        appViewerFrame.src = 'about:blank';
+    }
+
+    // Pop the history entry if needed
+    if (triggerHistoryBack && window.location.hash.startsWith('#app-')) {
+        try {
+            window.history.back();
+        } catch (err) {
+            console.warn('History back error:', err);
+        }
+    }
+
+    // Restore focus back to the originating element
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+    }
+}
+
+if (btnExitAppViewer) {
+    btnExitAppViewer.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeAppViewer(true);
+    });
+}
+
+// ---------------------------------------------------------------------------
+// 6. UNIVERSAL SMART TV REMOTE "BACK / RETURN" BUTTON ENGINE
+// Handles: Samsung Tizen (10009 / tizenhwkey), LG webOS (461), Android TV (4),
+// Escape (27), Backspace (8), and browser popstate.
+// ---------------------------------------------------------------------------
+function handleTvBackButton(e) {
+    // 1. If App Viewer is open -> close it and return to the portal
+    if (appViewerModal && appViewerModal.classList.contains('active')) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        closeAppViewer(true);
+        return true;
+    }
+
+    // 2. If Screensaver is active -> hide it and return
+    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        hideScreensaver();
+        return true;
+    }
+
+    // 3. If in another tab (Apps, Settings, Info) -> return to Widgets tab
+    if (state.activeTab !== 'widgets') {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        switchTab('widgets');
+        const widgetsTabBtn = document.querySelector('.menu-tab[data-tab="widgets"]');
+        if (widgetsTabBtn) widgetsTabBtn.focus();
+        return true;
+    }
+
+    // 4. If already on Widgets tab and user presses Back -> exit cleanly to MSX root
+    // Only if explicitly triggered
+    return false;
+}
+
+window.addEventListener('keydown', (e) => {
+    const key = e.key;
+    const keyCode = e.keyCode;
+
+    // Samsung Tizen (10009), LG webOS (461), Android TV (4), Escape (27), Backspace (8)
+    const isBackKey = (
+        keyCode === 10009 ||
+        keyCode === 461 ||
+        keyCode === 4 ||
+        keyCode === 27 ||
+        key === 'Escape' ||
+        key === 'Back' ||
+        key === 'GoBack' ||
+        (keyCode === 8 && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')
+    );
+
+    if (isBackKey) {
+        const handled = handleTvBackButton(e);
+        if (handled && e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+});
+
+// Tizen hardware key listener (Samsung Smart TVs)
+document.addEventListener('tizenhwkey', (e) => {
+    if (e.keyName === 'back') {
+        handleTvBackButton(e);
+    }
+});
+
+// Browser PopState Listener (triggers when TV browser navigates back)
+window.addEventListener('popstate', () => {
+    if (appViewerModal && appViewerModal.classList.contains('active')) {
+        closeAppViewer(false);
+    }
+});
+
+// ---------------------------------------------------------------------------
+// 7. APPS MANAGEMENT ENGINE
 // ---------------------------------------------------------------------------
 const appsGrid = document.getElementById('appsGrid');
 const appsCountBadge = document.getElementById('appsCountBadge');
@@ -399,9 +555,15 @@ function renderApps() {
                 </div>
             `;
 
+            // Open in In-App Viewer with top return button & Back key capture
             card.addEventListener('click', () => {
-                if (app.url) {
-                    window.location.href = app.url;
+                openAppViewer(app);
+            });
+
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    openAppViewer(app);
                 }
             });
 
@@ -514,8 +676,16 @@ if (openAddAppModalBtn) {
     });
 }
 
+// Exit to MSX Button
+const exitToMsxBtn = document.getElementById('exitToMsxBtn');
+if (exitToMsxBtn) {
+    exitToMsxBtn.addEventListener('click', () => {
+        window.location.href = "http://msx.benzac.de/exit.html";
+    });
+}
+
 // ---------------------------------------------------------------------------
-// 6. 4K SCREENSAVER ENGINE (IDLE TIMER & MANUAL START)
+// 8. 4K SCREENSAVER ENGINE (IDLE TIMER & MANUAL START)
 // ---------------------------------------------------------------------------
 const screensaverLayer = document.getElementById('screensaverLayer');
 let idleTimer = null;
