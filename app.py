@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-from flask import Flask, jsonify, request, redirect
+from flask import Flask, jsonify, request
 
 app = Flask(__name__, static_folder='static')
 
@@ -15,110 +15,138 @@ def get_base_url():
     host = request.headers.get('X-Forwarded-Host', request.host)
     return f"{proto}://{host}"
 
-# Persistent runtime state
-current_settings = {
-    "background_id": "bg_space",
-    "background_name": "Космическая Аврора 4K",
-    "background_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
-    "clock_widget": "digital",     # "digital", "modern", "analog", "both"
-    "calendar_widget": "grid",     # "grid", "compact", "events"
-    "widgets_position": "center",  # "center", "left", "right", "top", "bottom"
+# ---------------------------------------------------------------------------
+# GLOBAL STATE & PRESETS
+# ---------------------------------------------------------------------------
+
+# Background wallpapers for distinct menu sections
+MENU_BACKGROUNDS = {
+    "widgets": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85", # Cosmic Aurora
+    "apps": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=85",    # Neon Cyber City
+    "settings": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85",# Mountain Horizon
+    "info": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=85"     # Night Sky
 }
 
-PRESET_BACKGROUNDS = [
+# Screensaver Wallpapers Library
+SCREENSAVER_IMAGES = [
     {
-        "id": "bg_space",
+        "id": "ss_all",
+        "name": "Все фото (Слайд-шоу 4K)",
+        "thumb": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop&q=80",
+        "url": None
+    },
+    {
+        "id": "ss_space",
         "name": "Космическая Аврора 4K",
-        "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
-        "thumb": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop&q=80"
+        "thumb": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90"
     },
     {
-        "id": "bg_cyber",
-        "name": "Неоновый Мегаполис 4K",
-        "url": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=85",
-        "thumb": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400&auto=format&fit=crop&q=80"
+        "id": "ss_cyber",
+        "name": "Ночной Неоновый Город 4K",
+        "thumb": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90"
     },
     {
-        "id": "bg_mountains",
-        "name": "Горный Закат 4K",
-        "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85",
-        "thumb": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&auto=format&fit=crop&q=80"
+        "id": "ss_mountains",
+        "name": "Горные Пики в Облаках 4K",
+        "thumb": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90"
     },
     {
-        "id": "bg_ocean",
-        "name": "Океанский Прибой 4K",
-        "url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=85",
-        "thumb": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80"
+        "id": "ss_ocean",
+        "name": "Океанский Закат & Волны 4K",
+        "thumb": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90"
     },
     {
-        "id": "bg_fireplace",
-        "name": "Уютный Огонь Камина 4K",
-        "url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=85",
-        "thumb": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&auto=format&fit=crop&q=80"
+        "id": "ss_fire",
+        "name": "Теплый Огонь Камина 4K",
+        "thumb": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&auto=format&fit=crop&q=80",
+        "url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90"
     }
 ]
 
-MOVIES = [
+# Configurable settings
+current_settings = {
+    "widgets_position": "center",       # "center", "left", "right", "top", "bottom"
+    "active_screensaver": "ss_all",     # ID of selected screensaver wallpaper or "ss_all"
+    "screensaver_duration": 8,
+    "widgets_active": {
+        "clock_digital": True,
+        "clock_modern": False,
+        "clock_analog": True,
+        "calendar_grid": True,
+        "calendar_compact": False,
+        "calendar_events": True,
+        "weather_status": True
+    }
+}
+
+# Installed TV Programs / Applications
+installed_apps = [
     {
-        "id": "mov_1",
-        "title": "Интерстеллар: Сквозь горизонт",
-        "titleHeader": "4K HDR • Фантастика, Драма",
-        "titleFooter": "★ 8.9 | 2024 | 2 ч 49 мин",
-        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
-        "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        "badge": "TOP 1"
+        "id": "app_lampa",
+        "name": "Lampa",
+        "sub": "Онлайн-кинотеатр, торренты и сериалы",
+        "url": "http://lampa.mx",
+        "icon": "movie",
+        "badge": "CINEMA",
+        "color": "msx-glass",
+        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80"
     },
     {
-        "id": "mov_2",
-        "title": "Кибер-Горизонт 2099",
-        "titleHeader": "4K ULTRA • Киберпанк, Боевик",
-        "titleFooter": "★ 8.5 | 2024 | 2 ч 15 мин",
-        "image": "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
-        "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "badge": "ПРЕМЬЕРА"
+        "id": "app_youtube",
+        "name": "YouTube MSX",
+        "sub": "Видео, клипы и трансляции без рекламы",
+        "url": "http://msx.benzac.de/plugins/youtube.html",
+        "icon": "play-circle",
+        "badge": "VIDEO",
+        "color": "msx-glass",
+        "image": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop&q=80"
     },
     {
-        "id": "mov_3",
-        "title": "Хроники Ледяного Безмолвия",
-        "titleHeader": "Full HD • Приключения, Выживание",
-        "titleFooter": "★ 8.2 | 2023 | 1 ч 58 мин",
-        "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80",
-        "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "badge": "4K"
+        "id": "app_iptv",
+        "name": "IPTV Плеер",
+        "sub": "Прямой эфир телевизионных каналов",
+        "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "icon": "live-tv",
+        "badge": "LIVE HD",
+        "color": "msx-glass",
+        "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&auto=format&fit=crop&q=80"
     },
     {
-        "id": "mov_4",
-        "title": "Тайна Неонового Детектива",
-        "titleHeader": "4K HDR • Нео-нуар, Триллер",
-        "titleFooter": "★ 8.1 | 2024 | 2 ч 04 мин",
-        "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
-        "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        "badge": "ХИТ"
+        "id": "app_forkplayer",
+        "name": "ForkPlayer",
+        "sub": "Медиа-портал для Smart TV",
+        "url": "http://operats.obovse.ru/2.5/",
+        "icon": "language",
+        "badge": "PORTAL",
+        "color": "msx-glass",
+        "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        "id": "app_music",
+        "name": "Lo-Fi Radio 24/7",
+        "sub": "Атмосферный музыкальный поток",
+        "url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "icon": "music-note",
+        "badge": "CHILL",
+        "color": "msx-glass",
+        "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80"
     }
 ]
 
-TV_CHANNELS = [
-    {
-        "id": "tv_1",
-        "title": "Кино Премьера HD",
-        "titleHeader": "ПРЯМОЙ ЭФИР • Фильмы 24/7",
-        "titleFooter": "Сейчас: 'Начало'",
-        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
-        "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        "badge": "LIVE"
-    },
-    {
-        "id": "tv_2",
-        "title": "Discovery Nature 4K",
-        "titleHeader": "ПРЯМОЙ ЭФИР • Природа",
-        "titleFooter": "Сейчас: 'Тайны планеты'",
-        "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop&q=80",
-        "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "badge": "4K LIVE"
-    }
+# Quick presets for 1-click addition of popular TV apps
+PRESET_POPULAR_APPS = [
+    {"name": "Deeplex", "url": "http://deeplex.cc", "icon": "theaters", "badge": "4K CINEMA"},
+    {"name": "Vplay", "url": "http://vplay.one", "icon": "video-library", "badge": "MOVIES"},
+    {"name": "HDRezka", "url": "http://rezka.ag", "icon": "movie-filter", "badge": "SERIALS"},
+    {"name": "Kinopub", "url": "http://kino.pub", "icon": "star", "badge": "PRO"},
+    {"name": "Twitch MSX", "url": "http://msx.benzac.de/plugins/twitch.html", "icon": "videogame-asset", "badge": "STREAM"}
 ]
 
-# Enable CORS for Smart TV requests
+# Enable CORS for Smart TV browsers
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -127,9 +155,9 @@ def add_cors_headers(response):
     return response
 
 # ---------------------------------------------------------------------------
-# 1. START PARAMETER ENTRYPOINT (ONLY THIS USES /msx/)
+# 1. START PARAMETER ENTRYPOINT
 # When entering just <domain> in MSX, MSX automatically fetches /msx/start.json.
-# This Start Object immediately redirects to the root menu: menu:{SERVER}/menu.json
+# This Start Object redirects directly to root menu: menu:{SERVER}/menu.json
 # ---------------------------------------------------------------------------
 
 @app.route('/msx/start.json')
@@ -139,15 +167,15 @@ def msx_start():
     base_url = get_base_url()
     return jsonify({
         "name": "MX Station Portal",
-        "version": "1.3.0",
+        "version": "2.0.0",
         "parameter": f"menu:{base_url}/menu.json",
-        "background": current_settings["background_url"],
+        "background": MENU_BACKGROUNDS["widgets"],
         "logo": f"{base_url}/static/images/logo.svg"
     })
 
 # ---------------------------------------------------------------------------
-# 2. ROOT MENU (SIDEBAR NAVIGATION IN MSX)
-# All core endpoints reside at the root level (/menu.json, /screensaver.json, etc.)
+# 2. ROOT MENU (EXACT 4 ITEMS: ВИДЖЕТЫ, ПРОГРАММЫ, НАСТРОЙКИ, О ПРИЛОЖЕНИИ)
+# Each menu section has its own dedicated 4K background!
 # ---------------------------------------------------------------------------
 
 @app.route('/menu.json')
@@ -157,67 +185,38 @@ def msx_menu():
         "headline": "MX STATION PLAYER",
         "logo": f"{base_url}/static/images/logo.svg",
         "logoSize": "small",
-        "background": current_settings["background_url"],
+        "background": MENU_BACKGROUNDS["widgets"],
         "color": "msx-glass",
         "menu": [
             {
                 "icon": "dashboard",
-                "label": "Виджеты & Время",
-                "badge": "ГЛАВНАЯ",
+                "label": "Виджеты",
+                "badge": "1",
                 "data": f"{base_url}/content/widgets.json"
             },
             {
-                "icon": "movie",
-                "label": "Фильмы 4K",
-                "badge": "4K",
-                "data": f"{base_url}/content/movies.json"
+                "icon": "apps",
+                "label": "Программы",
+                "badge": f"{len(installed_apps)}",
+                "data": f"{base_url}/content/apps.json"
             },
             {
-                "icon": "tv",
-                "label": "ТВ Каналы",
-                "badge": "LIVE",
-                "data": f"{base_url}/content/tv.json"
-            },
-            {
-                "icon": "schedule",
-                "label": "Стиль часов",
-                "badge": current_settings["clock_widget"].upper(),
-                "data": f"{base_url}/content/settings_clock.json"
-            },
-            {
-                "icon": "calendar-month",
-                "label": "Стиль календаря",
-                "badge": current_settings["calendar_widget"].upper(),
-                "data": f"{base_url}/content/settings_cal.json"
-            },
-            {
-                "icon": "open-with",
-                "label": "Позиция виджетов",
-                "badge": current_settings["widgets_position"].upper(),
-                "data": f"{base_url}/content/settings_pos.json"
-            },
-            {
-                "icon": "palette",
-                "label": "Выбор фона 4K",
-                "data": f"{base_url}/content/settings_bg.json"
-            },
-            {
-                "icon": "brightness-3",
-                "label": "Заставка MSX",
-                "badge": "4K",
-                "action": f"slideshow:{base_url}/screensaver.json"
+                "icon": "settings",
+                "label": "Настройки",
+                "badge": "SETUP",
+                "data": f"{base_url}/content/settings.json"
             },
             {
                 "icon": "info",
-                "label": "Инфо о сервере",
+                "label": "О приложении",
                 "data": f"{base_url}/content/info.json"
             }
         ]
     })
 
 # ---------------------------------------------------------------------------
-# 3. NATIVE MSX WIDGETS HUB (/content/widgets.json)
-# Renders semi-transparent glass cards with blur and dynamic placement
+# 3. SECTION 1: ВИДЖЕТЫ (/content/widgets.json)
+# Background: Deep Cosmic Aurora 4K
 # ---------------------------------------------------------------------------
 
 @app.route('/content/widgets.json')
@@ -234,425 +233,643 @@ def msx_content_widgets():
     weekday_str = ru_weekdays[now.weekday()]
     
     pos = current_settings["widgets_position"]
-    clock_mode = current_settings["clock_widget"]
-    cal_mode = current_settings["calendar_widget"]
-    
-    # Grid coordinates according to chosen position
+    w_active = current_settings["widgets_active"]
+
+    # Positioning layouts
     if pos == "left":
-        clk_layout = "0,0,4.0,3.0"
-        cal_layout = "0,3,4.0,3.0"
-        ban_layout = "4.5,0,7.0,6.0"
+        w1_layout = "0,0,4.2,2.8"
+        w2_layout = "0,2.9,4.2,2.8"
+        act_layout = "4.5,0,7.5,5.8"
     elif pos == "right":
-        ban_layout = "0,0,7.0,6.0"
-        clk_layout = "7.5,0,4.0,3.0"
-        cal_layout = "7.5,3,4.0,3.0"
+        act_layout = "0,0,7.5,5.8"
+        w1_layout = "7.8,0,4.2,2.8"
+        w2_layout = "7.8,2.9,4.2,2.8"
     elif pos == "top":
-        clk_layout = "0,0,5.5,2.5"
-        cal_layout = "6.0,0,5.5,2.5"
-        ban_layout = "0,3.0,11.5,3.5"
+        w1_layout = "0,0,5.8,2.5"
+        w2_layout = "6.2,0,5.8,2.5"
+        act_layout = "0,2.8,12.0,3.2"
     elif pos == "bottom":
-        ban_layout = "0,0,11.5,3.5"
-        clk_layout = "0,4.0,5.5,2.5"
-        cal_layout = "6.0,4.0,5.5,2.5"
+        act_layout = "0,0,12.0,3.2"
+        w1_layout = "0,3.5,5.8,2.5"
+        w2_layout = "6.2,3.5,5.8,2.5"
     else:  # "center"
-        clk_layout = "2.0,0,3.8,3.0"
-        cal_layout = "6.2,0,3.8,3.0"
-        ban_layout = "0,3.4,12.0,3.2"
+        w1_layout = "1.5,0,4.3,2.8"
+        w2_layout = "6.2,0,4.3,2.8"
+        act_layout = "0,3.1,12.0,3.0"
 
     items = []
 
-    # CLOCK WIDGET
-    if clock_mode == "digital":
+    # CLOCK WIDGETS
+    if w_active.get("clock_digital"):
         items.append({
             "id": "w_clock_dig",
             "type": "teaser",
-            "layout": clk_layout,
+            "layout": w1_layout,
             "headline": f"{weekday_str}, {date_str}",
             "title": f"⏱ {time_str}",
-            "titleHeader": "ЦИФРОВЫЕ НЕОНОВЫЕ ЧАСЫ",
-            "titleFooter": "Нажмите OK для переключения стиля часов",
+            "titleHeader": "ЦИФРОВЫЕ НЕОН ЧАСЫ",
+            "titleFooter": "Точное системное время • 24H",
             "color": "msx-glass",
             "icon": "schedule",
-            "action": f"[execute:{base_url}/api/toggle_clock|reload:content|info:Стиль часов переключен]"
+            "action": f"content:{base_url}/content/settings_widgets.json"
         })
-    elif clock_mode == "modern":
-        items.append({
-            "id": "w_clock_mod",
-            "type": "teaser",
-            "layout": clk_layout,
-            "headline": f"{ru_months[now.month-1].upper()} {now.year}",
-            "title": f"{time_str}",
-            "titleHeader": f"MODERN MINIMAL • {weekday_str.upper()}",
-            "titleFooter": "Нажмите OK для смены стиля часов",
-            "color": "msx-glass",
-            "icon": "av-timer",
-            "action": f"[execute:{base_url}/api/toggle_clock|reload:content|info:Стиль часов переключен]"
-        })
-    elif clock_mode == "analog":
+    elif w_active.get("clock_analog"):
         items.append({
             "id": "w_clock_ana",
             "type": "teaser",
-            "layout": clk_layout,
+            "layout": w1_layout,
             "headline": "MX LUXURY CHRONO",
             "title": f"🕒 {time_str}",
-            "titleHeader": "АНАЛОГОВЫЙ ЦИФЕРБЛАТ",
+            "titleHeader": "АНАЛОГОВЫЕ ЧАСЫ",
             "titleFooter": f"{weekday_str} • {date_str}",
             "color": "msx-glass",
             "icon": "watch-later",
-            "action": f"[execute:{base_url}/api/toggle_clock|reload:content|info:Стиль часов переключен]"
+            "action": f"content:{base_url}/content/settings_widgets.json"
         })
-    elif clock_mode == "both":
+    elif w_active.get("clock_modern"):
         items.append({
-            "id": "w_clock_dig",
+            "id": "w_clock_mod",
             "type": "teaser",
-            "layout": clk_layout,
-            "headline": f"{weekday_str}, {date_str}",
-            "title": f"⏱ {time_str}",
-            "titleHeader": "DIGITAL NEON",
-            "titleFooter": "Цифровые часы",
+            "layout": w1_layout,
+            "headline": f"{ru_months[now.month-1].upper()} {now.year}",
+            "title": f"{time_str}",
+            "titleHeader": f"MODERN MINIMAL • {weekday_str.upper()}",
+            "titleFooter": "Время и дата",
             "color": "msx-glass",
-            "icon": "schedule",
-            "action": f"[execute:{base_url}/api/toggle_clock|reload:content]"
+            "icon": "av-timer",
+            "action": f"content:{base_url}/content/settings_widgets.json"
         })
 
-    # CALENDAR WIDGET
-    if cal_mode == "grid":
+    # CALENDAR WIDGETS
+    if w_active.get("calendar_grid"):
         items.append({
             "id": "w_cal_grid",
             "type": "teaser",
-            "layout": cal_layout,
+            "layout": w2_layout,
             "headline": f"{ru_months[now.month-1]} {now.year}",
             "title": f"📅 {now.day} число",
             "titleHeader": "КАЛЕНДАРЬ МЕСЯЦА",
             "titleFooter": f"ПН ВТ СР ЧТ ПТ [СБ] [ВС] • {weekday_str}",
             "color": "msx-glass",
             "icon": "calendar-month",
-            "action": f"[execute:{base_url}/api/toggle_cal|reload:content|info:Стиль календаря переключен]"
+            "action": f"content:{base_url}/content/settings_widgets.json"
         })
-    elif cal_mode == "compact":
+    elif w_active.get("calendar_compact"):
         items.append({
             "id": "w_cal_comp",
             "type": "teaser",
-            "layout": cal_layout,
-            "headline": "СЕГОДНЯ НА ТВ",
+            "layout": w2_layout,
+            "headline": "СЕГОДНЯ",
             "title": f"{now.day} {ru_months[now.month-1]}",
             "titleHeader": weekday_str.upper(),
-            "titleFooter": "Нажмите OK для смены вида календаря",
+            "titleFooter": f"{now.year} год",
             "color": "msx-glass",
             "icon": "today",
-            "action": f"[execute:{base_url}/api/toggle_cal|reload:content|info:Стиль календаря переключен]"
+            "action": f"content:{base_url}/content/settings_widgets.json"
         })
-    elif cal_mode == "events":
+    elif w_active.get("calendar_events"):
         items.append({
             "id": "w_cal_ev",
             "type": "teaser",
-            "layout": cal_layout,
+            "layout": w2_layout,
             "headline": "ПЛАНИРОВЩИК ТВ",
             "title": "19:00 Кино • 21:30 Discovery",
             "titleHeader": "РАСПИСАНИЕ НА ВЕЧЕР",
-            "titleFooter": "23:00 Ночная заставка & Chill",
+            "titleFooter": "23:00 Ночной релакс & Chill",
             "color": "msx-glass",
             "icon": "event-note",
-            "action": f"[execute:{base_url}/api/toggle_cal|reload:content|info:Стиль календаря переключен]"
+            "action": f"content:{base_url}/content/settings_widgets.json"
         })
 
-    # PROMO BANNER / QUICK ACCESS
+    # ACTION BUTTONS & BANNER
     items.append({
-        "id": "w_banner",
-        "type": "teaser",
-        "layout": ban_layout,
-        "title": "Хит дня: Интерстеллар: Сквозь горизонт",
-        "titleHeader": "★ 4K DOLBY VISION ★",
-        "titleFooter": "Нажмите OK для запуска фильма в MX Player",
-        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=85",
-        "imageFiller": "cover",
-        "badge": "ВЫБОР РЕДАКЦИИ",
-        "action": "video:https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        "id": "btn_screensaver_now",
+        "type": "button",
+        "layout": "0,4.6,5.8,1.4" if pos in ("center", "top") else "0,4.8,4.0,1.2",
+        "icon": "brightness-3",
+        "label": "🌙 Запустить заставку сейчас",
+        "color": "msx-glass",
+        "action": f"slideshow:{base_url}/screensaver.json"
+    })
+    
+    items.append({
+        "id": "btn_settings_quick",
+        "type": "button",
+        "layout": "6.2,4.6,5.8,1.4" if pos in ("center", "top") else "4.2,4.8,4.0,1.2",
+        "icon": "tune",
+        "label": "⚙ Настройки виджетов и фона",
+        "color": "msx-glass",
+        "action": f"content:{base_url}/content/settings.json"
     })
 
     return jsonify({
         "type": "list",
-        "headline": "Интерактивные виджеты и главное меню",
+        "headline": "Виджеты — Часы, Календарь и Статус",
+        "background": MENU_BACKGROUNDS["widgets"],
         "items": items
     })
 
 # ---------------------------------------------------------------------------
-# 4. SETTINGS SCREENS (CLOCK, CALENDAR, POSITION, BACKGROUNDS)
-# All configurable right on the Smart TV via TV Remote!
+# 4. SECTION 2: ПРОГРАММЫ / ПРИЛОЖЕНИЯ (/content/apps.json)
+# Background: Neon Cyber City 4K
 # ---------------------------------------------------------------------------
 
-@app.route('/content/settings_clock.json')
-def msx_settings_clock():
+@app.route('/content/apps.json')
+def msx_content_apps():
     base_url = get_base_url()
-    clocks = [
-        {"id": "digital", "name": "Цифровые Неон", "sub": "Крупные цифры, секунды, дата", "icon": "schedule"},
-        {"id": "modern", "name": "Минимал Модерн", "sub": "Изящный шрифт, крупный день недели", "icon": "av-timer"},
-        {"id": "analog", "name": "Аналоговые со стрелками", "sub": "Круглый циферблат Chrono", "icon": "watch-later"},
-        {"id": "both", "name": "Оба стиля часов", "sub": "Цифровые + Аналоговые вместе", "icon": "view-carousel"}
-    ]
     items = []
-    for c in clocks:
-        is_cur = (current_settings["clock_widget"] == c["id"])
+
+    # Button: Add application shortcut
+    items.append({
+        "id": "btn_add_app_tile",
+        "type": "button",
+        "layout": "0,0,3.6,2.6",
+        "icon": "add-circle",
+        "label": "+ Добавить программу",
+        "title": "Управление и добавление ярлыков",
+        "color": "msx-glass",
+        "action": f"content:{base_url}/content/settings_apps.json"
+    })
+
+    # List of installed apps
+    for app_item in installed_apps:
+        app_url = app_item["url"]
+        
+        # Determine launch action: if starts with video: or start: or slideshow:, keep it, otherwise open link/start
+        if app_url.startswith("http://") or app_url.startswith("https://"):
+            if app_url.endswith(".mp4") or app_url.endswith(".m3u8"):
+                act = f"video:{app_url}"
+            elif "msx" in app_url:
+                act = f"start:{app_url}"
+            else:
+                act = f"link:{app_url}"
+        else:
+            act = app_url
+
         items.append({
-            "id": f"clk_{c['id']}",
-            "type": "button",
-            "layout": "0,0,5.5,2.2",
-            "icon": c["icon"],
-            "label": f"{'✓ ' if is_cur else ''}{c['name']}",
-            "title": c["sub"],
-            "badge": "АКТИВЕН" if is_cur else "ВЫБРАТЬ",
+            "id": app_item["id"],
+            "layout": "0,0,3.6,2.6",
+            "title": app_item["name"],
+            "titleHeader": app_item["sub"],
+            "titleFooter": app_item["url"],
+            "icon": app_item["icon"],
+            "badge": app_item.get("badge", "APP"),
+            "image": app_item.get("image"),
+            "imageFiller": "cover",
             "color": "msx-glass",
-            "action": f"[execute:{base_url}/api/set_clock/{c['id']}|reload:menu|info:Выбран стиль: {c['name']}]"
+            "action": act
         })
+
     return jsonify({
         "type": "list",
-        "headline": "Настройка вида часов на главном экране",
-        "template": {"type": "button", "layout": "0,0,5.5,2.2", "color": "msx-glass"},
+        "headline": "Программы и Онлайн-Кинотеатры",
+        "background": MENU_BACKGROUNDS["apps"],
+        "template": {"type": "default", "layout": "0,0,3.6,2.6", "color": "msx-glass"},
         "items": items
     })
 
-@app.route('/content/settings_cal.json')
-def msx_settings_cal():
+# ---------------------------------------------------------------------------
+# 5. SECTION 3: НАСТРОЙКИ (/content/settings.json)
+# Background: Minimalist Mountain Horizon 4K
+# Contains: Настройки виджетов, Настройки программ, Настройки заставки
+# ---------------------------------------------------------------------------
+
+@app.route('/content/settings.json')
+def msx_content_settings():
     base_url = get_base_url()
-    cals = [
-        {"id": "grid", "name": "Сетка месяца", "sub": "Полный календарь с подсветкой сегодня", "icon": "calendar-month"},
-        {"id": "compact", "name": "Компактная дата", "sub": "Крупный день, месяц и день недели", "icon": "today"},
-        {"id": "events", "name": "Расписание и Планы", "sub": "Список ближайших фильмов и передач", "icon": "event-note"}
-    ]
-    items = []
-    for c in cals:
-        is_cur = (current_settings["calendar_widget"] == c["id"])
-        items.append({
-            "id": f"cal_{c['id']}",
-            "type": "button",
-            "layout": "0,0,5.5,2.2",
-            "icon": c["icon"],
-            "label": f"{'✓ ' if is_cur else ''}{c['name']}",
-            "title": c["sub"],
-            "badge": "АКТИВЕН" if is_cur else "ВЫБРАТЬ",
-            "color": "msx-glass",
-            "action": f"[execute:{base_url}/api/set_cal/{c['id']}|reload:menu|info:Выбран стиль: {c['name']}]"
-        })
     return jsonify({
         "type": "list",
-        "headline": "Настройка вида календаря",
-        "template": {"type": "button", "layout": "0,0,5.5,2.2", "color": "msx-glass"},
-        "items": items
+        "headline": "Панель управления и Настройки",
+        "background": MENU_BACKGROUNDS["settings"],
+        "items": [
+            {
+                "id": "set_cat_widgets",
+                "type": "teaser",
+                "layout": "0,0,5.8,3.2",
+                "icon": "dashboard-customize",
+                "title": "Настройки виджетов",
+                "titleHeader": "ЧАСЫ, КАЛЕНДАРЬ И РАСПОЛОЖЕНИЕ",
+                "titleFooter": f"Текущая позиция: {current_settings['widgets_position'].upper()}",
+                "color": "msx-glass",
+                "badge": "ВИДЖЕТЫ",
+                "action": f"content:{base_url}/content/settings_widgets.json"
+            },
+            {
+                "id": "set_cat_apps",
+                "type": "teaser",
+                "layout": "6.2,0,5.8,3.2",
+                "icon": "apps",
+                "title": "Настройки программ",
+                "titleHeader": "ДОБАВЛЕНИЕ И УДАЛЕНИЕ ЯРЛЫКОВ",
+                "titleFooter": f"Установлено программ: {len(installed_apps)}",
+                "color": "msx-glass",
+                "badge": "ЯРЛЫКИ",
+                "action": f"content:{base_url}/content/settings_apps.json"
+            },
+            {
+                "id": "set_cat_screensaver",
+                "type": "teaser",
+                "layout": "0,3.4,5.8,3.0",
+                "icon": "brightness-3",
+                "title": "Настройка заставки (Скринсейвер)",
+                "titleHeader": "ФОНЫ, СЛАЙД-ШОУ И ТАЙМАУТЫ",
+                "titleFooter": "Выбор картинки и мгновенный запуск",
+                "color": "msx-glass",
+                "badge": "4K SCREENSAVER",
+                "action": f"content:{base_url}/content/settings_screensaver.json"
+            },
+            {
+                "id": "set_cat_bg",
+                "type": "teaser",
+                "layout": "6.2,3.4,5.8,3.0",
+                "icon": "palette",
+                "title": "Фоны разделов меню",
+                "titleHeader": "АТМОСФЕРНЫЕ ОБОИ 4K",
+                "titleFooter": "Настроить фон для меню виджетов и программ",
+                "color": "msx-glass",
+                "badge": "ОБОИ",
+                "action": f"content:{base_url}/content/settings_bg.json"
+            }
+        ]
     })
 
-@app.route('/content/settings_pos.json')
-def msx_settings_pos():
+# --- 5.1 НАСТРОЙКИ ВИДЖЕТОВ ---
+@app.route('/content/settings_widgets.json')
+def msx_settings_widgets():
     base_url = get_base_url()
+    w_active = current_settings["widgets_active"]
+    pos = current_settings["widgets_position"]
+
+    items = []
+    
+    # Toggle individual widgets
+    widgets_list = [
+        {"key": "clock_digital", "name": "Цифровые Неон часы", "icon": "schedule"},
+        {"key": "clock_modern", "name": "Минимал Модерн часы", "icon": "av-timer"},
+        {"key": "clock_analog", "name": "Аналоговые часы со стрелками", "icon": "watch-later"},
+        {"key": "calendar_grid", "name": "Календарь: Сетка месяца", "icon": "calendar-month"},
+        {"key": "calendar_compact", "name": "Календарь: Компактный день", "icon": "today"},
+        {"key": "calendar_events", "name": "Планировщик ТВ программ", "icon": "event-note"}
+    ]
+
+    for w in widgets_list:
+        is_on = w_active.get(w["key"], False)
+        items.append({
+            "id": f"toggle_{w['key']}",
+            "type": "button",
+            "layout": "0,0,5.8,1.6",
+            "icon": w["icon"],
+            "label": f"{'ВКЛ [✓]' if is_on else 'ВЫКЛ [  ]'}  {w['name']}",
+            "color": "msx-glass",
+            "action": f"[execute:{base_url}/api/toggle_widget/{w['key']}|reload:content|info:{w['name']} {'включен' if not is_on else 'выключен'}]"
+        })
+
+    # Position Selection Buttons
     positions = [
-        {"id": "center", "name": "Посередине (Center)", "icon": "filter-center-focus"},
-        {"id": "left", "name": "Слева (Left)", "icon": "format-align-left"},
-        {"id": "right", "name": "Справа (Right)", "icon": "format-align-right"},
-        {"id": "top", "name": "Сверху (Top)", "icon": "vertical-align-top"},
-        {"id": "bottom", "name": "Снизу (Bottom)", "icon": "vertical-align-bottom"}
+        {"id": "center", "name": "Посередине"},
+        {"id": "left", "name": "Слева"},
+        {"id": "right", "name": "Справа"},
+        {"id": "top", "name": "Сверху"},
+        {"id": "bottom", "name": "Снизу"}
     ]
-    items = []
     for p in positions:
-        is_cur = (current_settings["widgets_position"] == p["id"])
+        is_sel = (pos == p["id"])
         items.append({
             "id": f"pos_{p['id']}",
             "type": "button",
-            "layout": "0,0,5.5,2.0",
-            "icon": p["icon"],
-            "label": f"{'✓ ' if is_cur else ''}{p['name']}",
-            "badge": "АКТИВНО" if is_cur else "ВЫБРАТЬ",
+            "layout": "0,0,3.8,1.6",
+            "icon": "filter-center-focus",
+            "label": f"{'✓ ' if is_sel else ''}Позиция: {p['name']}",
             "color": "msx-glass",
-            "action": f"[execute:{base_url}/api/set_pos/{p['id']}|reload:menu|info:Позиция изменена на {p['name']}]"
+            "action": f"[execute:{base_url}/api/set_pos/{p['id']}|reload:content|info:Позиция изменена на {p['name']}]"
         })
+
     return jsonify({
         "type": "list",
-        "headline": "Размещение виджетов на экране телевизора",
-        "template": {"type": "button", "layout": "0,0,5.5,2.0", "color": "msx-glass"},
+        "headline": "Настройки виджетов (Включение и расположение)",
+        "background": MENU_BACKGROUNDS["settings"],
         "items": items
     })
 
+# --- 5.2 НАСТРОЙКИ ПРОГРАММ (ДОБАВЛЕНИЕ ПО ПУТИ / URL) ---
+@app.route('/content/settings_apps.json')
+def msx_settings_apps():
+    base_url = get_base_url()
+    items = []
+
+    # 1. Custom URL Input via MSX On-Screen Code Panel
+    items.append({
+        "id": "btn_code_add",
+        "type": "button",
+        "layout": "0,0,5.8,2.4",
+        "icon": "keyboard",
+        "label": "⌨ Ввести URL нового приложения",
+        "title": "Нажмите OK для ввода адреса приложения",
+        "badge": "ВВОД URL",
+        "color": "msx-glass",
+        "action": f"execute:code:{base_url}/api/add_app_by_code",
+        "data": {
+            "headline": "Введите адрес приложения",
+            "placeholder": "http:// или https://...",
+            "value": "http://"
+        }
+    })
+
+    # 2. Reset / Clear custom apps
+    items.append({
+        "id": "btn_reset_apps",
+        "type": "button",
+        "layout": "6.2,0,5.8,2.4",
+        "icon": "restore",
+        "label": "Сбросить список программ",
+        "title": "Вернуть стандартный набор приложений",
+        "color": "msx-glass",
+        "action": f"[execute:{base_url}/api/reset_apps|reload:content|info:Список программ сброшен к стандартному]"
+    })
+
+    # 3. Quick-Add Catalog of popular services
+    for pop in PRESET_POPULAR_APPS:
+        already_has = any(a["url"] == pop["url"] for a in installed_apps)
+        items.append({
+            "id": f"quick_{pop['name']}",
+            "type": "button",
+            "layout": "0,0,3.8,2.0",
+            "icon": pop["icon"],
+            "label": f"{'✓ Добавлено: ' if already_has else '+ Добавить: '}{pop['name']}",
+            "title": pop["url"],
+            "badge": pop["badge"],
+            "color": "msx-glass",
+            "action": f"[execute:{base_url}/api/add_preset_app/{pop['name']}|reload:content|info:Приложение {pop['name']} добавлено!]"
+        })
+
+    # 4. Currently Installed Apps List with Delete Option
+    for app_item in installed_apps:
+        items.append({
+            "id": f"del_{app_item['id']}",
+            "type": "button",
+            "layout": "0,0,5.8,1.6",
+            "icon": "delete",
+            "label": f"Удалить: {app_item['name']}",
+            "title": app_item["url"],
+            "color": "msx-glass",
+            "action": f"[execute:{base_url}/api/remove_app/{app_item['id']}|reload:content|info:{app_item['name']} удалено]"
+        })
+
+    return jsonify({
+        "type": "list",
+        "headline": "Настройки программ — Добавление и удаление ярлыков",
+        "background": MENU_BACKGROUNDS["settings"],
+        "items": items
+    })
+
+# --- 5.3 НАСТРОЙКИ ЗАСТАВКИ (СКРИНСЕЙВЕРА) ---
+@app.route('/content/settings_screensaver.json')
+def msx_settings_screensaver():
+    base_url = get_base_url()
+    cur_ss = current_settings["active_screensaver"]
+    
+    items = []
+
+    # Big Button: Launch Screensaver right now!
+    items.append({
+        "id": "btn_launch_ss_now",
+        "type": "teaser",
+        "layout": "0,0,6.0,3.2",
+        "icon": "play-circle-outline",
+        "title": "▶ Запустить заставку прямо сейчас",
+        "titleHeader": "ПРОВЕРКА И ЗАПУСК",
+        "titleFooter": "Нажмите OK для немедленного старта 4K скринсейвера",
+        "color": "msx-glass",
+        "badge": "СТАРТ",
+        "action": f"slideshow:{base_url}/screensaver.json"
+    })
+
+    # Info card: How to set in TV system settings
+    items.append({
+        "id": "card_ss_sys_info",
+        "type": "teaser",
+        "layout": "6.2,0,5.8,3.2",
+        "icon": "info",
+        "title": "Штатная заставка в MSX",
+        "titleHeader": "НАСТРОЙКИ ТВ",
+        "titleFooter": f"Укажите: {base_url}/screensaver.json в Настройки -> Заставка",
+        "color": "msx-glass",
+        "action": f"info:Введите адрес {base_url}/screensaver.json в Настройки -> Заставка Media Station X"
+    })
+
+    # Wallpapers Gallery for Screensaver
+    for img in SCREENSAVER_IMAGES:
+        is_cur = (cur_ss == img["id"])
+        items.append({
+            "id": f"choose_ss_{img['id']}",
+            "layout": "0,0,3.8,2.6",
+            "title": img["name"],
+            "titleHeader": "ФОН ЗАСТАВКИ",
+            "titleFooter": "Нажмите OK для выбора",
+            "image": img["thumb"],
+            "imageFiller": "cover",
+            "badge": "АКТИВНА" if is_cur else "ВЫБРАТЬ",
+            "color": "msx-glass",
+            "action": f"[execute:{base_url}/api/set_screensaver/{img['id']}|reload:content|info:Выбрана заставка: {img['name']}]"
+        })
+
+    return jsonify({
+        "type": "list",
+        "headline": "Настройка заставки (Скринсейвер) — Выбор фото и старт",
+        "background": MENU_BACKGROUNDS["settings"],
+        "items": items
+    })
+
+# --- 5.4 НАСТРОЙКИ ФОНОВ МЕНЮ ---
 @app.route('/content/settings_bg.json')
 def msx_settings_bg():
     base_url = get_base_url()
     items = []
-    for bg in PRESET_BACKGROUNDS:
-        is_cur = (current_settings["background_id"] == bg["id"])
+    for img in SCREENSAVER_IMAGES[1:]:
         items.append({
-            "id": f"bg_{bg['id']}",
-            "layout": "0,0,3.6,2.5",
-            "title": bg["name"],
-            "titleHeader": "ФОНОВЫЕ ОБОИ 4K",
+            "id": f"bg_set_{img['id']}",
+            "layout": "0,0,3.8,2.6",
+            "title": img["name"],
+            "titleHeader": "ОБОИ ДЛЯ ВИДЖЕТОВ",
             "titleFooter": "Нажмите OK для установки",
-            "image": bg["thumb"],
+            "image": img["thumb"],
             "imageFiller": "cover",
-            "badge": "АКТИВЕН" if is_cur else "ВЫБРАТЬ",
             "color": "msx-glass",
-            "action": f"[execute:{base_url}/api/set_background/{bg['id']}|reload:menu|info:Установлен фон: {bg['name']}]"
+            "action": f"[execute:{base_url}/api/set_menu_bg/{img['id']}|reload:menu|info:Установлен фон: {img['name']}]"
         })
     return jsonify({
         "type": "list",
-        "headline": "Выбор фоновых 4K обоев с блюром",
-        "template": {"type": "default", "layout": "0,0,3.6,2.5", "color": "msx-glass"},
+        "headline": "Выбор фоновых обоев для разделов меню",
+        "background": MENU_BACKGROUNDS["settings"],
         "items": items
     })
 
 # ---------------------------------------------------------------------------
-# 5. CONTENT SECTIONS (MOVIES & TV)
+# 6. SECTION 4: О ПРИЛОЖЕНИИ (/content/info.json)
+# Background: Night Sky 4K
 # ---------------------------------------------------------------------------
-
-@app.route('/content/movies.json')
-def msx_content_movies():
-    items = []
-    for m in MOVIES:
-        items.append({
-            "id": m["id"],
-            "title": m["title"],
-            "titleHeader": m["titleHeader"],
-            "titleFooter": m["titleFooter"],
-            "image": m["image"],
-            "imageFiller": "cover",
-            "badge": m["badge"],
-            "action": f"video:{m['video']}"
-        })
-    return jsonify({
-        "type": "list",
-        "headline": "Каталог Фильмов 4K",
-        "template": {"type": "default", "layout": "0,0,2.5,3.6", "color": "msx-glass"},
-        "items": items
-    })
-
-@app.route('/content/tv.json')
-def msx_content_tv():
-    items = []
-    for t in TV_CHANNELS:
-        items.append({
-            "id": t["id"],
-            "title": t["title"],
-            "titleHeader": t["titleHeader"],
-            "titleFooter": t["titleFooter"],
-            "image": t["image"],
-            "imageFiller": "cover",
-            "badge": t["badge"],
-            "action": f"video:{t['video']}"
-        })
-    return jsonify({
-        "type": "list",
-        "headline": "Телеканалы Прямой Эфир",
-        "template": {"type": "default", "layout": "0,0,3.6,2.4", "color": "msx-glass"},
-        "items": items
-    })
-
-# ---------------------------------------------------------------------------
-# 6. ROOT SCREENSAVER PLAYLIST (/screensaver.json)
-# Used directly in MSX: Settings -> Screensaver -> Screensaver URL
-# ---------------------------------------------------------------------------
-
-@app.route('/screensaver.json')
-@app.route('/msx/screensaver.json')
-def msx_screensaver():
-    return jsonify({
-        "headline": "4K Заставка Media Station X",
-        "items": [
-            {
-                "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90",
-                "title": "Космическая Аврора 4K",
-                "duration": 8
-            },
-            {
-                "image": "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90",
-                "title": "Ночной Киберпанк Город",
-                "duration": 8
-            },
-            {
-                "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
-                "title": "Горные Пики в Облаках",
-                "duration": 8
-            },
-            {
-                "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
-                "title": "Океанский Прибой & Золотой Закат",
-                "duration": 8
-            },
-            {
-                "image": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90",
-                "title": "Уютный Огонь Камина",
-                "duration": 8
-            }
-        ]
-    })
 
 @app.route('/content/info.json')
 def msx_content_info():
     base_url = get_base_url()
     return jsonify({
         "type": "list",
-        "headline": "Информация о портале",
+        "headline": "Информация о портале и подключении",
+        "background": MENU_BACKGROUNDS["info"],
         "items": [
             {
-                "type": "button",
-                "layout": "0,0,5.0,2.2",
-                "icon": "wallpaper",
-                "label": "Адрес для Настройки -> Заставка",
-                "title": f"{base_url}/screensaver.json",
-                "action": f"info:Укажите {base_url}/screensaver.json в Настройки -> Заставка"
+                "id": "info_tile_1",
+                "type": "teaser",
+                "layout": "0,0,5.8,3.2",
+                "icon": "info",
+                "title": "MX Station Player Portal v2.0",
+                "titleHeader": "НА СЕРВЕРЕ FLASK",
+                "titleFooter": f"Хост: {base_url}",
+                "color": "msx-glass"
             },
             {
+                "id": "info_tile_2",
+                "type": "teaser",
+                "layout": "6.2,0,5.8,3.2",
+                "icon": "screen-share",
+                "title": "Ввод в Media Station X",
+                "titleHeader": "START PARAMETER",
+                "titleFooter": "Введите просто имя домена в Settings -> Start Parameter",
+                "color": "msx-glass"
+            },
+            {
+                "id": "btn_refresh_all",
                 "type": "button",
-                "layout": "0,0,5.0,2.2",
+                "layout": "0,3.5,12.0,1.8",
                 "icon": "refresh",
-                "label": "Перезагрузить меню",
+                "label": "Перезагрузить все меню портала",
+                "color": "msx-glass",
                 "action": f"menu:{base_url}/menu.json"
             }
         ]
     })
 
 # ---------------------------------------------------------------------------
-# 7. SERVER ACTIONS FOR TV REMOTE SELECTIONS
+# 7. NATIVE SCREENSAVER PLAYLIST (/screensaver.json)
+# Formatted for Media Station X: Settings -> Screensaver
 # ---------------------------------------------------------------------------
 
-@app.route('/api/set_background/<bg_id>')
-def api_set_background(bg_id):
-    for bg in PRESET_BACKGROUNDS:
-        if bg["id"] == bg_id:
-            current_settings["background_id"] = bg["id"]
-            current_settings["background_name"] = bg["name"]
-            current_settings["background_url"] = bg["url"]
-            return jsonify({"status": "ok", "background": bg})
-    return jsonify({"status": "error"}), 404
+@app.route('/screensaver.json')
+@app.route('/msx/screensaver.json')
+def msx_screensaver():
+    cur_ss = current_settings["active_screensaver"]
+    dur = current_settings["screensaver_duration"]
 
-@app.route('/api/set_clock/<clock_type>')
-def api_set_clock(clock_type):
-    current_settings["clock_widget"] = clock_type
-    return jsonify({"status": "ok", "clock": clock_type})
+    items = []
+    if cur_ss == "ss_all":
+        # Slideshow of all 4K wallpapers
+        for img in SCREENSAVER_IMAGES[1:]:
+            items.append({
+                "image": img["url"],
+                "title": img["name"],
+                "duration": dur
+            })
+    else:
+        # Specific chosen wallpaper
+        chosen = next((x for x in SCREENSAVER_IMAGES if x["id"] == cur_ss), SCREENSAVER_IMAGES[1])
+        items.append({
+            "image": chosen["url"] or SCREENSAVER_IMAGES[1]["url"],
+            "title": chosen["name"],
+            "duration": 3600 # Long display
+        })
 
-@app.route('/api/toggle_clock')
-def api_toggle_clock():
-    order = ["digital", "modern", "analog", "both"]
-    idx = order.index(current_settings["clock_widget"]) if current_settings["clock_widget"] in order else 0
-    current_settings["clock_widget"] = order[(idx + 1) % len(order)]
-    return jsonify({"status": "ok", "clock": current_settings["clock_widget"]})
+    return jsonify({
+        "headline": "4K Заставка Media Station X",
+        "items": items
+    })
 
-@app.route('/api/set_cal/<cal_type>')
-def api_set_cal(cal_type):
-    current_settings["calendar_widget"] = cal_type
-    return jsonify({"status": "ok", "calendar": cal_type})
+# ---------------------------------------------------------------------------
+# 8. API ACTIONS (HANDLES SELECTIONS & ADDING APPS FROM TV REMOTE)
+# ---------------------------------------------------------------------------
 
-@app.route('/api/toggle_cal')
-def api_toggle_cal():
-    order = ["grid", "compact", "events"]
-    idx = order.index(current_settings["calendar_widget"]) if current_settings["calendar_widget"] in order else 0
-    current_settings["calendar_widget"] = order[(idx + 1) % len(order)]
-    return jsonify({"status": "ok", "calendar": current_settings["calendar_widget"]})
+@app.route('/api/toggle_widget/<widget_key>')
+def api_toggle_widget(widget_key):
+    w_map = current_settings["widgets_active"]
+    if widget_key in w_map:
+        w_map[widget_key] = not w_map[widget_key]
+    return jsonify({"status": "ok"})
 
-@app.route('/api/set_pos/<pos_type>')
-def api_set_pos(pos_type):
-    current_settings["widgets_position"] = pos_type
-    return jsonify({"status": "ok", "position": pos_type})
+@app.route('/api/set_pos/<pos_key>')
+def api_set_pos(pos_key):
+    current_settings["widgets_position"] = pos_key
+    return jsonify({"status": "ok"})
+
+@app.route('/api/set_screensaver/<ss_id>')
+def api_set_screensaver(ss_id):
+    current_settings["active_screensaver"] = ss_id
+    return jsonify({"status": "ok"})
+
+@app.route('/api/set_menu_bg/<bg_id>')
+def api_set_menu_bg(bg_id):
+    chosen = next((x for x in SCREENSAVER_IMAGES if x["id"] == bg_id), None)
+    if chosen and chosen["url"]:
+        MENU_BACKGROUNDS["widgets"] = chosen["url"]
+    return jsonify({"status": "ok"})
+
+@app.route('/api/add_preset_app/<app_name>')
+def api_add_preset_app(app_name):
+    preset = next((p for p in PRESET_POPULAR_APPS if p["name"] == app_name), None)
+    if preset:
+        # Check if already added
+        if not any(a["name"] == preset["name"] for a in installed_apps):
+            installed_apps.append({
+                "id": f"app_{len(installed_apps) + 1}",
+                "name": preset["name"],
+                "sub": "Пользовательское приложение",
+                "url": preset["url"],
+                "icon": preset["icon"],
+                "badge": preset["badge"],
+                "color": "msx-glass",
+                "image": "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80"
+            })
+    return jsonify({"status": "ok"})
+
+@app.route('/api/add_app_by_code', methods=['GET', 'POST'])
+def api_add_app_by_code():
+    """Receives text entered via MSX on-screen keyboard"""
+    code = request.args.get('code') or request.args.get('value')
+    if not code and request.is_json:
+        data = request.get_json(silent=True) or {}
+        code = data.get('code') or data.get('value') or data.get('text')
+    
+    if code:
+        code = code.strip()
+        new_app = {
+            "id": f"app_custom_{len(installed_apps) + 1}",
+            "name": f"Приложение {len(installed_apps) + 1}",
+            "sub": "Пользовательский ярлык",
+            "url": code,
+            "icon": "launch",
+            "badge": "CUSTOM",
+            "color": "msx-glass",
+            "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&auto=format&fit=crop&q=80"
+        }
+        installed_apps.append(new_app)
+        return jsonify({"action": "[reload:content|info:Приложение успешно добавлено!]"})
+    
+    return jsonify({"action": "info:Адрес не был введен."})
+
+@app.route('/api/remove_app/<app_id>')
+def api_remove_app(app_id):
+    global installed_apps
+    installed_apps = [a for a in installed_apps if a["id"] != app_id]
+    return jsonify({"status": "ok"})
+
+@app.route('/api/reset_apps')
+def api_reset_apps():
+    global installed_apps
+    installed_apps = installed_apps[:5]
+    return jsonify({"status": "ok"})
 
 if __name__ == '__main__':
     print("=" * 65)
-    print("  MX Station Player — Native Media Station X Portal")
-    print("  В MSX на телевизоре достаточно ввести просто адрес:")
-    print("  <IP_ЭТОГО_КОМПЬЮТЕРА>:5000")
-    print("  (MSX автоматически подгрузит /msx/start.json)")
+    print("  MX Station Player v2.0 — Native MSX Portal")
+    print("  1. Виджеты  |  2. Программы  |  3. Настройки  |  4. О приложении")
+    print("  В MSX на ТВ вводите: <IP_ЭТОГО_КОМПЬЮТЕРА>:5000")
     print("=" * 65)
     app.run(host='0.0.0.0', port=5000, debug=True)
