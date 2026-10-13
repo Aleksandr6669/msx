@@ -83,13 +83,13 @@ const DEFAULT_APPS_LIST = [
 const WIDGETS_METADATA = {
     clock_digital: {
         title: "Цифровые часы",
-        desc: "Крупные часы с секундами и датой",
+        desc: "Крупные неоновые часы с секундами и датой",
         icon: "schedule",
         defaultSize: 2
     },
     clock_analog: {
         title: "Аналоговые часы",
-        desc: "Стрелочный хронограф с секундной стрелкой",
+        desc: "Прозрачный швейцарский циферблат",
         icon: "watch_later",
         defaultSize: 1
     },
@@ -132,7 +132,7 @@ let state = {
     activeTab: "widgets",
     themeColor: safeGetStorage('hp_theme_color', "#00d2ff"),
     themeRgb: safeGetStorage('hp_theme_rgb', "0, 210, 255"),
-    transparency: safeGetStorage('hp_transparency', "frosted"),
+    transparency: "frosted",
     animations: safeGetStorage('hp_animations', "snappy"),
     idleTimeoutSec: parseInt(safeGetStorage('hp_idle_sec', "120"), 10),
     screensaverBg: safeGetStorage('hp_ss_bg', "ss_all"),
@@ -141,7 +141,7 @@ let state = {
     ssYoutubeId: safeGetStorage('hp_ss_ytid', "L_LUpnjgPso"),
     ssVideoUrl: safeGetStorage('hp_ss_vurl', "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"),
     ssPhotoAnim: safeGetStorage('hp_ss_photo_anim', 'true') !== 'false',
-    ssWidgetOpacity: safeGetStorage('hp_ss_wopacity', "ultra"),
+    ssWidgetOpacity: "ultra",
     ssWidgetType: safeGetStorage('hp_ss_wtype', "both"),
     ssPosition: safeGetStorage('hp_ss_pos', "center"),
     widgets: JSON.parse(safeGetStorage('hp_widgets', JSON.stringify({
@@ -231,7 +231,7 @@ function applyThemeSettings() {
     root.style.setProperty('--accent-rgb', state.themeRgb);
 
     document.body.classList.remove('trans-frosted', 'trans-transparent', 'trans-dark');
-    document.body.classList.add(`trans-${state.transparency}`);
+    document.body.classList.add(`trans-frosted`);
 
     document.body.classList.remove('anim-fast', 'anim-snappy');
     document.body.classList.add(`anim-${state.animations}`);
@@ -239,7 +239,6 @@ function applyThemeSettings() {
     try {
         localStorage.setItem('hp_theme_color', state.themeColor);
         localStorage.setItem('hp_theme_rgb', state.themeRgb);
-        localStorage.setItem('hp_transparency', state.transparency);
         localStorage.setItem('hp_animations', state.animations);
     } catch (e) {}
 }
@@ -384,6 +383,10 @@ function updateClocks() {
 
         const fullDateStr = `${WEEKDAYS_RU[now.getDay()]}, ${now.getDate()} ${MONTHS_RU[now.getMonth()]} ${now.getFullYear()}`;
         if (digFullDate) digFullDate.textContent = fullDateStr;
+        const analogDigTime = document.getElementById('analogDigTime');
+        const analogDateLabel = document.getElementById('analogDateLabel');
+        if (analogDigTime) analogDigTime.textContent = `${hStr}:${mStr}`;
+        if (analogDateLabel) analogDateLabel.textContent = `${now.getDate()} ${MONTHS_RU[now.getMonth()]} ${now.getFullYear()}`.toUpperCase();
 
         if (compDayNum) compDayNum.textContent = String(now.getDate());
         if (compMonth) compMonth.textContent = `${MONTHS_RU[now.getMonth()]} ${now.getFullYear()}`;
@@ -473,7 +476,7 @@ function renderCalendars() {
 renderCalendars();
 
 // ---------------------------------------------------------------------------
-// 5. BENTO GRID MODULAR WIDGET SYSTEM
+// 5. BENTO GRID MODULAR WIDGET SYSTEM (UNIFORM 220PX HEIGHT)
 // ---------------------------------------------------------------------------
 const widgetsWrapper = document.getElementById('widgetsWrapper');
 const widgetElements = {
@@ -494,7 +497,7 @@ function applyWidgetSizesAndToggles() {
         el.style.display = isVisible ? 'flex' : 'none';
 
         const size = state.widgetSizes[key] || WIDGETS_METADATA[key].defaultSize;
-        el.classList.remove('span-1', 'span-2', 'span-4');
+        el.classList.remove('span-1', 'span-2', 'span-3', 'span-4');
         el.classList.add(`span-${size}`);
     });
 
@@ -546,19 +549,6 @@ colorSwatchBtns.forEach(btn => {
 });
 colorSwatchBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-color') === state.themeColor));
 
-// Transparency Modes
-const transBtns = document.querySelectorAll('.trans-option-btn');
-transBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        transBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.transparency = btn.getAttribute('data-trans');
-        applyThemeSettings();
-    });
-});
-transBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-trans') === state.transparency));
-
 // Sidebar Position Selector
 const sidebarPosBtns = document.querySelectorAll('.sidebar-pos-btn');
 sidebarPosBtns.forEach(btn => {
@@ -603,9 +593,10 @@ const detailToggleCheck = document.getElementById('detailToggleCheck');
 const bentoSizeCards = document.querySelectorAll('.bento-size-card');
 
 function formatSizeText(size) {
-    if (size === 1) return '1 ячейка (1×1)';
-    if (size === 2) return '2 ячейки (2×1 • По горизонтали)';
-    if (size === 4) return '4 ячейки (2×2 • 2 по верт. и 2 по гор.)';
+    if (size === 1) return '1 ячейка (~25% ширины)';
+    if (size === 2) return '2 ячейки (50% ширины)';
+    if (size === 3) return '3 ячейки (75% ширины)';
+    if (size === 4) return '4 ячейки (100% ширины)';
     return `${size} ячейки`;
 }
 
@@ -1055,13 +1046,22 @@ function extractYouTubeId(urlOrId) {
 }
 
 function applyScreensaverWidgetOpacity() {
-    const clockBlock = document.getElementById('ssWidgetBlock');
-    if (!clockBlock) return;
-    clockBlock.classList.remove('trans-ultra', 'trans-none', 'trans-glass');
-    clockBlock.classList.add(`trans-${state.ssWidgetOpacity || 'ultra'}`);
-    try {
-        localStorage.setItem('hp_ss_wopacity', state.ssWidgetOpacity);
-    } catch (e) {}
+    // Uniform frosted glass
+}
+
+// Screensaver tap/click dismiss for touch and mouse
+if (screensaverLayer) {
+    ['click', 'touchend'].forEach(evtType => {
+        screensaverLayer.addEventListener(evtType, (e) => {
+            if (screensaverLayer.classList.contains('active')) {
+                if (Date.now() - ssOpenedTimestamp > 300) {
+                    e.preventDefault();
+                    hideScreensaver();
+                    switchTab('widgets');
+                }
+            }
+        });
+    });
 }
 
 function showScreensaver() {
@@ -1262,18 +1262,6 @@ if (btnApplyCustomVideo && inputCustomVideo) {
         alert('Пользовательское видео успешно сохранено для заставки!');
     });
 }
-
-// Screensaver Widget Transparency Selector
-const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
-ssOpacityBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        ssOpacityBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.ssWidgetOpacity = btn.getAttribute('data-opacity') || 'ultra';
-        applyScreensaverWidgetOpacity();
-    });
-});
-ssOpacityBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-opacity') === state.ssWidgetOpacity));
 
 // ---------------------------------------------------------------------------
 // 11. INITIALIZATION & INITIAL FOCUS ON LOAD
