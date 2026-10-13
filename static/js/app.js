@@ -47,7 +47,7 @@ const DEFAULT_APPS_LIST = [
 const WIDGETS_METADATA = {
     clock_digital: {
         title: "Цифровые часы",
-        desc: "Крупные неоновые часы с секундами и датой",
+        desc: "Крупные часы с секундами и датой",
         icon: "schedule",
         defaultSize: 2
     },
@@ -73,8 +73,8 @@ const WIDGETS_METADATA = {
 
 let state = {
     activeTab: "widgets",
-    themeColor: safeGetStorage('hp_theme_color', "#00d2ff"),
-    themeRgb: safeGetStorage('hp_theme_rgb', "0, 210, 255"),
+    themeColor: safeGetStorage('hp_theme_color', "#f8fafc"),
+    themeRgb: safeGetStorage('hp_theme_rgb', "248, 250, 252"),
     transparency: "frosted",
     animations: safeGetStorage('hp_animations', "snappy"),
     idleTimeoutSec: parseInt(safeGetStorage('hp_idle_sec', "120"), 10),
@@ -147,6 +147,20 @@ function expandSidebar(expand) {
 }
 
 function focusCurrentTabContent() {
+    if (state.activeTab === 'widgets') {
+        const w1 = document.getElementById('wClockDigital');
+        if (w1) { w1.focus(); return; }
+    } else if (state.activeTab === 'apps') {
+        const firstApp = appsGrid?.querySelector('.app-card');
+        if (firstApp) { firstApp.focus(); return; }
+    } else if (state.activeTab === 'settings') {
+        const activeSubtab = document.querySelector('.subtab-btn.active') || document.querySelector('.subtab-btn');
+        if (activeSubtab) { activeSubtab.focus(); return; }
+    } else if (state.activeTab === 'info') {
+        const firstInfo = document.querySelector('#tabInfo .info-card');
+        if (firstInfo) { firstInfo.focus(); return; }
+    }
+
     const activePane = tabPanes[state.activeTab];
     if (!activePane) return;
     const focusable = activePane.querySelectorAll('button, [tabindex="0"], input, select');
@@ -206,7 +220,7 @@ if (btnLaunchScreensaver) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. REAL-TIME CLOCKS (DIGITAL NEON & CIRCULAR ANALOG)
+// 4. REAL-TIME CLOCKS (DIGITAL & CIRCULAR ANALOG)
 // ---------------------------------------------------------------------------
 const MONTHS_RU = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
 const WEEKDAYS_RU = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -675,6 +689,132 @@ window.addEventListener('keydown', (e) => {
     if (isBackKey) {
         handleTvBackButton(e);
         return;
+    }
+
+    // APPS TAB D-PAD NAVIGATION
+    if (state.activeTab === 'apps' && !screensaverLayer?.classList.contains('active')) {
+        const el = document.activeElement;
+        const appCards = Array.from(appsGrid?.querySelectorAll('.app-card') || []);
+        const idx = appCards.indexOf(el);
+
+        if (idx !== -1) {
+            if (e.key === 'ArrowRight' || e.keyCode === 39) {
+                e.preventDefault();
+                if (idx < appCards.length - 1) {
+                    appCards[idx + 1].focus();
+                }
+                return;
+            }
+            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
+                e.preventDefault();
+                if (idx === 0) {
+                    const tabBtn = document.querySelector('.menu-tab[data-tab="apps"]');
+                    if (tabBtn) tabBtn.focus();
+                } else {
+                    appCards[idx - 1].focus();
+                }
+                return;
+            }
+            if (e.key === 'ArrowDown' || e.keyCode === 40) {
+                e.preventDefault();
+                const nextIdx = Math.min(appCards.length - 1, idx + 4);
+                appCards[nextIdx].focus();
+                return;
+            }
+            if (e.key === 'ArrowUp' || e.keyCode === 38) {
+                e.preventDefault();
+                if (idx < 4) {
+                    const tabBtn = document.querySelector('.menu-tab[data-tab="apps"]');
+                    if (tabBtn) tabBtn.focus();
+                } else {
+                    appCards[idx - 4].focus();
+                }
+                return;
+            }
+        }
+    }
+
+    // SETTINGS TAB D-PAD NAVIGATION
+    if (state.activeTab === 'settings' && !screensaverLayer?.classList.contains('active')) {
+        const el = document.activeElement;
+        const subtabBtnsArr = Array.from(document.querySelectorAll('.subtab-btn'));
+        const subtabIdx = subtabBtnsArr.indexOf(el);
+
+        if (subtabIdx !== -1) {
+            // Focused on subtab buttons row
+            if (e.key === 'ArrowRight' || e.keyCode === 39) {
+                e.preventDefault();
+                const nextIdx = (subtabIdx + 1) % subtabBtnsArr.length;
+                subtabBtnsArr[nextIdx].focus();
+                subtabBtnsArr[nextIdx].click();
+                return;
+            }
+            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
+                e.preventDefault();
+                if (subtabIdx === 0) {
+                    const tabBtn = document.querySelector('.menu-tab[data-tab="settings"]');
+                    if (tabBtn) tabBtn.focus();
+                } else {
+                    const prevIdx = subtabIdx - 1;
+                    subtabBtnsArr[prevIdx].focus();
+                    subtabBtnsArr[prevIdx].click();
+                }
+                return;
+            }
+            if (e.key === 'ArrowDown' || e.keyCode === 40) {
+                e.preventDefault();
+                const activePane = document.querySelector('.settings-subpane.active');
+                if (activePane) {
+                    const focusable = activePane.querySelectorAll('button, input, select, [tabindex="0"]');
+                    if (focusable.length > 0) focusable[0].focus();
+                }
+                return;
+            }
+        } else {
+            // Inside subpane controls
+            const activePane = document.querySelector('.settings-subpane.active');
+            if (activePane && activePane.contains(el)) {
+                const controls = Array.from(activePane.querySelectorAll('button, input, select, [tabindex="0"]'));
+                const cIdx = controls.indexOf(el);
+
+                if (cIdx !== -1) {
+                    if (e.key === 'ArrowRight' || e.keyCode === 39) {
+                        e.preventDefault();
+                        if (cIdx < controls.length - 1) {
+                            controls[cIdx + 1].focus();
+                        }
+                        return;
+                    }
+                    if (e.key === 'ArrowLeft' || e.keyCode === 37) {
+                        e.preventDefault();
+                        if (cIdx === 0) {
+                            const tabBtn = document.querySelector('.menu-tab[data-tab="settings"]');
+                            if (tabBtn) tabBtn.focus();
+                        } else {
+                            controls[cIdx - 1].focus();
+                        }
+                        return;
+                    }
+                    if (e.key === 'ArrowUp' || e.keyCode === 38) {
+                        e.preventDefault();
+                        if (cIdx === 0) {
+                            const activeSubtab = document.querySelector('.subtab-btn.active');
+                            if (activeSubtab) activeSubtab.focus();
+                        } else {
+                            controls[Math.max(0, cIdx - 1)].focus();
+                        }
+                        return;
+                    }
+                    if (e.key === 'ArrowDown' || e.keyCode === 40) {
+                        e.preventDefault();
+                        if (cIdx < controls.length - 1) {
+                            controls[cIdx + 1].focus();
+                        }
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     // 2x2 Quadrant Grid Spatial Navigation for TV Remote

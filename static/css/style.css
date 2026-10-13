@@ -3,13 +3,13 @@
    ========================================================================== */
 
 :root {
-    --accent-color: #00d2ff;
-    --accent-rgb: 0, 210, 255;
+    --accent-color: #f8fafc;
+    --accent-rgb: 248, 250, 252;
     --bg-dark: #060913;
     --current-wallpaper: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85');
-    --glass-bg: rgba(255, 255, 255, 0.04);
-    --glass-border: rgba(255, 255, 255, 0.18);
-    --glass-blur: 28px;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-blur: 20px;
     --text-main: #ffffff;
     --text-normal: #e2e8f0;
     --text-dim: #94a3b8;
@@ -97,7 +97,7 @@ body {
 }
 
 /* ==========================================================================
-   APP SHELL & SIDEBAR (LEFT-ALIGNED, PERMANENT, NO OVERLAP)
+   APP SHELL & SIDEBAR (UNIFIED FROSTED GLASS TO MATCH WIDGETS)
    ========================================================================== */
 .tv-shell {
     display: flex;
@@ -111,9 +111,9 @@ body {
 
 .tv-sidebar {
     width: 210px !important;
-    background: rgba(8, 12, 22, 0.72) !important;
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
+    background: rgba(255, 255, 255, 0.04) !important; /* UNIFIED FROSTED GLASS TO MATCH WIDGETS! */
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -121,8 +121,8 @@ body {
     z-index: 20 !important;
     flex-shrink: 0 !important;
     box-sizing: border-box;
-    border-right: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2) !important;
     pointer-events: auto !important;
 }
 
@@ -138,12 +138,13 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: linear-gradient(135deg, var(--accent-color), rgba(var(--accent-rgb), 0.3));
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.4);
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
 }
 
@@ -199,17 +200,17 @@ body {
 }
 
 .menu-tab:focus {
-    background: rgba(var(--accent-rgb), 0.18) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
     border-color: var(--accent-color) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.4) !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
     transform: translateX(3px) !important;
 }
 
 .menu-tab.active {
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
 .tab-icon {
@@ -225,7 +226,7 @@ body {
     font-size: 0.65rem;
     padding: 2px 6px;
     border-radius: 6px;
-    background: rgba(var(--accent-rgb), 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--accent-color);
     font-weight: 700;
 }
@@ -244,7 +245,7 @@ body {
     gap: 10px;
     padding: 10px 12px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: var(--text-normal);
     font-family: inherit;
@@ -256,10 +257,10 @@ body {
 }
 
 .btn-sidebar-action:focus {
-    background: rgba(var(--accent-rgb), 0.2) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
     border-color: var(--accent-color) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.4) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.35) !important;
 }
 
 .sys-status-badge {
@@ -343,7 +344,7 @@ body {
 }
 
 /* ==========================================================================
-   2x2 QUADRANTS (PURE TRANSPARENT FROSTED GLASS - ZERO BLUE TINT)
+   2x2 QUADRANTS (ULTRA-LIGHT NATURAL CRYSTAL FROSTED GLASS)
    ========================================================================== */
 .widgets-bento-grid {
     display: grid !important;
@@ -363,13 +364,13 @@ body {
     min-height: 0 !important;
     max-height: 100% !important;
     width: 100% !important;
-    background: rgba(255, 255, 255, 0.04) !important; /* COMPLETELY PURE TRANSPARENT FROSTED GLASS - ZERO BLUE TINT! */
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.03) !important; /* ULTRA-LIGHT NATURAL CRYSTAL FROSTED GLASS */
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 20px !important;
     padding: 16px 20px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
     outline: none !important;
     display: flex !important;
     flex-direction: column !important;
@@ -453,7 +454,7 @@ body {
     display: flex !important;
     align-items: baseline !important;
     justify-content: center !important;
-    text-shadow: 0 0 24px rgba(var(--accent-rgb), 0.45) !important;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5) !important;
 }
 
 .widget-clock-digital .colon {
@@ -560,21 +561,21 @@ body {
     width: 1.5px !important;
     height: 64px !important;
     margin-left: -0.75px !important;
-    background: var(--accent-color) !important;
-    box-shadow: 0 0 8px var(--accent-color) !important;
+    background: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-color);
     z-index: 4 !important;
 }
 
 .analog-face .center-pin {
     width: 8px !important;
     height: 8px !important;
-    border-radius: 50% !important;
-    background: var(--accent-color) !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    box-shadow: 0 0 8px var(--accent-color) !important;
+    border-radius: 50%;
+    background: var(--accent-color);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px var(--accent-color);
     z-index: 5 !important;
 }
 
@@ -591,23 +592,23 @@ body {
     font-weight: 700 !important;
     color: #ffffff !important;
     line-height: 1 !important;
-    text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
     white-space: nowrap !important;
 }
 
 .analog-date-label {
     font-size: 0.95rem !important;
-    color: var(--accent-color) !important;
-    font-weight: 600 !important;
-    letter-spacing: 1px !important;
+    color: var(--accent-color);
+    font-weight: 600;
+    letter-spacing: 1px;
     white-space: nowrap !important;
 }
 
 .analog-city-badge {
     font-size: 0.72rem !important;
-    color: var(--text-dim) !important;
-    letter-spacing: 1.5px !important;
-    text-transform: uppercase !important;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     white-space: nowrap !important;
 }
 
@@ -663,10 +664,11 @@ body {
 }
 
 .cal-cells .cell.today {
-    background: var(--accent-color) !important;
-    color: #000000 !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid var(--accent-color) !important;
+    color: #ffffff !important;
     font-weight: 800 !important;
-    box-shadow: 0 0 12px var(--accent-color) !important;
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4) !important;
 }
 
 .cal-cells .cell.other-month {
@@ -701,14 +703,14 @@ body {
 .events-stack .ev-item.ev-current {
     border-left: 3px solid var(--accent-color) !important;
     background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(var(--accent-rgb), 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .events-stack .ev-time {
     font-family: var(--font-mono) !important;
     font-size: 0.95rem !important;
     font-weight: 700 !important;
-    color: var(--accent-color) !important;
+    color: var(--accent-color);
     flex-shrink: 0 !important;
 }
 
@@ -817,21 +819,34 @@ body {
 }
 
 /* ==========================================================================
-   TAB 3: SETTINGS SUBTABS & CONFIGURATORS
+   TAB 3: SETTINGS SUBTABS & CONFIGURATORS (CLEAN FROSTED GLASS & ORDER)
    ========================================================================== */
+.setting-card {
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 18px;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
 .settings-subtabs {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
 }
 
 .subtab-btn {
     padding: 10px 18px;
-    border-radius: 10px;
-    background: transparent;
-    border: 1px solid transparent;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     color: var(--text-dim);
     font-family: inherit;
     font-size: 0.88rem;
@@ -842,38 +857,49 @@ body {
 }
 
 .subtab-btn:focus {
-    background: rgba(var(--accent-rgb), 0.18) !important;
     border-color: var(--accent-color) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.4) !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
 }
 
 .subtab-btn.active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+}
+
+.app-input,
+.ss-video-input,
+.app-select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-family: inherit !important;
+    font-size: 0.85rem !important;
+    outline: none !important;
+}
+
+.app-input:focus,
+.ss-video-input:focus,
+.app-select:focus {
+    border-color: var(--accent-color) !important;
+    background: rgba(255, 255, 255, 0.09) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.3) !important;
 }
 
 .settings-subpane {
     display: none;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
+    max-width: 1400px;
+    width: 100%;
 }
 
 .settings-subpane.active {
     display: flex;
-}
-
-.setting-card {
-    background: rgba(14, 20, 36, 0.55);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
 }
 
 .setting-card h3 {
@@ -889,7 +915,7 @@ body {
 
 .color-swatches-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 12px;
 }
 
@@ -899,7 +925,7 @@ body {
     gap: 10px;
     padding: 10px 14px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #ffffff;
     font-family: inherit;
@@ -914,7 +940,7 @@ body {
 .color-swatch-btn.active {
     border-color: var(--c);
     background: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 0 16px var(--c);
+    box-shadow: 0 0 14px var(--c);
 }
 
 .color-swatch-btn .dot {
@@ -948,7 +974,7 @@ body {
 .btn-reset-all {
     padding: 10px 16px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: var(--text-normal);
     font-family: inherit;
@@ -980,10 +1006,10 @@ body {
 .btn-save-app:focus,
 .preset-btn:focus,
 .btn-reset-all:focus {
-    background: rgba(var(--accent-rgb), 0.2) !important;
+    background: rgba(255, 255, 255, 0.14) !important;
     border-color: var(--accent-color) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.4) !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
 }
 
 .ss-position-selector {
@@ -995,7 +1021,7 @@ body {
 .ss-pos-btn {
     padding: 10px 14px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: var(--text-normal);
     font-family: inherit;
@@ -1009,10 +1035,10 @@ body {
 
 .ss-pos-btn:focus,
 .ss-pos-btn.active {
-    background: rgba(var(--accent-rgb), 0.2) !important;
+    background: rgba(255, 255, 255, 0.14) !important;
     border-color: var(--accent-color) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.4) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.35) !important;
 }
 
 .ss-thumbs-grid {
@@ -1035,7 +1061,7 @@ body {
 .ss-thumb-card:focus,
 .ss-thumb-card.selected {
     border-color: var(--accent-color);
-    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.4);
     transform: scale(1.04);
     z-index: 5;
 }
@@ -1068,9 +1094,9 @@ body {
 }
 
 .info-card {
-    background: rgba(14, 20, 36, 0.5);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 18px;
     padding: 20px;
@@ -1083,7 +1109,7 @@ body {
 
 .info-card:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4);
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35);
 }
 
 .info-icon {
@@ -1232,13 +1258,13 @@ body {
 
 .ss-widget-block,
 .ss-calendar-widget {
-    background: rgba(14, 20, 36, 0.45) !important;
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: 20px !important;
     padding: 20px 28px !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3) !important;
     display: inline-flex;
     flex-direction: column;
 }
@@ -1249,7 +1275,7 @@ body {
     font-weight: 700;
     color: #ffffff;
     line-height: 1;
-    text-shadow: 0 0 24px rgba(var(--accent-rgb), 0.5);
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
 }
 
 .ss-clock-date {
@@ -1267,7 +1293,7 @@ body {
     margin-top: 12px;
     padding: 4px 10px;
     border-radius: 6px;
-    background: rgba(var(--accent-rgb), 0.15);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--accent-color);
     font-size: 0.72rem;
     font-weight: 700;
