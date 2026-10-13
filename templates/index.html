@@ -259,19 +259,11 @@
                         </div>
                     </div>
 
-                    <div class="setting-card">
-                        <h3>Расположение панели навигации</h3>
-                        <p class="setting-desc">Выберите сторону экрана для бокового меню:</p>
-                        <div class="sidebar-pos-selector" id="sidebarPosSelector">
-                            <button class="sidebar-pos-btn active" data-pos="left" tabindex="0">
-                                <span class="material-icons">format_textdirection_l_to_r</span>
-                                <span>Слева на экране (Выбрано)</span>
-                            </button>
-                            <button class="sidebar-pos-btn" data-pos="right" tabindex="0">
-                                <span class="material-icons">format_textdirection_r_to_l</span>
-                                <span>Справа на экране</span>
-                            </button>
-                        </div>
+                    <div class="sidebar-pos-selector" id="sidebarPosSelector" style="display: none;">
+                        <button class="sidebar-pos-btn active" data-pos="left" tabindex="0">
+                            <span class="material-icons">format_textdirection_l_to_r</span>
+                            <span>Слева на экране (Выбрано)</span>
+                        </button>
                     </div>
 
                     <div class="setting-card">
@@ -289,7 +281,7 @@
                     <div id="widgetsListView">
                         <div class="setting-card">
                             <h3>Фиксированная 2×2 сетка квадрантов</h3>
-                            <p class="setting-desc">Рабочее пространство экрана автоматически разделено на 4 фиксированные части (2×2). Все виджеты имеют идеальный размер и пропорции без искажений:</p>
+                            <p class="setting-desc">Рабочее пространство экрана разделено на 4 фиксированные части (2×2). Все виджеты имеют идеальный размер и пропорции:</p>
                             
                             <div class="widgets-manage-grid" id="widgetsManageGrid">
                                 <!-- Cards generated dynamically -->

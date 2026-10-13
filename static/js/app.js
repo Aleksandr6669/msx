@@ -170,6 +170,7 @@ function switchTab(tabId) {
 
     if (bgWallpaper && SECTION_WALLPAPERS[tabId]) {
         bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS[tabId]}')`;
+        document.documentElement.style.setProperty('--current-wallpaper', `url('${SECTION_WALLPAPERS[tabId]}')`);
     }
 
     if (tabId === 'apps') {
@@ -711,22 +712,85 @@ window.addEventListener('keydown', (e) => {
         }
     }
 
+    // Sidebar D-pad navigation with wrap-around (Up/Down) & Right to stage
     const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
 
-    if (e.key === 'ArrowRight' && inSidebar) {
-        e.preventDefault();
-        focusCurrentTabContent();
-    } else if (e.key === 'ArrowLeft' && !inSidebar && !screensaverLayer?.classList.contains('active')) {
+    if (inSidebar) {
+        const sidebarNavItems = [
+            document.querySelector('.menu-tab[data-tab="widgets"]'),
+            document.querySelector('.menu-tab[data-tab="apps"]'),
+            document.querySelector('.menu-tab[data-tab="settings"]'),
+            document.querySelector('.menu-tab[data-tab="info"]'),
+            document.getElementById('btnLaunchScreensaver'),
+            document.getElementById('btnRestartPortal')
+        ].filter(Boolean);
+
+        const curIndex = sidebarNavItems.indexOf(document.activeElement);
+
+        if (e.key === 'ArrowDown' || e.keyCode === 40) {
+            e.preventDefault();
+            const nextIndex = curIndex === -1 ? 0 : (curIndex + 1) % sidebarNavItems.length;
+            const targetEl = sidebarNavItems[nextIndex];
+            targetEl.focus();
+            if (targetEl.classList.contains('menu-tab')) {
+                const tabName = targetEl.getAttribute('data-tab');
+                if (tabName && tabName !== state.activeTab) {
+                    switchTab(tabName);
+                }
+            }
+            return;
+        }
+
+        if (e.key === 'ArrowUp' || e.keyCode === 38) {
+            e.preventDefault();
+            const prevIndex = curIndex === -1 ? 0 : (curIndex - 1 + sidebarNavItems.length) % sidebarNavItems.length;
+            const targetEl = sidebarNavItems[prevIndex];
+            targetEl.focus();
+            if (targetEl.classList.contains('menu-tab')) {
+                const tabName = targetEl.getAttribute('data-tab');
+                if (tabName && tabName !== state.activeTab) {
+                    switchTab(tabName);
+                }
+            }
+            return;
+        }
+
+        if (e.key === 'ArrowRight' || e.keyCode === 39) {
+            e.preventDefault();
+            focusCurrentTabContent();
+            return;
+        }
+    } else if (e.key === 'ArrowLeft' && !screensaverLayer?.classList.contains('active')) {
         const activeEl = document.activeElement;
         const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
-        const isFirstWidget = activeEl && activeEl.classList.contains('glass-widget') && activeEl === document.getElementById('wClockDigital');
+        const isLeftWidget = activeEl && (activeEl === document.getElementById('wClockDigital') || activeEl === document.getElementById('wCalGrid'));
 
-        if (isFirstAppCard || isFirstWidget || activeEl === document.body || !activeEl) {
+        if (isFirstAppCard || isLeftWidget || activeEl === document.body || !activeEl) {
             e.preventDefault();
-            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`);
+            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`) || document.querySelector('.menu-tab');
             if (activeTabBtn) activeTabBtn.focus();
         }
     }
+});
+
+// Tizen hardware key listener
+document.addEventListener('tizenhwkey', (e) => {
+    if (e.keyName === 'back') {
+        handleTvBackButton(e);
+    }
+});
+
+// History trap to prevent TV browser from exiting
+function pushTrapHistory() {
+    try {
+        window.history.pushState({ trap: true }, '', window.location.pathname + window.location.search);
+    } catch (err) {}
+}
+pushTrapHistory();
+
+window.addEventListener('popstate', (e) => {
+    pushTrapHistory();
+    handleTvBackButton(e);
 });
 
 // ---------------------------------------------------------------------------
@@ -740,6 +804,7 @@ function initApp() {
     // Ensure background wallpaper is set immediately
     if (bgWallpaper) {
         bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS.widgets}')`;
+        document.documentElement.style.setProperty('--current-wallpaper', `url('${SECTION_WALLPAPERS.widgets}')`);
     }
 
     setTimeout(() => {

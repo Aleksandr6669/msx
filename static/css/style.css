@@ -6,14 +6,15 @@
     --accent-color: #00d2ff;
     --accent-rgb: 0, 210, 255;
     --bg-dark: #060913;
-    --glass-bg: rgba(14, 22, 40, 0.45);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-blur: 25px;
+    --current-wallpaper: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85');
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.22);
+    --glass-blur: 28px;
     --text-main: #ffffff;
     --text-normal: #e2e8f0;
     --text-dim: #94a3b8;
     --text-muted: #64748b;
-    --card-radius: 18px;
+    --card-radius: 20px;
     --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 }
@@ -60,7 +61,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85') !important;
-    opacity: 0.75;
+    opacity: 0.78;
     transition: opacity 0.8s ease;
     transform: scale(1.02);
 }
@@ -83,7 +84,7 @@ body {
     height: 100%;
     background: radial-gradient(circle at 75% 25%, rgba(0, 210, 255, 0.08) 0%, transparent 60%),
                 radial-gradient(circle at 25% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
-                linear-gradient(180deg, rgba(6, 9, 19, 0.35) 0%, rgba(6, 9, 19, 0.65) 100%) !important;
+                linear-gradient(180deg, rgba(6, 9, 19, 0.3) 0%, rgba(6, 9, 19, 0.6) 100%) !important;
 }
 
 .vignette-overlay,
@@ -93,7 +94,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.65);
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.6);
     pointer-events: none;
 }
 
@@ -288,7 +289,7 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    padding: 18px 36px 18px 36px !important; /* 36px clean spacing all around */
+    padding: 18px 52px 20px 48px !important; /* 48px left, 52px right for TV safe-zone without bezel clipping */
     height: 100vh;
     max-height: 100vh;
     overflow: hidden !important;
@@ -355,7 +356,7 @@ body {
     height: calc(100% - 48px) !important; /* Perfectly fills stage */
     max-height: calc(100% - 48px) !important;
     box-sizing: border-box !important;
-    padding: 0 !important;
+    padding: 10px 14px !important; /* Buffer so focus glow/box-shadow is never clipped */
     margin: 0 !important;
 }
 
@@ -364,13 +365,13 @@ body {
     min-height: 0 !important;
     max-height: 100% !important;
     width: 100% !important;
-    background: rgba(14, 22, 40, 0.48) !important;
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.08) !important; /* LIGHT ULTRA-TRANSPARENT GLASS (IOS AESTHETIC, NOT DARK) */
+    backdrop-filter: blur(30px) saturate(180%) brightness(1.08) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.08) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: 20px !important;
     padding: 16px 20px !important;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
     outline: none !important;
     display: flex !important;
     flex-direction: column !important;
@@ -384,10 +385,31 @@ body {
     transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
-/* On focus: NO transform/scaling to prevent overlap with sidebar or neighbors! */
+/* OPTICAL LENS: Wallpaper magnified & separated inside each widget */
+.glass-widget::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: -15px !important;
+    background-image: var(--current-wallpaper) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    transform: scale(1.06) !important;
+    filter: blur(22px) brightness(1.15) saturate(1.4) !important;
+    -webkit-filter: blur(22px) brightness(1.15) saturate(1.4) !important;
+    opacity: 0.52 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+.glass-widget > * {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* On focus: Safe glow protected by grid padding, never clipped */
 .glass-widget:focus {
     border-color: var(--accent-color) !important;
-    box-shadow: 0 0 22px rgba(var(--accent-rgb), 0.5), inset 0 0 12px rgba(var(--accent-rgb), 0.15) !important;
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.6), inset 0 0 14px rgba(var(--accent-rgb), 0.25) !important;
     transform: none !important;
     z-index: 10 !important;
 }
