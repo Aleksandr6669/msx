@@ -7,8 +7,8 @@
     --accent-rgb: 0, 210, 255;
     --bg-dark: #060913;
     --current-wallpaper: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85');
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.22);
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.18);
     --glass-blur: 28px;
     --text-main: #ffffff;
     --text-normal: #e2e8f0;
@@ -38,7 +38,7 @@ body {
 }
 
 /* ==========================================================================
-   AMBIENT BACKGROUND & 4K WALLPAPER (ALWAYS VISIBLE & CRISP)
+   AMBIENT BACKGROUND & 4K WALLPAPER (NATURAL 4K COLORS, ZERO BLUE OVERLAY)
    ========================================================================== */
 .ambient-bg {
     position: fixed;
@@ -61,7 +61,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85') !important;
-    opacity: 0.78;
+    opacity: 0.95 !important;
     transition: opacity 0.8s ease;
     transform: scale(1.02);
 }
@@ -82,9 +82,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 75% 25%, rgba(0, 210, 255, 0.08) 0%, transparent 60%),
-                radial-gradient(circle at 25% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
-                linear-gradient(180deg, rgba(6, 9, 19, 0.3) 0%, rgba(6, 9, 19, 0.6) 100%) !important;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%) !important;
 }
 
 .vignette-overlay,
@@ -94,7 +92,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.6);
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
     pointer-events: none;
 }
 
@@ -345,7 +343,7 @@ body {
 }
 
 /* ==========================================================================
-   2x2 QUADRANTS (PERFECT PROPORTIONS, FROSTED GLASS & CONTENT FITTING)
+   2x2 QUADRANTS (PURE TRANSPARENT FROSTED GLASS - ZERO BLUE TINT)
    ========================================================================== */
 .widgets-bento-grid {
     display: grid !important;
@@ -365,13 +363,13 @@ body {
     min-height: 0 !important;
     max-height: 100% !important;
     width: 100% !important;
-    background: rgba(255, 255, 255, 0.08) !important; /* LIGHT ULTRA-TRANSPARENT GLASS (IOS AESTHETIC, NOT DARK) */
-    backdrop-filter: blur(30px) saturate(180%) brightness(1.08) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.08) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+    background: rgba(255, 255, 255, 0.04) !important; /* COMPLETELY PURE TRANSPARENT FROSTED GLASS - ZERO BLUE TINT! */
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
     border-radius: 20px !important;
     padding: 16px 20px !important;
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
     outline: none !important;
     display: flex !important;
     flex-direction: column !important;
@@ -383,27 +381,6 @@ body {
     pointer-events: auto !important;
     box-sizing: border-box !important;
     transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
-}
-
-/* OPTICAL LENS: Wallpaper magnified & separated inside each widget */
-.glass-widget::before {
-    content: '' !important;
-    position: absolute !important;
-    inset: -15px !important;
-    background-image: var(--current-wallpaper) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    transform: scale(1.06) !important;
-    filter: blur(22px) brightness(1.15) saturate(1.4) !important;
-    -webkit-filter: blur(22px) brightness(1.15) saturate(1.4) !important;
-    opacity: 0.52 !important;
-    z-index: 0 !important;
-    pointer-events: none !important;
-}
-
-.glass-widget > * {
-    position: relative !important;
-    z-index: 2 !important;
 }
 
 /* On focus: Safe glow protected by grid padding, never clipped */
@@ -723,7 +700,7 @@ body {
 
 .events-stack .ev-item.ev-current {
     border-left: 3px solid var(--accent-color) !important;
-    background: rgba(var(--accent-rgb), 0.12) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(var(--accent-rgb), 0.25) !important;
 }
 
