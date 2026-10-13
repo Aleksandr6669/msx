@@ -2,83 +2,81 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Portal TV</title>
-    <!-- Google Fonts & Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home Portal TV — Smart TV Hub</title>
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Main Style -->
     <link rel="stylesheet" href="{{ base_url }}/static/css/style.css">
 </head>
-<body class="tv-mode" id="tvBody">
-    <!-- Dynamic 4K Background Layer (Cross-fades per section) -->
-    <div class="bg-wallpaper" id="bgWallpaper"></div>
-    <div class="ambient-vignette"></div>
+<body class="theme-cyan anim-snappy">
+
+    <!-- AMBIENT BACKGROUND & 4K WALLPAPER LAYER -->
+    <div class="ambient-bg" id="ambientBg">
+        <div class="wallpaper ken-burns" id="bgWallpaper" style="background-image: url('{{ default_wallpaper }}');"></div>
+        <div class="ambient-overlay"></div>
+        <div class="vignette-overlay"></div>
+    </div>
 
     <!-- MAIN APP SHELL -->
-    <div class="tv-shell" id="tvShell">
-        <!-- 1. SIDEBAR (NARROW, LEFT-SIDE NAVIGATION) -->
+    <div class="tv-shell sidebar-left" id="tvShell">
+        
+        <!-- SIDEBAR NAVIGATION PANEL (PERMANENTLY OPEN, NEVER COLLAPSING) -->
         <aside class="tv-sidebar" id="tvSidebar">
-            <div class="sidebar-logo">
-                <img src="{{ base_url }}/static/images/logo.svg" alt="Home Portal TV" class="sidebar-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="sidebar-logo-fallback" style="display: none; align-items: center; gap: 8px;">
-                    <span class="material-icons logo-icon">tv</span>
-                    <div class="logo-title">
-                        <span class="logo-brand">HOME PORTAL</span>
-                        <span class="logo-sub">SMART TV HUB</span>
+            <div class="sidebar-top">
+                <div class="brand-section">
+                    <div class="brand-icon-wrap">
+                        <span class="material-icons">home</span>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">HOME PORTAL</span>
+                        <span class="brand-sub">SMART TV HUB</span>
                     </div>
                 </div>
+
+                <nav class="nav-section">
+                    <button class="menu-tab active" data-tab="widgets" tabindex="0">
+                        <span class="material-icons tab-icon">dashboard</span>
+                        <span class="tab-label">Виджеты</span>
+                    </button>
+                    <button class="menu-tab" data-tab="apps" tabindex="0">
+                        <span class="material-icons tab-icon">apps</span>
+                        <span class="tab-label">Программы</span>
+                        <span class="tab-badge" id="appsCountBadge">8</span>
+                    </button>
+                    <button class="menu-tab" data-tab="settings" tabindex="0">
+                        <span class="material-icons tab-icon">settings</span>
+                        <span class="tab-label">Настройки</span>
+                    </button>
+                    <button class="menu-tab" data-tab="info" tabindex="0">
+                        <span class="material-icons tab-icon">info</span>
+                        <span class="tab-label">Инфо</span>
+                    </button>
+                </nav>
             </div>
 
-            <nav class="sidebar-menu">
-                <!-- ITEM 1: ВИДЖЕТЫ -->
-                <button class="menu-tab active" data-tab="widgets" tabindex="0">
-                    <span class="material-icons">dashboard</span>
-                    <span class="tab-label">Виджеты</span>
-                </button>
-
-                <!-- ITEM 2: ПРОГРАММЫ -->
-                <button class="menu-tab" data-tab="apps" tabindex="0">
-                    <span class="material-icons">apps</span>
-                    <span class="tab-label">Программы</span>
-                    <span class="tab-badge" id="appsCountBadge">7</span>
-                </button>
-
-                <!-- ITEM 3: НАСТРОЙКИ -->
-                <button class="menu-tab" data-tab="settings" tabindex="0">
-                    <span class="material-icons">settings</span>
-                    <span class="tab-label">Настройки</span>
-                </button>
-
-                <!-- ITEM 4: О ПРИЛОЖЕНИИ -->
-                <button class="menu-tab" data-tab="info" tabindex="0">
-                    <span class="material-icons">info</span>
-                    <span class="tab-label">Инфо</span>
-                </button>
-            </nav>
-
-            <div class="sidebar-bottom">
-                <button class="quick-screensaver-btn" id="startScreensaverBtn" tabindex="0" title="Включить заставку сейчас">
+            <div class="sidebar-footer">
+                <button class="btn-sidebar-action" id="btnLaunchScreensaver" tabindex="0">
                     <span class="material-icons">wallpaper</span>
                     <span>Заставка</span>
                 </button>
-                <button class="quick-restart-btn" id="restartPortalBtn" tabindex="0" title="Выход и перезагрузка портала">
-                    <span class="material-icons">refresh</span>
+                <button class="btn-sidebar-action" id="btnRestartPortal" tabindex="0">
+                    <span class="material-icons">restart_alt</span>
                     <span>Перезапуск</span>
                 </button>
-                <div class="sidebar-status">
-                    <span class="live-dot"></span>
-                    <span>Smart TV 4K</span>
+                <div class="sys-status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Smart TV 4K</span>
                 </div>
             </div>
         </aside>
 
-        <!-- 2. MAIN CONTENT STAGE -->
-        <main class="tv-content-stage tv-stage" id="tvStage">
+        <!-- MAIN CONTENT STAGE -->
+        <main class="tv-stage" id="tvStage">
             
-            <!-- TAB 1: ВИДЖЕТЫ -->
+            <!-- TAB 1: ВИДЖЕТЫ (BENTO 2x2 QUADRANTS) -->
             <section class="tab-pane active" id="tabWidgets">
                 <div class="tab-header">
                     <div class="header-left">
@@ -87,102 +85,88 @@
                     </div>
                 </div>
 
-                <!-- Bento Box Grid of Modular Widgets (Uniform height, expandable width) -->
+                <!-- 2x2 Quadrant Grid (4 equal parts, perfect proportions, no distortion) -->
                 <div class="widgets-bento-grid" id="widgetsWrapper">
                     
-                    <!-- WIDGET: DIGITAL NEON CLOCK -->
-                    <div class="glass-widget widget-clock-digital span-2" id="wClockDigital" tabindex="0">
+                    <!-- QUADRANT 1 (TOP-LEFT): DIGITAL NEON CLOCK -->
+                    <div class="glass-widget widget-clock-digital" id="wClockDigital" tabindex="0">
                         <div class="w-header">
-                            <span class="material-icons w-icon">schedule</span>
-                            <span class="w-label">ЦИФРОВЫЕ ЧАСЫ</span>
+                            <div class="w-header-left">
+                                <span class="material-icons w-icon">schedule</span>
+                                <span class="w-label">ЦИФРОВЫЕ ЧАСЫ</span>
+                            </div>
                             <span class="w-sec-badge" id="wSecBadge">SEC</span>
                         </div>
-                        <div class="w-digital-time">
-                            <span id="digH">18</span>
-                            <span class="colon">:</span>
-                            <span id="digM">45</span>
-                            <span class="sec-text" id="digS">30</span>
-                        </div>
-                        <div class="w-footer-date" id="digFullDate">
-                            Понедельник, 12 Октября 2026
+                        <div class="w-digital-content">
+                            <div class="w-digital-time">
+                                <span id="digH">09</span>
+                                <span class="colon">:</span>
+                                <span id="digM">19</span>
+                                <span class="sec-text" id="digS">56</span>
+                            </div>
+                            <div class="w-footer-date" id="digFullDate">
+                                Вторник, 13 Октября 2026
+                            </div>
                         </div>
                     </div>
 
-                    <!-- WIDGET: ANALOG LUXURY CLOCK (TRANSPARENT MINIMALIST DIAL) -->
-                    <div class="glass-widget widget-clock-analog span-1" id="wClockAnalog" tabindex="0">
+                    <!-- QUADRANT 2 (TOP-RIGHT): ANALOG LUXURY CLOCK (CIRCULAR TRANSPARENT DIAL + INFO) -->
+                    <div class="glass-widget widget-clock-analog" id="wClockAnalog" tabindex="0">
                         <div class="w-header">
-                            <span class="material-icons w-icon">watch_later</span>
-                            <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
+                            <div class="w-header-left">
+                                <span class="material-icons w-icon">watch_later</span>
+                                <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
+                            </div>
+                            <span class="w-sec-badge" style="background: rgba(var(--accent-rgb), 0.18); color: var(--accent-color);">SWISS</span>
                         </div>
                         <div class="analog-content-row">
-                            <div class="analog-face">
-                                <div class="face-numbers">
-                                    <span class="n12">12</span>
-                                    <span class="n3">3</span>
-                                    <span class="n6">6</span>
-                                    <span class="n9">9</span>
+                            <div class="analog-face-wrap">
+                                <div class="analog-face">
+                                    <div class="face-numbers">
+                                        <span class="n12">12</span>
+                                        <span class="n3">3</span>
+                                        <span class="n6">6</span>
+                                        <span class="n9">9</span>
+                                    </div>
+                                    <div class="hand hour-hand" id="handHour"></div>
+                                    <div class="hand min-hand" id="handMin"></div>
+                                    <div class="hand sec-hand" id="handSec"></div>
+                                    <div class="center-pin"></div>
                                 </div>
-                                <div class="hand hour-hand" id="handHour"></div>
-                                <div class="hand min-hand" id="handMin"></div>
-                                <div class="hand sec-hand" id="handSec"></div>
-                                <div class="center-pin"></div>
                             </div>
                             <div class="analog-wide-info" id="analogWideInfo">
-                                <div class="analog-digital-time" id="analogDigTime">18:45</div>
+                                <div class="analog-digital-time" id="analogDigTime">09:19</div>
                                 <div class="analog-date-label" id="analogDateLabel">13 ОКТЯБРЯ 2026</div>
                                 <div class="analog-city-badge">ШВЕЙЦАРСКИЙ ХРОНОГРАФ</div>
                             </div>
                         </div>
-                        <div class="analog-title">PORTAL CHRONOGRAPH</div>
                     </div>
 
-                    <!-- WIDGET: MODERN MINIMAL CLOCK -->
-                    <div class="glass-widget widget-clock-modern span-1" id="wClockModern" tabindex="0">
+                    <!-- QUADRANT 3 (BOTTOM-LEFT): CALENDAR MONTH GRID -->
+                    <div class="glass-widget widget-cal-grid" id="wCalGrid" tabindex="0">
                         <div class="w-header">
-                            <span class="material-icons w-icon">av_timer</span>
-                            <span class="w-label">МИНИМАЛ ЧАСЫ</span>
-                        </div>
-                        <div class="modern-time-val" id="modTimeVal">18:45</div>
-                        <div class="modern-weekday-val" id="modWeekdayVal">ПОНЕДЕЛЬНИК</div>
-                        <div class="modern-month-val" id="modMonthVal">ОКТЯБРЬ 2026</div>
-                    </div>
-
-                    <!-- WIDGET: CALENDAR MONTH GRID -->
-                    <div class="glass-widget widget-cal-grid span-2" id="wCalGrid" tabindex="0">
-                        <div class="w-header">
-                            <span class="material-icons w-icon">calendar_month</span>
-                            <span class="w-label" id="calMonthName">ОКТЯБРЬ 2026</span>
-                        </div>
-                        <div class="cal-days-head">
-                            <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
-                        </div>
-                        <div class="cal-cells" id="calCellsGrid"></div>
-                    </div>
-
-                    <!-- WIDGET: COMPACT DATE CARD -->
-                    <div class="glass-widget widget-cal-compact span-1" id="wCalCompact" tabindex="0">
-                        <div class="w-header">
-                            <span class="material-icons w-icon">today</span>
-                            <span class="w-label">СЕГОДНЯ</span>
-                        </div>
-                        <div class="compact-flex">
-                            <div class="compact-day-big" id="compDayNum">12</div>
-                            <div class="compact-info">
-                                <div class="comp-month" id="compMonth">Октября 2026</div>
-                                <div class="comp-week" id="compWeek">Понедельник</div>
-                                <div class="comp-badge">
-                                    <span class="material-icons" style="font-size: 15px; color: #f59e0b;">wb_sunny</span>
-                                    <span>Уютный вечер на ТВ</span>
-                                </div>
+                            <div class="w-header-left">
+                                <span class="material-icons w-icon">calendar_month</span>
+                                <span class="w-label" id="calMonthName">ОКТЯБРЬ 2026</span>
                             </div>
+                            <span class="w-sec-badge" style="background: rgba(255,255,255,0.08); color: #cbd5e1;">КАЛЕНДАРЬ</span>
+                        </div>
+                        <div class="cal-grid-content">
+                            <div class="cal-days-head">
+                                <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="we">СБ</span><span class="we">ВС</span>
+                            </div>
+                            <div class="cal-cells" id="calCellsGrid"></div>
                         </div>
                     </div>
 
-                    <!-- WIDGET: SCHEDULE & EVENTS -->
-                    <div class="glass-widget widget-cal-events span-2" id="wCalEvents" tabindex="0">
+                    <!-- QUADRANT 4 (BOTTOM-RIGHT): SCHEDULE & EVENTS -->
+                    <div class="glass-widget widget-cal-events" id="wCalEvents" tabindex="0">
                         <div class="w-header">
-                            <span class="material-icons w-icon">event_note</span>
-                            <span class="w-label">ПЛАНИРОВЩИК ТВ</span>
+                            <div class="w-header-left">
+                                <span class="material-icons w-icon">event_note</span>
+                                <span class="w-label">ПЛАНИРОВЩИК ТВ</span>
+                            </div>
+                            <span class="w-sec-badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">СОБЫТИЯ</span>
                         </div>
                         <div class="events-stack">
                             <div class="ev-item ev-current">
@@ -302,84 +286,13 @@
 
                 <!-- SUBTAB 2: НАСТРОЙКИ ВИДЖЕТОВ И СЕТКИ -->
                 <div class="settings-subpane" id="sub-widgets">
-                    <!-- VIEW A: СПИСОК ВСЕХ ВИДЖЕТОВ -->
                     <div id="widgetsListView">
                         <div class="setting-card">
-                            <h3>Категории виджетов & Bento-сетка</h3>
-                            <p class="setting-desc">Выберите виджет и нажмите <strong>«⚙ Настроить»</strong>, чтобы изменить его размер (1, 2, 3 или 4 ячейки) и видимость:</p>
+                            <h3>Фиксированная 2×2 сетка квадрантов</h3>
+                            <p class="setting-desc">Рабочее пространство экрана автоматически разделено на 4 фиксированные части (2×2). Все виджеты имеют идеальный размер и пропорции без искажений:</p>
                             
                             <div class="widgets-manage-grid" id="widgetsManageGrid">
                                 <!-- Cards generated dynamically -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- VIEW B: ДЕТАЛЬНАЯ НАСТРОЙКА ВЫБРАННОГО ВИДЖЕТА -->
-                    <div id="widgetDetailView" style="display: none;">
-                        <div class="setting-card">
-                            <div class="detail-top-nav">
-                                <button class="detail-back-btn" id="btnBackToWidgetsList" tabindex="0">
-                                    <span class="material-icons">arrow_back</span>
-                                    <span>Назад к списку виджетов</span>
-                                </button>
-                                <div class="detail-widget-badge" id="detailWidgetBadge">Виджет</div>
-                            </div>
-
-                            <h3 id="detailWidgetTitle" style="font-size: 1.4rem; margin-top: 14px; margin-bottom: 6px;">Настройка виджета</h3>
-                            <p class="setting-desc" id="detailWidgetDesc">Настройте видимость и ширину ячеек в сетке (по высоте все виджеты одинаковые):</p>
-
-                            <div class="detail-section">
-                                <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Отображение виджета</h4>
-                                <div class="toggle-pill checked" id="detailTogglePill" tabindex="0">
-                                    <span class="material-icons" id="detailWidgetIcon">schedule</span>
-                                    <span id="detailToggleLabel">Виджет включен на главном экране</span>
-                                    <span class="toggle-check" id="detailToggleCheck">✓</span>
-                                </div>
-                            </div>
-
-                            <div class="detail-section" style="margin-top: 18px;">
-                                <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Ширина виджета в сетке</h4>
-                                <p class="setting-desc" style="margin-bottom: 10px;">Выберите ширину виджета (высота фиксирована и одинакова для всех блоков):</p>
-                                <div class="bento-size-options" id="detailSizeOptions" style="grid-template-columns: repeat(4, 1fr);">
-                                    <button class="bento-size-card" data-size="1" tabindex="0">
-                                        <div class="bento-visual size-1-visual">
-                                            <span class="cell-active"></span><span></span><span></span><span></span>
-                                        </div>
-                                        <div class="bento-size-name">1 ячейка</div>
-                                        <div class="bento-size-desc">~25% ширины</div>
-                                    </button>
-
-                                    <button class="bento-size-card selected" data-size="2" tabindex="0">
-                                        <div class="bento-visual size-2-visual">
-                                            <span class="cell-active"></span><span class="cell-active"></span><span></span><span></span>
-                                        </div>
-                                        <div class="bento-size-name">2 ячейки</div>
-                                        <div class="bento-size-desc">50% ширины</div>
-                                    </button>
-
-                                    <button class="bento-size-card" data-size="3" tabindex="0">
-                                        <div class="bento-visual size-3-visual">
-                                            <span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span><span></span>
-                                        </div>
-                                        <div class="bento-size-name">3 ячейки</div>
-                                        <div class="bento-size-desc">75% ширины</div>
-                                    </button>
-
-                                    <button class="bento-size-card" data-size="4" tabindex="0">
-                                        <div class="bento-visual size-4-visual">
-                                            <span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span><span class="cell-active"></span>
-                                        </div>
-                                        <div class="bento-size-name">4 ячейки</div>
-                                        <div class="bento-size-desc">Вся ширина</div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div style="margin-top: 22px;">
-                                <button class="action-btn action-primary" id="btnSaveWidgetDetail" tabindex="0">
-                                    <span class="material-icons">check</span>
-                                    <span>Готово</span>
-                                </button>
                             </div>
                         </div>
                     </div>
