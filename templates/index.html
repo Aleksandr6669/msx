@@ -11,11 +11,11 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{{ base_url }}/static/css/style.css">
 </head>
-<body class="theme-cyan anim-snappy">
+<body class="tv-mode theme-cyan anim-snappy" id="tvBody">
 
-    <!-- AMBIENT BACKGROUND & 4K WALLPAPER LAYER -->
+    <!-- AMBIENT BACKGROUND & 4K WALLPAPER LAYER (VISIBLE 4K WALLPAPER) -->
     <div class="ambient-bg" id="ambientBg">
-        <div class="wallpaper ken-burns" id="bgWallpaper" style="background-image: url('{{ default_wallpaper }}');"></div>
+        <div class="wallpaper ken-burns" id="bgWallpaper" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85');"></div>
         <div class="ambient-overlay"></div>
         <div class="vignette-overlay"></div>
     </div>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
 
-                <!-- 2x2 Quadrant Grid (4 equal parts, perfect proportions, no distortion) -->
+                <!-- 2x2 Quadrant Grid (4 equal parts, laconic, no cut-offs, perfect proportions) -->
                 <div class="widgets-bento-grid" id="widgetsWrapper">
                     
                     <!-- QUADRANT 1 (TOP-LEFT): DIGITAL NEON CLOCK -->
@@ -101,8 +101,8 @@
                             <div class="w-digital-time">
                                 <span id="digH">09</span>
                                 <span class="colon">:</span>
-                                <span id="digM">19</span>
-                                <span class="sec-text" id="digS">56</span>
+                                <span id="digM">34</span>
+                                <span class="sec-text" id="digS">16</span>
                             </div>
                             <div class="w-footer-date" id="digFullDate">
                                 Вторник, 13 Октября 2026
@@ -110,7 +110,7 @@
                         </div>
                     </div>
 
-                    <!-- QUADRANT 2 (TOP-RIGHT): ANALOG LUXURY CLOCK (CIRCULAR TRANSPARENT DIAL + INFO) -->
+                    <!-- QUADRANT 2 (TOP-RIGHT): ANALOG LUXURY CLOCK (CIRCULAR 150PX DIAL + INFO) -->
                     <div class="glass-widget widget-clock-analog" id="wClockAnalog" tabindex="0">
                         <div class="w-header">
                             <div class="w-header-left">
@@ -135,14 +135,14 @@
                                 </div>
                             </div>
                             <div class="analog-wide-info" id="analogWideInfo">
-                                <div class="analog-digital-time" id="analogDigTime">09:19</div>
+                                <div class="analog-digital-time" id="analogDigTime">09:34</div>
                                 <div class="analog-date-label" id="analogDateLabel">13 ОКТЯБРЯ 2026</div>
                                 <div class="analog-city-badge">ШВЕЙЦАРСКИЙ ХРОНОГРАФ</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- QUADRANT 3 (BOTTOM-LEFT): CALENDAR MONTH GRID -->
+                    <!-- QUADRANT 3 (BOTTOM-LEFT): CALENDAR MONTH GRID (ALL ROWS FIT) -->
                     <div class="glass-widget widget-cal-grid" id="wCalGrid" tabindex="0">
                         <div class="w-header">
                             <div class="w-header-left">
@@ -159,7 +159,7 @@
                         </div>
                     </div>
 
-                    <!-- QUADRANT 4 (BOTTOM-RIGHT): SCHEDULE & EVENTS -->
+                    <!-- QUADRANT 4 (BOTTOM-RIGHT): SCHEDULE & EVENTS (ALL 3 CARDS FIT) -->
                     <div class="glass-widget widget-cal-events" id="wCalEvents" tabindex="0">
                         <div class="w-header">
                             <div class="w-header-left">

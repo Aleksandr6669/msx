@@ -26,6 +26,13 @@ const DEFAULT_WALLPAPERS = [
     { id: "ss_desert", title: "Красные дюны Сахары", url: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1920&auto=format&fit=crop&q=80" }
 ];
 
+const SECTION_WALLPAPERS = {
+    widgets: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&auto=format&fit=crop&q=85",
+    apps: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
+    settings: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1920&auto=format&fit=crop&q=85",
+    info: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&auto=format&fit=crop&q=85"
+};
+
 const DEFAULT_APPS_LIST = [
     { id: "app_filmix", name: "Filmix", url: "http://filmix.tv", icon: "movie_filter", badge: "CINEMA", img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80" },
     { id: "app_lampa", name: "Lampa", url: "http://lampa.mx", icon: "movie", badge: "PORTAL", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80" },
@@ -160,6 +167,10 @@ function switchTab(tabId) {
             tabPanes[k].classList.toggle('active', k === tabId);
         }
     });
+
+    if (bgWallpaper && SECTION_WALLPAPERS[tabId]) {
+        bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS[tabId]}')`;
+    }
 
     if (tabId === 'apps') {
         renderAppsGrid();
@@ -725,6 +736,11 @@ function initApp() {
     applyThemeSettings();
     applySidebarPosition();
     switchTab('widgets');
+
+    // Ensure background wallpaper is set immediately
+    if (bgWallpaper) {
+        bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS.widgets}')`;
+    }
 
     setTimeout(() => {
         const w1 = document.getElementById('wClockDigital');
