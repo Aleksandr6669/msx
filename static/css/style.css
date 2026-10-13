@@ -341,18 +341,23 @@ body.anim-fast * {
 }
 
 /* ==========================================================================
-   MAIN CONTENT STAGE
+   MAIN CONTENT STAGE (SAFE AREA & NO OVERSCAN CLIPPING)
    ========================================================================== */
 .tv-content-stage,
 .tv-stage {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    padding: 26px 36px;
+    padding: 24px 36px 32px 32px;
     height: 100vh;
+    max-height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     z-index: 5;
+    box-sizing: border-box;
+    width: calc(100vw - 200px);
+    max-width: calc(100vw - 200px);
 }
 
 .tab-pane {
@@ -416,52 +421,60 @@ body.anim-fast * {
 }
 
 /* ==========================================================================
-   BENTO GRID SYSTEM FOR WIDGETS (FLEX CONTENT ADAPTATION)
+   BENTO GRID SYSTEM FOR WIDGETS (UNIFORM 220PX HEIGHT FOR ALL WIDGETS)
    ========================================================================== */
 .widgets-bento-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: minmax(185px, auto);
+    grid-auto-rows: 220px;
     gap: 16px;
     width: 100%;
-    grid-auto-flow: dense;
+    box-sizing: border-box;
+    padding-bottom: 24px;
 }
 
 .glass-widget {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    border-radius: var(--card-radius);
+    height: 220px !important;
+    min-height: 220px !important;
+    max-height: 220px !important;
+    background: rgba(14, 20, 36, 0.45) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 20px !important;
     padding: 16px 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
     outline: none;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 10px;
+    gap: 8px;
     overflow: hidden;
     position: relative;
     cursor: pointer;
     pointer-events: auto !important;
+    box-sizing: border-box;
 }
 
+/* Spans: 1 col, 2 cols, 3 cols, 4 cols (all same 220px height!) */
 .glass-widget.span-1 {
     grid-column: span 1;
     grid-row: span 1;
-    min-height: 185px;
 }
 
 .glass-widget.span-2 {
     grid-column: span 2;
     grid-row: span 1;
-    min-height: 185px;
+}
+
+.glass-widget.span-3 {
+    grid-column: span 3;
+    grid-row: span 1;
 }
 
 .glass-widget.span-4 {
-    grid-column: span 2;
-    grid-row: span 2;
-    min-height: 386px;
+    grid-column: span 4;
+    grid-row: span 1;
 }
 
 /* Transparency Modes */
@@ -558,7 +571,7 @@ body.trans-dark .glass-widget {
 }
 
 /* ==========================================================================
-   ANALOG CLOCK — STRICTLY CIRCULAR (NEVER OVAL!)
+   ANALOG CLOCK — 100% TRANSPARENT DIAL (NO DARK CIRCLE BACKGROUND!)
    ========================================================================== */
 .analog-face {
     width: 124px !important;
@@ -569,9 +582,9 @@ body.trans-dark .glass-widget {
     max-height: 124px !important;
     aspect-ratio: 1 / 1 !important;
     border-radius: 50% !important;
-    border: 2px solid rgba(255, 255, 255, 0.18) !important;
-    background: radial-gradient(circle at 35% 35%, rgba(30, 40, 70, 0.5) 0%, rgba(8, 12, 22, 0.85) 100%) !important;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    background: transparent !important; /* PURE TRANSPARENT - NO DARK CIRCLE! */
+    box-shadow: none !important;
     position: relative !important;
     align-self: center !important;
     flex-shrink: 0 !important;
@@ -646,6 +659,49 @@ body.trans-dark .glass-widget {
     flex-shrink: 0;
 }
 
+/* Analog Content Row & Wide Expansion */
+.analog-content-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
+    gap: 16px;
+}
+
+.analog-wide-info {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.glass-widget.span-2 .analog-wide-info,
+.glass-widget.span-3 .analog-wide-info,
+.glass-widget.span-4 .analog-wide-info {
+    display: flex;
+}
+
+.analog-digital-time {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.analog-date-label {
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.analog-city-badge {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+}
+
 /* Modern Minimal Clock */
 .widget-clock-modern {
     text-align: center;
@@ -703,7 +759,7 @@ body.trans-dark .glass-widget {
 }
 
 .cal-cells .cell {
-    min-height: 22px !important;
+    min-height: 20px !important;
     height: 100% !important;
     display: flex !important;
     align-items: center !important;
@@ -1553,7 +1609,7 @@ body.trans-dark .glass-widget {
 }
 
 /* ==========================================================================
-   FULLSCREEN 4K SCREENSAVER OVERLAY WITH SELECTABLE POSITIONS
+   FULLSCREEN 4K SCREENSAVER OVERLAY (UNIFORM FROSTED GLASS WIDGETS)
    ========================================================================== */
 .screensaver-layer {
     position: fixed;
@@ -1696,13 +1752,17 @@ canvas#ssStarsCanvas {
     text-align: right;
 }
 
-.ss-widget-block {
-    border-radius: 18px;
-    padding: 20px 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+.ss-widget-block,
+.ss-calendar-widget {
+    background: rgba(14, 20, 36, 0.45) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 20px !important;
+    padding: 20px 28px !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5) !important;
     display: inline-flex;
     flex-direction: column;
-    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .ss-widget-block.trans-ultra {
@@ -1775,12 +1835,6 @@ canvas#ssStarsCanvas {
 }
 
 .ss-calendar-widget {
-    background: rgba(14, 20, 36, 0.45);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
-    padding: 16px 20px;
     min-width: 280px;
 }
 
