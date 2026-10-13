@@ -82,7 +82,7 @@ body.tv-mode {
 }
 
 .tv-sidebar {
-    width: 200px !important; /* Narrower navigation panel */
+    width: 200px !important; /* Permanent open navigation panel */
     background: rgba(8, 12, 22, 0.65);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
@@ -93,7 +93,7 @@ body.tv-mode {
     padding: 16px 12px;
     flex-shrink: 0;
     box-shadow: 6px 0 28px rgba(0, 0, 0, 0.35);
-    transition: width 0.18s ease-out, padding 0.18s ease-out;
+    /* fixed width, no collapsing */
     overflow: hidden;
     z-index: 20 !important;
     pointer-events: auto !important;
@@ -105,25 +105,7 @@ body.tv-mode {
     box-shadow: 6px 0 28px rgba(0, 0, 0, 0.35);
 }
 
-.tv-sidebar.collapsed {
-    width: 64px !important;
-    padding: 16px 8px;
-}
-
-.tv-sidebar.collapsed .tab-label,
-.tv-sidebar.collapsed .tab-badge,
-.tv-sidebar.collapsed .quick-screensaver-btn span:last-child,
-.tv-sidebar.collapsed .quick-restart-btn span:last-child,
-.tv-sidebar.collapsed .sidebar-status span:last-child {
-    display: none !important;
-}
-
-.tv-sidebar.collapsed .quick-screensaver-btn,
-.tv-sidebar.collapsed .quick-restart-btn {
-    pointer-events: auto !important;
-    justify-content: center;
-    padding: 10px 0;
-}
+/* Sidebar permanent open mode - never collapses */
 
 /* Sidebar Logo */
 .sidebar-logo {
@@ -434,7 +416,7 @@ body.anim-fast * {
 }
 
 /* ==========================================================================
-   BENTO GRID SYSTEM FOR WIDGETS
+   BENTO GRID SYSTEM FOR WIDGETS (FLEX CONTENT ADAPTATION)
    ========================================================================== */
 .widgets-bento-grid {
     display: grid;
@@ -456,7 +438,8 @@ body.anim-fast * {
     outline: none;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 10px;
     overflow: hidden;
     position: relative;
     cursor: pointer;
@@ -509,7 +492,7 @@ body.trans-dark .glass-widget {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     flex-shrink: 0;
 }
 
@@ -546,8 +529,7 @@ body.trans-dark .glass-widget {
     align-items: baseline;
     gap: 4px;
     text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.35);
-    margin-bottom: 6px;
-    flex-grow: 1;
+    margin: auto 0;
 }
 
 .w-digital-time .colon {
@@ -571,6 +553,7 @@ body.trans-dark .glass-widget {
     font-size: 0.8rem;
     color: var(--text-dim);
     font-weight: 500;
+    margin-top: auto;
     flex-shrink: 0;
 }
 
@@ -593,7 +576,7 @@ body.trans-dark .glass-widget {
     align-self: center !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
-    margin: 2px auto 4px auto !important;
+    margin: auto auto !important;
 }
 
 .face-numbers span {
@@ -659,7 +642,7 @@ body.trans-dark .glass-widget {
     color: var(--text-muted);
     letter-spacing: 1.5px;
     text-align: center;
-    margin-top: 2px;
+    margin-top: auto;
     flex-shrink: 0;
 }
 
@@ -686,11 +669,12 @@ body.trans-dark .glass-widget {
 }
 
 /* ==========================================================================
-   FULL CALENDAR MONTH GRID
+   FULL CALENDAR MONTH GRID (EVEN VERTICAL CELL SPREAD)
    ========================================================================== */
 .widget-cal-grid {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
 }
 
 .cal-days-head {
@@ -711,13 +695,16 @@ body.trans-dark .glass-widget {
 .cal-cells {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
-    gap: 3px !important;
+    grid-auto-rows: 1fr !important;
+    align-content: stretch !important;
+    gap: 4px !important;
     width: 100% !important;
     flex-grow: 1;
 }
 
 .cal-cells .cell {
-    height: 22px !important;
+    min-height: 22px !important;
+    height: 100% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -770,15 +757,18 @@ body.trans-dark .glass-widget {
     align-items: center;
     gap: 4px;
     font-size: 0.68rem;
-    color: var(--text-dim), margin-top: 4px;
+    color: var(--text-dim);
+    margin-top: 4px;
 }
 
 /* TV Planner Events */
 .events-stack {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
     margin-top: 4px;
+    flex-grow: 1;
+    justify-content: space-around;
 }
 
 .ev-item {
@@ -817,7 +807,7 @@ body.trans-dark .glass-widget {
 .glass-widget.span-4 .min-hand  { height: 72px; width: 3px; }
 .glass-widget.span-4 .sec-hand  { height: 84px; width: 2px; }
 .glass-widget.span-4 .w-digital-time { font-size: 4.5rem; }
-.glass-widget.span-4 .cal-cells .cell { height: 36px !important; font-size: 0.95rem !important; }
+.glass-widget.span-4 .cal-cells .cell { min-height: 36px !important; font-size: 0.95rem !important; }
 .glass-widget.span-4 .compact-day-big { font-size: 5rem; }
 
 /* ==========================================================================
