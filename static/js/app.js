@@ -1,22 +1,23 @@
 // ==========================================================================
 // HOME PORTAL TV — CLIENT ENGINE FOR SMART TV & MEDIA STATION X
-// Optimized for 60fps, TV Remote D-Pad Navigation, Bento Grid
+// Optimized for 60fps, TV Remote D-Pad Navigation, Bento 2x2 Grid
 // ==========================================================================
 
 const SECTION_WALLPAPERS = {
     widgets: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85",
-    apps: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&auto=format&fit=crop&q=85",
-    settings: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=85",
-    info: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85"
+    apps: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=85",
+    settings: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=85",
+    info: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=85"
 };
 
 const SCREENSAVER_IMAGES = {
-    ss_space: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90",
+    ss_nature: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=90",
+    ss_space: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
+    ss_aurora: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1920&auto=format&fit=crop&q=90",
     ss_cyber: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&auto=format&fit=crop&q=90",
-    ss_mountains: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&auto=format&fit=crop&q=90",
-    ss_ocean: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90",
-    ss_fireplace: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&auto=format&fit=crop&q=90"
+    ss_minimal: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=90"
 };
+
 const SS_SLIDESHOW_LIST = Object.values(SCREENSAVER_IMAGES);
 let ssSlideshowInterval = null;
 let ssSlideshowIndex = 0;
@@ -27,7 +28,7 @@ const DEFAULT_APPS_LIST = [
         id: "app_filmix",
         name: "Filmix",
         url: "http://filmix.tv",
-        sub: "Онлайн-кинотеатр",
+        sub: "Онлайн-кинотеатр и сериалы",
         icon: "movie_filter",
         badge: "CINEMA",
         image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80"
@@ -36,8 +37,26 @@ const DEFAULT_APPS_LIST = [
         id: "app_lampa",
         name: "Lampa",
         url: "http://lampa.mx",
-        sub: "Каталог фильмов и сериалов",
+        sub: "Онлайн-кинотеатр",
         icon: "movie",
+        badge: "FILMS",
+        image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_youtube",
+        name: "YouTube",
+        url: "http://msx.benzac.de/plugins/youtube.html",
+        sub: "Видео и стримы",
+        icon: "play_circle",
+        badge: "VIDEO",
+        image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "app_forkplayer",
+        name: "ForkPlayer",
+        url: "http://operats.obovse.ru/2.5/",
+        sub: "Медиа-портал",
+        icon: "language",
         badge: "PORTAL",
         image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
     },
@@ -45,105 +64,70 @@ const DEFAULT_APPS_LIST = [
         id: "app_deeplex",
         name: "Deeplex 4K",
         url: "http://deeplex.cc",
-        sub: "Фильмы и сериалы 4K",
-        icon: "play_circle_filled",
+        sub: "Фильмы и сериалы",
+        icon: "theaters",
         badge: "CINEMA",
         image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-        id: "app_iptv",
-        name: "IPTV HD",
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        sub: "Телеканалы",
-        icon: "live_tv",
-        badge: "LIVE",
-        image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&auto=format&fit=crop&q=80"
     },
     {
         id: "app_twitch",
         name: "Twitch",
         url: "http://msx.benzac.de/plugins/twitch.html",
-        sub: "Игровые трансляции",
-        icon: "videogame_asset",
-        badge: "GAMES",
+        sub: "Игровые стримы",
+        icon: "live_tv",
+        badge: "LIVE",
         image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-        id: "app_youtube",
-        name: "YouTube",
-        url: "http://msx.benzac.de/plugins/youtube.html",
-        sub: "Видео и музыка 4K",
-        icon: "smart_display",
-        badge: "VIDEO",
-        image: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=500&auto=format&fit=crop&q=80"
-    },
-    {
-        id: "app_music",
-        name: "Lo-Fi Radio",
-        url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        sub: "Релакс музыка",
-        icon: "music_note",
-        badge: "CHILL",
-        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80"
     }
 ];
 
 const WIDGETS_METADATA = {
     clock_digital: {
-        id: "clock_digital",
-        name: "Цифровые часы",
-        desc: "Неоновые часы с бегущими секундами и полной датой",
+        title: "Цифровые часы",
+        desc: "Крупные часы с секундами и датой",
         icon: "schedule",
         defaultSize: 2
     },
     clock_analog: {
-        id: "clock_analog",
-        name: "Аналоговые часы",
-        desc: "Круглый швейцарский циферблат с плавной секундной стрелкой",
+        title: "Аналоговые часы",
+        desc: "Стрелочный хронограф с секундной стрелкой",
         icon: "watch_later",
         defaultSize: 1
     },
     clock_modern: {
-        id: "clock_modern",
-        name: "Минимал часы",
-        desc: "Крупные контрастные цифры, день недели и месяц",
+        title: "Минимал часы",
+        desc: "Лаконичный циферблат и день недели",
         icon: "av_timer",
         defaultSize: 1
     },
     calendar_grid: {
-        id: "calendar_grid",
-        name: "Календарь месяца",
-        desc: "Полная сетка дней текущего месяца с подсветкой сегодня",
+        title: "Календарь (Сетка месяца)",
+        desc: "Полная сетка дней текущего месяца",
         icon: "calendar_month",
         defaultSize: 2
     },
     calendar_compact: {
-        id: "calendar_compact",
-        name: "Карточка Сегодня",
-        desc: "Компактная дата, крупный день и статус дня",
+        title: "Компактная дата",
+        desc: "Карточка сегодняшнего дня",
         icon: "today",
         defaultSize: 1
     },
     calendar_events: {
-        id: "calendar_events",
-        name: "Планировщик ТВ",
-        desc: "Список вечерних киносеансов и напоминаний",
+        title: "Планировщик ТВ",
+        desc: "Список предстоящих передач и фильмов",
         icon: "event_note",
         defaultSize: 2
     }
 };
 
-// Safe localStorage helper
-function safeGetStorage(key, defaultVal) {
+function safeGetStorage(key, fallback) {
     try {
         const val = localStorage.getItem(key);
-        return val !== null ? val : defaultVal;
+        return val !== null ? val : fallback;
     } catch (e) {
-        return defaultVal;
+        return fallback;
     }
 }
 
-// App State
 let state = {
     activeTab: "widgets",
     themeColor: safeGetStorage('hp_theme_color', "#00d2ff"),
@@ -152,8 +136,8 @@ let state = {
     animations: safeGetStorage('hp_animations', "snappy"),
     idleTimeoutSec: parseInt(safeGetStorage('hp_idle_sec', "120"), 10),
     screensaverBg: safeGetStorage('hp_ss_bg', "ss_all"),
-    sidebarPos: safeGetStorage('hp_sidebar_pos', "right"), // DEFAULT: RIGHT SIDE
-    ssMediaType: safeGetStorage('hp_ss_mtype', "photo"), // photo, youtube, video
+    sidebarPos: "left", // DEFAULT: LEFT SIDE
+    ssMediaType: safeGetStorage('hp_ss_mtype', "photo"),
     ssYoutubeId: safeGetStorage('hp_ss_ytid', "L_LUpnjgPso"),
     ssVideoUrl: safeGetStorage('hp_ss_vurl', "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"),
     ssPhotoAnim: safeGetStorage('hp_ss_photo_anim', 'true') !== 'false',
@@ -165,7 +149,7 @@ let state = {
         clock_analog: true,
         clock_modern: false,
         calendar_grid: true,
-        calendar_compact: false,
+        calendar_compact: true,
         calendar_events: true
     }))),
     widgetSizes: JSON.parse(safeGetStorage('hp_widget_sizes', JSON.stringify({
@@ -180,7 +164,23 @@ let state = {
     currentEditingWidget: null
 };
 
-// URL Normalizer (Keeps TV services on HTTP to prevent SSL failures on TV)
+// Force sidebar to LEFT
+state.sidebarPos = 'left';
+try { localStorage.setItem('hp_sidebar_pos', 'left'); } catch (e) {}
+
+// Auto-heal widgets: Ensure Digital & Analog clocks are enabled
+if (!state.widgets || (!state.widgets.clock_digital && !state.widgets.clock_analog)) {
+    state.widgets = {
+        clock_digital: true,
+        clock_analog: true,
+        clock_modern: false,
+        calendar_grid: true,
+        calendar_compact: true,
+        calendar_events: true
+    };
+    try { localStorage.setItem('hp_widgets', JSON.stringify(state.widgets)); } catch (e) {}
+}
+
 function normalizeUrl(url) {
     if (!url) return '';
     url = url.trim();
@@ -198,7 +198,7 @@ function normalizeUrl(url) {
     return url;
 }
 
-// Auto-heal stored apps from localStorage (Filmix must be first)
+// Auto-heal stored apps from localStorage
 if (Array.isArray(state.apps)) {
     if (!state.apps.some(a => a && (a.id === 'app_filmix' || (a.name && a.name.toLowerCase() === 'filmix')))) {
         state.apps.unshift({
@@ -217,27 +217,24 @@ if (Array.isArray(state.apps)) {
     });
 }
 
-// Dismiss app transition loader on page show
 window.addEventListener('pageshow', () => {
     const loader = document.getElementById('appNavLoader');
     if (loader) loader.classList.remove('active');
 });
 
 // ---------------------------------------------------------------------------
-// 1. THEME, ACCENT COLOR, TRANSPARENCY & SIDEBAR POSITION
+// 1. THEME & COLOR CONTROLLER
 // ---------------------------------------------------------------------------
 function applyThemeSettings() {
     const root = document.documentElement;
-    if (root) {
-        root.style.setProperty('--accent-color', state.themeColor);
-        root.style.setProperty('--accent-rgb', state.themeRgb);
-    }
+    root.style.setProperty('--accent-color', state.themeColor);
+    root.style.setProperty('--accent-rgb', state.themeRgb);
 
-    if (document.body) {
-        document.body.classList.remove('trans-frosted', 'trans-transparent', 'trans-dark');
-        document.body.classList.add(`trans-${state.transparency}`);
-        document.body.classList.toggle('anim-fast', state.animations === 'fast');
-    }
+    document.body.classList.remove('trans-frosted', 'trans-transparent', 'trans-dark');
+    document.body.classList.add(`trans-${state.transparency}`);
+
+    document.body.classList.remove('anim-fast', 'anim-snappy');
+    document.body.classList.add(`anim-${state.animations}`);
 
     try {
         localStorage.setItem('hp_theme_color', state.themeColor);
@@ -270,6 +267,11 @@ const tabPanes = {
     info: document.getElementById('tabInfo')
 };
 
+function expandSidebar(expand) {
+    if (!tvSidebar) return;
+    tvSidebar.classList.toggle('collapsed', !expand);
+}
+
 function focusCurrentTabContent() {
     setTimeout(() => {
         if (state.activeTab === 'widgets') {
@@ -279,8 +281,8 @@ function focusCurrentTabContent() {
             const firstApp = document.querySelector('.app-card');
             if (firstApp) firstApp.focus();
         } else if (state.activeTab === 'settings') {
-            const firstSubtab = document.querySelector('.subtab-btn.active') || document.querySelector('.subtab-btn');
-            if (firstSubtab) firstSubtab.focus();
+            const firstSetting = document.querySelector('.subtab-btn.active') || document.querySelector('.subtab-btn');
+            if (firstSetting) firstSetting.focus();
         } else if (state.activeTab === 'info') {
             const firstInfo = document.querySelector('.info-card');
             if (firstInfo) firstInfo.focus();
@@ -301,23 +303,65 @@ function switchTab(tabId) {
         if (tabPanes[k]) tabPanes[k].classList.toggle('active', k === tabId);
     });
 
-    if (bgWallpaper && SECTION_WALLPAPERS[tabId]) {
-        bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS[tabId]}')`;
+    const bgUrl = SECTION_WALLPAPERS[tabId] || SECTION_WALLPAPERS.widgets;
+    if (bgWallpaper) {
+        bgWallpaper.style.backgroundImage = `url('${bgUrl}')`;
     }
 }
 
-// Wire menu tab clicks and Enter keys
 menuTabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
         e.preventDefault();
         const target = tab.getAttribute('data-tab');
         switchTab(target);
+        expandSidebar(false);
+        focusCurrentTabContent();
+    });
+    tab.addEventListener('focus', () => {
+        expandSidebar(true);
     });
 });
 
+// Restart Button
+const restartPortalBtn = document.getElementById('restartPortalBtn');
+if (restartPortalBtn) {
+    restartPortalBtn.addEventListener('click', () => {
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage('msx:exit', '*');
+        }
+        window.location.reload();
+    });
+}
+
 // ---------------------------------------------------------------------------
-// 3. REAL-TIME CLOCKS & DATES ENGINE (60 FPS)
+// 3. CLOCKS ENGINE (SMOOTH 60FPS TIME & ANALOG HANDS)
 // ---------------------------------------------------------------------------
+const digH = document.getElementById('digH');
+const digM = document.getElementById('digM');
+const digS = document.getElementById('digS');
+const digFullDate = document.getElementById('digFullDate');
+
+const modTimeVal = document.getElementById('modTimeVal');
+const modWeekdayVal = document.getElementById('modWeekdayVal');
+const modMonthVal = document.getElementById('modMonthVal');
+
+const handHour = document.getElementById('handHour');
+const handMin = document.getElementById('handMin');
+const handSec = document.getElementById('handSec');
+
+const compDayNum = document.getElementById('compDayNum');
+const compMonth = document.getElementById('compMonth');
+const compWeek = document.getElementById('compWeek');
+
+const ssClockTime = document.getElementById('ssClockTime');
+const ssClockDate = document.getElementById('ssClockDate');
+
+const WEEKDAYS_RU = ["ВОСКРЕСЕНЬЕ", "ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА"];
+const MONTHS_RU = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+const MONTHS_FULL_RU = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+
+let lastSec = -1;
+
 function updateClocks() {
     const now = new Date();
     const h = now.getHours();
@@ -325,75 +369,44 @@ function updateClocks() {
     const s = now.getSeconds();
     const ms = now.getMilliseconds();
 
-    const hStr = String(h).padStart(2, '0');
-    const mStr = String(m).padStart(2, '0');
-    const sStr = String(s).padStart(2, '0');
+    const hStr = h < 10 ? '0' + h : String(h);
+    const mStr = m < 10 ? '0' + m : String(m);
+    const sStr = s < 10 ? '0' + s : String(s);
 
-    // 1. Digital Clock
-    const elH = document.getElementById('digH');
-    const elM = document.getElementById('digM');
-    const elS = document.getElementById('digS');
-    if (elH) elH.textContent = hStr;
-    if (elM) elM.textContent = mStr;
-    if (elS) elS.textContent = sStr;
+    if (s !== lastSec) {
+        lastSec = s;
 
-    // Digital Full Date string
-    const elDigDate = document.getElementById('digFullDate');
-    if (elDigDate) {
-        const dateOpts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const ds = now.toLocaleDateString('ru-RU', dateOpts);
-        elDigDate.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
+        if (digH) digH.textContent = hStr;
+        if (digM) digM.textContent = mStr;
+        if (digS) digS.textContent = sStr;
+
+        if (modTimeVal) modTimeVal.textContent = `${hStr}:${mStr}`;
+        if (modWeekdayVal) modWeekdayVal.textContent = WEEKDAYS_RU[now.getDay()];
+        if (modMonthVal) modMonthVal.textContent = `${MONTHS_FULL_RU[now.getMonth()]} ${now.getFullYear()}`;
+
+        const fullDateStr = `${WEEKDAYS_RU[now.getDay()]}, ${now.getDate()} ${MONTHS_RU[now.getMonth()]} ${now.getFullYear()}`;
+        if (digFullDate) digFullDate.textContent = fullDateStr;
+
+        if (compDayNum) compDayNum.textContent = String(now.getDate());
+        if (compMonth) compMonth.textContent = `${MONTHS_RU[now.getMonth()]} ${now.getFullYear()}`;
+        if (compWeek) compWeek.textContent = WEEKDAYS_RU[now.getDay()];
+
+        if (ssClockTime) ssClockTime.textContent = `${hStr}:${mStr}`;
+        if (ssClockDate) ssClockDate.textContent = `${WEEKDAYS_RU[now.getDay()]}, ${now.getDate()} ${MONTHS_FULL_RU[now.getMonth()]} ${now.getFullYear()}`;
     }
 
-    // 2. Modern Clock
-    const elModTime = document.getElementById('modTimeVal');
-    const elModWeek = document.getElementById('modWeekdayVal');
-    const elModMonth = document.getElementById('modMonthVal');
-    if (elModTime) elModTime.textContent = `${hStr}:${mStr}`;
-    if (elModWeek) {
-        const days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
-        elModWeek.textContent = days[now.getDay()].toUpperCase();
-    }
-    if (elModMonth) {
-        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        elModMonth.textContent = `${months[now.getMonth()].toUpperCase()} ${now.getFullYear()}`;
-    }
+    if (handHour && handMin && handSec) {
+        const totalSec = s + ms / 1000;
+        const totalMin = m + totalSec / 60;
+        const totalHour = (h % 12) + totalMin / 60;
 
-    // 3. Analog Clock (Always perfect circle with smooth sweep hands)
-    const hHand = document.getElementById('handHour');
-    const mHand = document.getElementById('handMin');
-    const sHand = document.getElementById('handSec');
-    if (hHand && mHand && sHand) {
-        const sDeg = (s + ms / 1000) * 6;
-        const mDeg = m * 6 + (s / 60) * 6;
-        const hDeg = (h % 12) * 30 + (m / 60) * 30;
-        hHand.style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
-        mHand.style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
-        sHand.style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
-    }
+        const secDeg = totalSec * 6;
+        const minDeg = totalMin * 6;
+        const hourDeg = totalHour * 30;
 
-    // 4. Compact Date Card
-    const compDay = document.getElementById('compDayNum');
-    const compMonth = document.getElementById('compMonth');
-    const compWeek = document.getElementById('compWeek');
-    if (compDay) compDay.textContent = String(now.getDate());
-    if (compMonth) {
-        const mNames = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
-        compMonth.textContent = `${mNames[now.getMonth()]} ${now.getFullYear()}`;
-    }
-    if (compWeek) {
-        const wDays = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
-        compWeek.textContent = wDays[now.getDay()];
-    }
-
-    // 5. Screensaver Clock & Date
-    const ssTime = document.getElementById('ssClockTime');
-    const ssDate = document.getElementById('ssClockDate');
-    if (ssTime) ssTime.textContent = `${hStr}:${mStr}:${sStr}`;
-    if (ssDate) {
-        const dateOpts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const ds = now.toLocaleDateString('ru-RU', dateOpts);
-        ssDate.textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
+        handSec.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+        handMin.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+        handHour.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
     }
 }
 
@@ -404,26 +417,30 @@ function clockLoop() {
 requestAnimationFrame(clockLoop);
 
 // ---------------------------------------------------------------------------
-// 4. DYNAMIC CALENDAR ENGINE
+// 4. CALENDARS ENGINE
 // ---------------------------------------------------------------------------
 function renderCalendars() {
     const calCells = document.getElementById('calCellsGrid');
+    const calMonthName = document.getElementById('calMonthName');
     const ssCalGrid = document.getElementById('ssCalGrid');
-    const calMonthHeader = document.getElementById('calMonthName');
     const ssCalHeader = document.getElementById('ssCalHeader');
 
     const now = new Date();
     const curYear = now.getFullYear();
     const curMonth = now.getMonth();
-    const curDate = now.getDate();
+    const today = now.getDate();
 
-    const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+    const monthNames = [
+        "ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ",
+        "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"
+    ];
     const monthTitle = `${monthNames[curMonth]} ${curYear}`;
-    if (calMonthHeader) calMonthHeader.textContent = monthTitle;
+
+    if (calMonthName) calMonthName.textContent = monthTitle;
     if (ssCalHeader) ssCalHeader.textContent = monthTitle;
 
     const firstDay = new Date(curYear, curMonth, 1).getDay();
-    const startOffset = (firstDay + 6) % 7; // Monday is 0
+    const startOffset = (firstDay === 0 ? 7 : firstDay) - 1;
     const totalDays = new Date(curYear, curMonth + 1, 0).getDate();
 
     function fillGrid(gridElement) {
@@ -431,25 +448,23 @@ function renderCalendars() {
         gridElement.innerHTML = '';
 
         for (let i = 0; i < startOffset; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'cell empty';
-            gridElement.appendChild(emptyCell);
+            const empty = document.createElement('div');
+            empty.className = 'cell empty';
+            gridElement.appendChild(empty);
         }
 
         for (let d = 1; d <= totalDays; d++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.textContent = String(d);
+            cell.textContent = d;
 
             const dayOfWeek = (startOffset + d - 1) % 7;
             if (dayOfWeek === 5 || dayOfWeek === 6) {
                 cell.classList.add('we');
             }
-
-            if (d === curDate) {
+            if (d === today) {
                 cell.classList.add('today');
             }
-
             gridElement.appendChild(cell);
         }
     }
@@ -460,8 +475,9 @@ function renderCalendars() {
 renderCalendars();
 
 // ---------------------------------------------------------------------------
-// 5. MODULAR BENTO GRID & WIDGET SIZING ENGINE
+// 5. BENTO GRID MODULAR WIDGET SYSTEM
 // ---------------------------------------------------------------------------
+const widgetsWrapper = document.getElementById('widgetsWrapper');
 const widgetElements = {
     clock_digital: document.getElementById('wClockDigital'),
     clock_analog: document.getElementById('wClockAnalog'),
@@ -479,7 +495,7 @@ function applyWidgetSizesAndToggles() {
         const isVisible = !!state.widgets[key];
         el.style.display = isVisible ? 'flex' : 'none';
 
-        const size = state.widgetSizes[key] || 2;
+        const size = state.widgetSizes[key] || WIDGETS_METADATA[key].defaultSize;
         el.classList.remove('span-1', 'span-2', 'span-4');
         el.classList.add(`span-${size}`);
     });
@@ -491,21 +507,8 @@ function applyWidgetSizesAndToggles() {
 }
 applyWidgetSizesAndToggles();
 
-// Make widgets clickable to open their configuration in Settings
-Object.keys(widgetElements).forEach(key => {
-    const el = widgetElements[key];
-    if (el) {
-        el.addEventListener('click', () => {
-            switchTab('settings');
-            const subWidgetBtn = document.querySelector('.subtab-btn[data-subtab="widgets"]');
-            if (subWidgetBtn) subWidgetBtn.click();
-            openWidgetDetail(key);
-        });
-    }
-});
-
 // ---------------------------------------------------------------------------
-// 6. SETTINGS SUBTABS & CUSTOMIZATION
+// 6. SETTINGS SUBTABS & CONTROLLERS
 // ---------------------------------------------------------------------------
 const subtabBtns = document.querySelectorAll('.subtab-btn');
 const subpanes = {
@@ -522,24 +525,28 @@ subtabBtns.forEach(btn => {
         btn.classList.add('active');
         const target = btn.getAttribute('data-subtab');
         Object.keys(subpanes).forEach(k => {
-            if (subpanes[k]) subpanes[k].classList.toggle('active', k === target);
+            if (subpanes[k]) subpanes[k].classList.toggle('active', k === target || k === 'sub-' + target);
         });
+
+        if (target === 'widgets' || target === 'sub-widgets') {
+            showWidgetsListView();
+        }
     });
 });
 
-// Accent Color Swatches
-const colorSwatches = document.querySelectorAll('.color-swatch-btn');
-colorSwatches.forEach(btn => {
+// Color Swatches
+const colorSwatchBtns = document.querySelectorAll('.color-swatch-btn');
+colorSwatchBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
-        colorSwatches.forEach(b => b.classList.remove('active'));
+        colorSwatchBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.themeColor = btn.getAttribute('data-color');
         state.themeRgb = btn.getAttribute('data-rgb');
         applyThemeSettings();
     });
 });
-colorSwatches.forEach(b => b.classList.toggle('active', b.getAttribute('data-color') === state.themeColor));
+colorSwatchBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-color') === state.themeColor));
 
 // Transparency Modes
 const transBtns = document.querySelectorAll('.trans-option-btn');
@@ -561,7 +568,7 @@ sidebarPosBtns.forEach(btn => {
         e.preventDefault();
         sidebarPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.sidebarPos = btn.getAttribute('data-pos') || 'right';
+        state.sidebarPos = btn.getAttribute('data-pos') || 'left';
         applySidebarPosition();
     });
 });
@@ -581,21 +588,28 @@ animBtns.forEach(btn => {
 animBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-anim') === state.animations));
 
 // ---------------------------------------------------------------------------
-// 7. WIDGETS MANAGER IN SETTINGS (Cards -> Detail Configurator)
+// 7. WIDGET MANAGER & DETAIL EDIT VIEW IN SETTINGS
 // ---------------------------------------------------------------------------
 const widgetsListView = document.getElementById('widgetsListView');
 const widgetDetailView = document.getElementById('widgetDetailView');
 const widgetsManageGrid = document.getElementById('widgetsManageGrid');
 const btnBackToWidgetsList = document.getElementById('btnBackToWidgetsList');
 
-const detailWidgetIcon = document.getElementById('detailWidgetIcon');
-const detailWidgetBadge = document.getElementById('detailWidgetBadge');
 const detailWidgetTitle = document.getElementById('detailWidgetTitle');
 const detailWidgetDesc = document.getElementById('detailWidgetDesc');
+const detailWidgetBadge = document.getElementById('detailWidgetBadge');
+const detailWidgetIcon = document.getElementById('detailWidgetIcon');
 const detailTogglePill = document.getElementById('detailTogglePill');
+const detailToggleLabel = document.getElementById('detailToggleLabel');
 const detailToggleCheck = document.getElementById('detailToggleCheck');
-const detailSizeCards = document.querySelectorAll('.bento-size-card');
-const btnSaveWidgetDetail = document.getElementById('btnSaveWidgetDetail');
+const bentoSizeCards = document.querySelectorAll('.bento-size-card');
+
+function formatSizeText(size) {
+    if (size === 1) return '1 ячейка (1×1)';
+    if (size === 2) return '2 ячейки (2×1 • По горизонтали)';
+    if (size === 4) return '4 ячейки (2×2 • 2 по верт. и 2 по гор.)';
+    return `${size} ячейки`;
+}
 
 function renderWidgetsManageGrid() {
     if (!widgetsManageGrid) return;
@@ -607,339 +621,328 @@ function renderWidgetsManageGrid() {
         const curSize = state.widgetSizes[key] || meta.defaultSize;
 
         const card = document.createElement('div');
-        card.className = `widget-card-manage ${isEnabled ? 'is-enabled' : 'is-disabled'}`;
-        card.setAttribute('tabindex', '0');
-
+        card.className = 'widget-card-manage';
+        card.tabIndex = 0;
         card.innerHTML = `
             <div class="wcm-header">
                 <span class="material-icons wcm-icon">${meta.icon}</span>
                 <span class="wcm-status-pill ${isEnabled ? 'pill-active' : 'pill-inactive'}">
-                    ${isEnabled ? 'Активен' : 'Скрыт'}
+                    ${isEnabled ? 'Включен' : 'Скрыт'}
                 </span>
             </div>
             <div class="wcm-body">
-                <h4 class="wcm-title">${meta.name}</h4>
-                <p class="wcm-desc">${meta.desc}</p>
+                <div class="wcm-title">${meta.title}</div>
+                <div class="wcm-desc">${meta.desc}</div>
             </div>
             <div class="wcm-footer">
-                <span class="wcm-size-badge">${curSize === 1 ? '1 ячейка (1x1)' : (curSize === 2 ? '2 ячейки (2x1)' : '4 ячейки (2x2)')}</span>
-                <button class="btn-manage-cfg" tabindex="0">⚙ Настроить</button>
+                <span class="wcm-size-badge">${formatSizeText(curSize)}</span>
+                <button class="btn-manage-cfg" tabindex="0">
+                    <span class="material-icons" style="font-size: 16px;">tune</span>
+                    <span>Настроить</span>
+                </button>
             </div>
         `;
 
-        const openHandler = (e) => {
-            e.preventDefault();
-            openWidgetDetail(key);
-        };
-
-        card.addEventListener('click', openHandler);
-        const cfgBtn = card.querySelector('.btn-manage-cfg');
-        if (cfgBtn) cfgBtn.addEventListener('click', openHandler);
+        card.addEventListener('click', () => openWidgetDetail(key));
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                openWidgetDetail(key);
+            }
+        });
 
         widgetsManageGrid.appendChild(card);
     });
 }
 
-function openWidgetDetail(widgetKey) {
-    state.currentEditingWidget = widgetKey;
-    const meta = WIDGETS_METADATA[widgetKey];
+function showWidgetsListView() {
+    if (widgetsListView) widgetsListView.style.display = 'block';
+    if (widgetDetailView) widgetDetailView.style.display = 'none';
+    renderWidgetsManageGrid();
+}
+
+function openWidgetDetail(key) {
+    state.currentEditingWidget = key;
+    const meta = WIDGETS_METADATA[key];
     if (!meta) return;
-
-    if (detailWidgetIcon) detailWidgetIcon.textContent = meta.icon;
-    if (detailWidgetBadge) detailWidgetBadge.textContent = widgetKey.toUpperCase();
-    if (detailWidgetTitle) detailWidgetTitle.textContent = meta.name;
-    if (detailWidgetDesc) detailWidgetDesc.textContent = meta.desc;
-
-    const isEnabled = !!state.widgets[widgetKey];
-    if (detailTogglePill) {
-        detailTogglePill.classList.toggle('checked', isEnabled);
-        if (detailToggleCheck) detailToggleCheck.textContent = isEnabled ? '✓' : '✕';
-    }
-
-    const currentSize = state.widgetSizes[widgetKey] || meta.defaultSize;
-    detailSizeCards.forEach(c => {
-        const sz = parseInt(c.getAttribute('data-size'), 10);
-        c.classList.toggle('selected', sz === currentSize);
-    });
 
     if (widgetsListView) widgetsListView.style.display = 'none';
     if (widgetDetailView) widgetDetailView.style.display = 'block';
 
-    if (detailTogglePill) detailTogglePill.focus();
+    if (detailWidgetTitle) detailWidgetTitle.textContent = `Настройка: ${meta.title}`;
+    if (detailWidgetDesc) detailWidgetDesc.textContent = meta.desc;
+    if (detailWidgetBadge) detailWidgetBadge.textContent = key.toUpperCase();
+    if (detailWidgetIcon) detailWidgetIcon.textContent = meta.icon;
+
+    updateDetailToggleUI();
+    updateDetailSizeUI();
+
+    if (btnBackToWidgetsList) {
+        btnBackToWidgetsList.focus();
+    }
 }
 
-function showWidgetsListView() {
-    if (widgetDetailView) widgetDetailView.style.display = 'none';
-    if (widgetsListView) widgetsListView.style.display = 'block';
-    renderWidgetsManageGrid();
+function updateDetailToggleUI() {
+    const key = state.currentEditingWidget;
+    if (!key) return;
+    const isChecked = !!state.widgets[key];
+    if (detailTogglePill) detailTogglePill.classList.toggle('checked', isChecked);
+    if (detailToggleCheck) detailToggleCheck.textContent = isChecked ? '✓' : '—';
+    if (detailToggleLabel) detailToggleLabel.textContent = isChecked ? 'Виджет включен в сетке' : 'Виджет выключен (скрыт)';
 }
 
-if (btnBackToWidgetsList) {
-    btnBackToWidgetsList.addEventListener('click', (e) => {
-        e.preventDefault();
-        showWidgetsListView();
+function updateDetailSizeUI() {
+    const key = state.currentEditingWidget;
+    if (!key) return;
+    const curSize = state.widgetSizes[key] || 2;
+    bentoSizeCards.forEach(card => {
+        const sizeVal = parseInt(card.getAttribute('data-size'), 10);
+        card.classList.toggle('active', sizeVal === curSize);
+        card.classList.toggle('selected', sizeVal === curSize);
     });
 }
 
 if (detailTogglePill) {
-    detailTogglePill.addEventListener('click', (e) => {
-        e.preventDefault();
-        detailTogglePill.classList.toggle('checked');
-        const isChecked = detailTogglePill.classList.contains('checked');
-        if (detailToggleCheck) detailToggleCheck.textContent = isChecked ? '✓' : '✕';
+    detailTogglePill.addEventListener('click', () => {
+        const key = state.currentEditingWidget;
+        if (!key) return;
+        state.widgets[key] = !state.widgets[key];
+        updateDetailToggleUI();
+        applyWidgetSizesAndToggles();
     });
 }
 
-detailSizeCards.forEach(card => {
-    card.addEventListener('click', (e) => {
-        e.preventDefault();
-        detailSizeCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
+bentoSizeCards.forEach(card => {
+    card.addEventListener('click', () => {
+        const key = state.currentEditingWidget;
+        if (!key) return;
+        const sizeVal = parseInt(card.getAttribute('data-size'), 10);
+        state.widgetSizes[key] = sizeVal;
+        updateDetailSizeUI();
+        applyWidgetSizesAndToggles();
     });
 });
 
-if (btnSaveWidgetDetail) {
-    btnSaveWidgetDetail.addEventListener('click', (e) => {
-        e.preventDefault();
-        const key = state.currentEditingWidget;
-        if (!key) return;
-
-        const isChecked = detailTogglePill ? detailTogglePill.classList.contains('checked') : true;
-        state.widgets[key] = isChecked;
-
-        let selectedSize = 2;
-        detailSizeCards.forEach(c => {
-            if (c.classList.contains('selected')) {
-                selectedSize = parseInt(c.getAttribute('data-size'), 10);
-            }
-        });
-        state.widgetSizes[key] = selectedSize;
-
-        applyWidgetSizesAndToggles();
+if (btnBackToWidgetsList) {
+    btnBackToWidgetsList.addEventListener('click', () => {
         showWidgetsListView();
     });
 }
+
+const btnSaveWidgetDetail = document.getElementById('btnSaveWidgetDetail');
+if (btnSaveWidgetDetail) {
+    btnSaveWidgetDetail.addEventListener('click', () => {
+        showWidgetsListView();
+    });
+}
+
 renderWidgetsManageGrid();
 
 // ---------------------------------------------------------------------------
-// 8. DIRECT WEBSITE LAUNCHER & APPS MANAGEMENT
+// 8. APPS LAUNCHER ENGINE & PHONE-STYLE COMPACT CARDS
 // ---------------------------------------------------------------------------
-function openApp(app) {
-    if (!app || !app.url) return;
-    const targetUrl = normalizeUrl(app.url);
+const appsGrid = document.getElementById('appsGrid');
+const appsCountBadge = document.getElementById('appsCountBadge');
+const installedAppsList = document.getElementById('installedAppsList');
 
+function openApp(app) {
     const loader = document.getElementById('appNavLoader');
-    const loaderText = document.getElementById('loaderText');
+    const loaderAppName = document.getElementById('loaderAppName');
     if (loader) {
-        if (loaderText) loaderText.textContent = `Запуск ${app.name}...`;
+        if (loaderAppName) loaderAppName.textContent = `Запуск: ${app.name}...`;
         loader.classList.add('active');
     }
 
-    try {
-        window.history.pushState({ appOpen: true, appName: app.name, url: targetUrl }, '', window.location.pathname + window.location.search);
-    } catch (err) {}
-
     setTimeout(() => {
-        window.location.href = targetUrl;
-    }, 120);
+        try {
+            window.location.href = app.url;
+        } catch (e) {
+            window.open(app.url, '_self');
+        }
+    }, 280);
 }
 
-const appsGrid = document.getElementById('appsGrid');
-const appsCountBadge = document.getElementById('appsCountBadge');
-const installedAppsManageList = document.getElementById('installedAppsManageList');
-
 function renderApps() {
-    if (appsCountBadge) appsCountBadge.textContent = state.apps.length;
-
     if (appsGrid) {
         appsGrid.innerHTML = '';
         state.apps.forEach(app => {
             const card = document.createElement('div');
             card.className = 'app-card';
             card.tabIndex = 0;
-
-            const imgUrl = app.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500';
+            card.setAttribute('role', 'button');
             card.innerHTML = `
                 <div class="app-icon-squircle">
-                    <img src="${imgUrl}" alt="${app.name}" class="app-icon-img" loading="lazy">
+                    <img src="${app.image}" alt="${app.name}" class="app-icon-img" loading="lazy">
                     <span class="app-card-badge">${app.badge || 'APP'}</span>
                 </div>
                 <div class="app-card-name">${app.name}</div>
             `;
 
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                openApp(app);
+            card.addEventListener('click', () => openApp(app));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    openApp(app);
+                }
             });
 
             appsGrid.appendChild(card);
         });
     }
 
-    if (installedAppsManageList) {
-        installedAppsManageList.innerHTML = '';
+    if (appsCountBadge) {
+        appsCountBadge.textContent = state.apps.length;
+    }
+
+    if (installedAppsList) {
+        installedAppsList.innerHTML = '';
         state.apps.forEach((app, index) => {
             const item = document.createElement('div');
             item.className = 'installed-item';
             item.innerHTML = `
-                <span><strong>${app.name}</strong> (${app.url})</span>
+                <div>
+                    <strong>${app.name}</strong>
+                    <div style="font-size:0.75rem; color:var(--text-dim);">${app.url}</div>
+                </div>
                 <button class="btn-del-app" data-index="${index}" tabindex="0">Удалить</button>
             `;
             const delBtn = item.querySelector('.btn-del-app');
             if (delBtn) {
-                delBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
+                delBtn.addEventListener('click', () => {
                     state.apps.splice(index, 1);
                     try {
                         localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-                    } catch (err) {}
+                    } catch (e) {}
                     renderApps();
                 });
             }
-            installedAppsManageList.appendChild(item);
+            installedAppsList.appendChild(item);
         });
     }
 }
 renderApps();
 
-// Add Custom App in Settings
+// Add Custom App
 const btnSaveApp = document.getElementById('btnSaveApp');
 const inputAppName = document.getElementById('inputAppName');
 const inputAppUrl = document.getElementById('inputAppUrl');
 const selectAppIcon = document.getElementById('selectAppIcon');
 
 if (btnSaveApp && inputAppName && inputAppUrl) {
-    btnSaveApp.addEventListener('click', (e) => {
-        e.preventDefault();
+    btnSaveApp.addEventListener('click', () => {
         const name = inputAppName.value.trim();
         const url = normalizeUrl(inputAppUrl.value.trim());
         const icon = selectAppIcon ? selectAppIcon.value : 'launch';
 
         if (!name || !url) {
-            alert('Пожалуйста, заполните название и URL программы.');
+            alert('Пожалуйста, введите название и корректный URL программы.');
             return;
         }
 
         state.apps.push({
-            id: `app_custom_${Date.now()}`,
+            id: `app_${Date.now()}`,
             name: name,
             url: url,
-            sub: 'Пользовательский ярлык',
+            sub: "Пользовательское приложение",
             icon: icon,
-            badge: 'CUSTOM',
-            image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500'
+            badge: "WEB",
+            image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80"
         });
 
         try {
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-        } catch (err) {}
+        } catch (e) {}
         inputAppName.value = '';
         inputAppUrl.value = '';
         renderApps();
-        alert('Программа добавлена в каталог!');
+        alert(`Программа «${name}» успешно добавлена!`);
     });
 }
 
 // Preset Quick Add Buttons
 const presetBtns = document.querySelectorAll('.preset-btn');
 presetBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
         const name = btn.getAttribute('data-name');
         const url = normalizeUrl(btn.getAttribute('data-url'));
-        const icon = btn.getAttribute('data-icon') || 'launch';
+        const icon = btn.getAttribute('data-icon');
+        const badge = btn.getAttribute('data-badge');
+        const img = btn.getAttribute('data-img');
 
-        if (!state.apps.some(a => a.name.toLowerCase() === name.toLowerCase())) {
-            state.apps.push({
-                id: `app_${name.toLowerCase()}`,
-                name: name,
-                url: url,
-                sub: 'Популярное ТВ-приложение',
-                icon: icon,
-                badge: 'APP',
-                image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500'
-            });
-            try {
-                localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-            } catch (err) {}
-            renderApps();
-            alert(`Программа «${name}» добавлена!`);
-        } else {
-            alert(`Программа «${name}» уже установлена.`);
+        if (state.apps.some(a => a.id === id || a.name.toLowerCase() === name.toLowerCase())) {
+            alert(`«${name}» уже есть в вашем списке программ!`);
+            return;
         }
+
+        state.apps.push({
+            id: id,
+            name: name,
+            url: url,
+            sub: "Онлайн-сервис",
+            icon: icon,
+            badge: badge,
+            image: img
+        });
+
+        try {
+            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
+        } catch (e) {}
+        renderApps();
+        alert(`«${name}» добавлена в Программы!`);
     });
 });
 
-// Reset Apps Button
+// Reset Default Apps
 const btnResetDefaultApps = document.getElementById('btnResetDefaultApps');
 if (btnResetDefaultApps) {
-    btnResetDefaultApps.addEventListener('click', (e) => {
-        e.preventDefault();
+    btnResetDefaultApps.addEventListener('click', () => {
         state.apps = JSON.parse(JSON.stringify(DEFAULT_APPS_LIST));
         try {
             localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-        } catch (err) {}
+        } catch (e) {}
         renderApps();
-        alert('Список программ сброшен к стандартному.');
-    });
-}
-
-// Restart Portal Button
-const restartPortalBtn = document.getElementById('restartPortalBtn');
-if (restartPortalBtn) {
-    restartPortalBtn.addEventListener('click', (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        window.location.reload();
+        alert('Список программ сброшен к стандартному заводскому набору!');
     });
 }
 
 // ---------------------------------------------------------------------------
-// 9. UNIVERSAL SMART TV REMOTE NAVIGATION & ENTER/OK HANDLERS
+// 9. REMOTE CONTROL BACK BUTTON & FULLSCREEN APPS VIEWER
 // ---------------------------------------------------------------------------
 function handleTvBackButton(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    const appLoader = document.getElementById('appNavLoader');
-    if (appLoader && appLoader.classList.contains('active')) {
-        appLoader.classList.remove('active');
-        return true;
-    }
-
     const screensaver = document.getElementById('screensaverLayer');
     if (screensaver && screensaver.classList.contains('active')) {
+        e.preventDefault();
         hideScreensaver();
-        switchTab('widgets');
-        return true;
+        return;
     }
 
-    if (state.activeTab === 'settings' && widgetDetailView && widgetDetailView.style.display !== 'none') {
+    if (widgetDetailView && widgetDetailView.style.display === 'block') {
+        e.preventDefault();
         showWidgetsListView();
-        return true;
+        return;
     }
 
     if (state.activeTab !== 'widgets') {
+        e.preventDefault();
         switchTab('widgets');
-        focusCurrentTabContent();
-        return true;
+        return;
     }
-
-    return true;
 }
 
 window.addEventListener('keydown', (e) => {
+    const key = e.key;
     const keyCode = e.keyCode;
+
     const isBackKey = (
-        keyCode === 10009 || // Samsung Tizen Return
-        keyCode === 461 ||   // LG webOS Back
-        keyCode === 4 ||     // Android TV Back
-        keyCode === 27 ||    // ESC
-        keyCode === 8        // Backspace
+        keyCode === 10009 ||
+        keyCode === 461 ||
+        keyCode === 4 ||
+        keyCode === 27 ||
+        key === 'Escape' ||
+        key === 'Back' ||
+        key === 'GoBack' ||
+        (keyCode === 8 && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')
     );
 
     if (isBackKey) {
@@ -968,7 +971,7 @@ window.addEventListener('keydown', (e) => {
         }
     }
 
-    // Spatial D-Pad Navigation for Right-Hand Sidebar
+    // Spatial D-Pad Navigation for LEFT-Side Sidebar
     const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
 
     if (inSidebar) {
@@ -985,13 +988,13 @@ window.addEventListener('keydown', (e) => {
                 e.preventDefault();
                 sidebarItems[currentIndex - 1].focus();
             }
-        } else if (e.key === 'ArrowLeft') {
+        } else if (e.key === 'ArrowRight') {
             e.preventDefault();
             focusCurrentTabContent();
         }
     } else {
-        // In main content stage (on the left): ArrowRight moves INTO the right sidebar
-        if (e.key === 'ArrowRight') {
+        // In content stage: ArrowLeft moves INTO the left sidebar
+        if (e.key === 'ArrowLeft') {
             const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`) || document.querySelector('.menu-tab');
             if (activeTabBtn) {
                 e.preventDefault();
@@ -1001,67 +1004,73 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-document.addEventListener('tizenhwkey', (e) => {
-    if (e.keyName === 'back') {
-        handleTvBackButton(e);
-    }
-});
-
-window.addEventListener('popstate', (e) => {
-    const loader = document.getElementById('appNavLoader');
-    if (loader) loader.classList.remove('active');
-    handleTvBackButton(null);
-});
-
 // ---------------------------------------------------------------------------
-// 10. 4K SCREENSAVER ENGINE (WALLPAPERS, VIDEO, YOUTUBE & KEN BURNS)
+// 10. SCREENSAVER 4K ENGINE WITH REALISTIC AMBIENT VIDEO & SLIDESHOW
 // ---------------------------------------------------------------------------
 const screensaverLayer = document.getElementById('screensaverLayer');
 const ssWidgetsContainer = document.getElementById('ssWidgetsContainer');
-const ssClockBlock = document.getElementById('ssClockBlock');
-const ssCalendarBlock = document.getElementById('ssCalendarBlock');
-let idleTimer = null;
+const startScreensaverBtn = document.getElementById('startScreensaverBtn');
+const btnTestScreensaver = document.getElementById('btnTestScreensaver');
 
-function applyScreensaverLayout() {
+function applyScreensaverWidgetsAndPosition() {
     if (!ssWidgetsContainer) return;
 
-    const validPositions = ['center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
-    validPositions.forEach(p => ssWidgetsContainer.classList.remove(`pos-${p}`));
+    ssWidgetsContainer.className = 'ss-widgets-container';
     ssWidgetsContainer.classList.add(`pos-${state.ssPosition || 'center'}`);
 
-    const type = state.ssWidgetType || 'both';
-    if (ssClockBlock) {
-        ssClockBlock.style.display = (type === 'both' || type === 'clock') ? 'inline-flex' : 'none';
+    const clockBlock = document.getElementById('ssWidgetBlock');
+    const calBlock = document.getElementById('ssCalendarBlock');
+
+    if (clockBlock) clockBlock.style.display = 'none';
+    if (calBlock) calBlock.style.display = 'none';
+
+    if (state.ssWidgetType === 'both') {
+        if (clockBlock) clockBlock.style.display = 'inline-flex';
+        if (calBlock) calBlock.style.display = 'block';
+    } else if (state.ssWidgetType === 'clock') {
+        if (clockBlock) clockBlock.style.display = 'inline-flex';
+    } else if (state.ssWidgetType === 'calendar') {
+        if (calBlock) calBlock.style.display = 'block';
     }
-    if (ssCalendarBlock) {
-        ssCalendarBlock.style.display = (type === 'both' || type === 'calendar') ? 'inline-flex' : 'none';
+
+    try {
+        localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
+        localStorage.setItem('hp_ss_pos', state.ssPosition);
+    } catch (e) {}
+}
+
+function updateScreensaverWallpaper(url) {
+    const ssBgImage = document.getElementById('ssBgImage');
+    if (ssBgImage) {
+        ssBgImage.style.backgroundImage = `url('${url}')`;
     }
 }
 
 function extractYouTubeId(urlOrId) {
     if (!urlOrId) return '';
-    const trimmed = urlOrId.trim();
-    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
-    const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
-    return match ? match[1] : trimmed;
+    urlOrId = urlOrId.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) {
+        return urlOrId;
+    }
+    const match = urlOrId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    return match ? match[1] : '';
 }
 
 function applyScreensaverWidgetOpacity() {
-    const blocks = document.querySelectorAll('.ss-widget-block');
-    blocks.forEach(b => {
-        b.classList.remove('trans-none', 'trans-ultra', 'trans-glass');
-        b.classList.add(`trans-${state.ssWidgetOpacity || 'ultra'}`);
-    });
+    const clockBlock = document.getElementById('ssWidgetBlock');
+    if (!clockBlock) return;
+    clockBlock.classList.remove('trans-ultra', 'trans-none', 'trans-glass');
+    clockBlock.classList.add(`trans-${state.ssWidgetOpacity || 'ultra'}`);
     try {
         localStorage.setItem('hp_ss_wopacity', state.ssWidgetOpacity);
     } catch (e) {}
 }
 
 function showScreensaver() {
+    ssOpenedTimestamp = Date.now();
     if (!screensaverLayer) return;
 
-    ssOpenedTimestamp = Date.now();
-    applyScreensaverLayout();
+    applyScreensaverWidgetsAndPosition();
     applyScreensaverWidgetOpacity();
 
     const ssBgImage = document.getElementById('ssBgImage');
@@ -1080,339 +1089,158 @@ function showScreensaver() {
     }
 
     if (state.ssMediaType === 'youtube') {
-        const ytId = extractYouTubeId(state.ssYoutubeId || 'L_LUpnjgPso');
+        const ytid = state.ssYoutubeId || 'L_LUpnjgPso';
         if (ssBgYoutubeWrap && ssBgYoutubeIframe) {
             ssBgYoutubeWrap.style.display = 'block';
-            ssBgYoutubeIframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&playsinline=1&modestbranding=1&rel=0&disablekb=1&enablejsapi=1`;
+            ssBgYoutubeIframe.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytid}&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3`;
         }
     } else if (state.ssMediaType === 'video') {
         if (ssBgVideo) {
             ssBgVideo.style.display = 'block';
-            ssBgVideo.src = state.ssVideoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+            ssBgVideo.src = state.ssVideoUrl;
             ssBgVideo.play().catch(() => {});
         }
     } else {
         if (ssBgImage) {
             ssBgImage.style.display = 'block';
             ssBgImage.classList.toggle('animated', !!state.ssPhotoAnim);
-
             if (state.screensaverBg === 'ss_all') {
                 ssSlideshowIndex = 0;
-                ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[0]}')`;
-
+                updateScreensaverWallpaper(SS_SLIDESHOW_LIST[0]);
                 if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
                 ssSlideshowInterval = setInterval(() => {
                     ssSlideshowIndex = (ssSlideshowIndex + 1) % SS_SLIDESHOW_LIST.length;
-                    if (ssBgImage) ssBgImage.style.backgroundImage = `url('${SS_SLIDESHOW_LIST[ssSlideshowIndex]}')`;
-                }, 7000);
+                    updateScreensaverWallpaper(SS_SLIDESHOW_LIST[ssSlideshowIndex]);
+                }, 10000);
             } else {
                 if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
-                const bgUrl = SCREENSAVER_IMAGES[state.screensaverBg] || SCREENSAVER_IMAGES.ss_space;
-                ssBgImage.style.backgroundImage = `url('${bgUrl}')`;
+                const bgUrl = SCREENSAVER_IMAGES[state.screensaverBg] || SCREENSAVER_IMAGES.ss_nature;
+                updateScreensaverWallpaper(bgUrl);
             }
         }
     }
 
+    screensaverLayer.style.display = 'flex';
+    void screensaverLayer.offsetWidth;
     screensaverLayer.classList.add('active');
 }
 
 function hideScreensaver() {
     if (!screensaverLayer) return;
     screensaverLayer.classList.remove('active');
-
-    const ssBgVideo = document.getElementById('ssBgVideo');
-    const ssBgYoutubeWrap = document.getElementById('ssBgYoutubeWrap');
-    const ssBgYoutubeIframe = document.getElementById('ssBgYoutubeIframe');
-
-    if (ssBgVideo) {
-        try { ssBgVideo.pause(); } catch (e) {}
-        ssBgVideo.src = '';
-        ssBgVideo.style.display = 'none';
-    }
-    if (ssBgYoutubeWrap && ssBgYoutubeIframe) {
-        ssBgYoutubeIframe.src = 'about:blank';
-        ssBgYoutubeWrap.style.display = 'none';
-    }
-
-    if (ssSlideshowInterval) {
-        clearInterval(ssSlideshowInterval);
-        ssSlideshowInterval = null;
-    }
-
+    setTimeout(() => {
+        screensaverLayer.style.display = 'none';
+        const ssBgVideo = document.getElementById('ssBgVideo');
+        if (ssBgVideo) {
+            try { ssBgVideo.pause(); } catch (e) {}
+        }
+        const ssBgYoutubeIframe = document.getElementById('ssBgYoutubeIframe');
+        if (ssBgYoutubeIframe) {
+            ssBgYoutubeIframe.src = 'about:blank';
+        }
+        if (ssSlideshowInterval) clearInterval(ssSlideshowInterval);
+    }, 450);
     resetIdleTimer();
 }
 
+let idleTimer = null;
 function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
-    if (state.idleTimeoutSec > 0) {
-        idleTimer = setTimeout(() => {
-            showScreensaver();
-        }, state.idleTimeoutSec * 1000);
-    }
+    if (!state.idleTimeoutSec || state.idleTimeoutSec <= 0) return;
+
+    idleTimer = setTimeout(() => {
+        showScreensaver();
+    }, state.idleTimeoutSec * 1000);
 }
 
-// User activity listener for idle timer & screensaver dismissal
-['mousemove', 'click', 'touchstart'].forEach(evt => {
-    window.addEventListener(evt, (e) => {
-        if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-            if (Date.now() - ssOpenedTimestamp > 400) {
-                hideScreensaver();
-                switchTab('widgets');
-            }
-        } else {
-            resetIdleTimer();
-        }
+['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, () => {
+        resetIdleTimer();
     }, { passive: true });
 });
 resetIdleTimer();
 
-// Manual screensaver triggers (with stopPropagation to prevent instant self-closing)
-const startScreensaverBtn = document.getElementById('startScreensaverBtn');
-if (startScreensaverBtn) {
-    startScreensaverBtn.addEventListener('click', (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        showScreensaver();
-    });
-}
+if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', () => showScreensaver());
+if (btnTestScreensaver) btnTestScreensaver.addEventListener('click', () => showScreensaver());
 
-const btnTestScreensaver = document.getElementById('btnTestScreensaver');
-if (btnTestScreensaver) {
-    btnTestScreensaver.addEventListener('click', (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        showScreensaver();
-    });
-}
-
-// Screensaver Wallpaper Picker
 const ssThumbCards = document.querySelectorAll('.ss-thumb-card');
 ssThumbCards.forEach(card => {
-    card.addEventListener('click', (e) => {
-        e.preventDefault();
+    card.addEventListener('click', () => {
         ssThumbCards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
-        state.screensaverBg = card.getAttribute('data-id');
+        state.screensaverBg = card.getAttribute('data-key');
         try {
             localStorage.setItem('hp_ss_bg', state.screensaverBg);
-        } catch (err) {}
+        } catch (e) {}
     });
 });
-ssThumbCards.forEach(card => {
-    card.classList.toggle('selected', card.getAttribute('data-id') === state.screensaverBg);
-});
 
-// Timeout selector buttons
 const timeoutBtns = document.querySelectorAll('.timeout-btn');
 timeoutBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
         timeoutBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.idleTimeoutSec = parseInt(btn.getAttribute('data-time'), 10);
         try {
             localStorage.setItem('hp_idle_sec', String(state.idleTimeoutSec));
-        } catch (err) {}
+        } catch (e) {}
         resetIdleTimer();
     });
 });
-timeoutBtns.forEach(b => b.classList.toggle('active', parseInt(b.getAttribute('data-time'), 10) === state.idleTimeoutSec));
 
-// Screensaver Widget Type Selector
 const ssWTypeBtns = document.querySelectorAll('.ss-wtype-btn');
 ssWTypeBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
         ssWTypeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssWidgetType = btn.getAttribute('data-wtype');
-        try {
-            localStorage.setItem('hp_ss_wtype', state.ssWidgetType);
-        } catch (err) {}
-        applyScreensaverLayout();
+        applyScreensaverWidgetsAndPosition();
     });
 });
-ssWTypeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-wtype') === state.ssWidgetType));
 
-// Screensaver Position Selector
 const ssPosBtns = document.querySelectorAll('.ss-pos-btn');
 ssPosBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
         ssPosBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPosition = btn.getAttribute('data-pos');
-        try {
-            localStorage.setItem('hp_ss_pos', state.ssPosition);
-        } catch (err) {}
-        applyScreensaverLayout();
+        applyScreensaverWidgetsAndPosition();
     });
 });
-ssPosBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-pos') === state.ssPosition));
 
-// Screensaver Media Type Selector (Photo / YouTube / Video)
 const ssMediaBtns = document.querySelectorAll('.ss-media-btn');
 ssMediaBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
         ssMediaBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssMediaType = btn.getAttribute('data-media') || 'photo';
         try {
             localStorage.setItem('hp_ss_mtype', state.ssMediaType);
-        } catch (err) {}
+        } catch (e) {}
     });
 });
-ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
 
-// Screensaver Photo Animation Toggle (Ken Burns on/off)
 const ssAnimBtns = document.querySelectorAll('.ss-anim-btn');
 ssAnimBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
         ssAnimBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.ssPhotoAnim = btn.getAttribute('data-anim') === 'on';
         try {
             localStorage.setItem('hp_ss_photo_anim', String(state.ssPhotoAnim));
-        } catch (err) {}
-    });
-});
-ssAnimBtns.forEach(b => b.classList.toggle('active', (b.getAttribute('data-anim') === 'on') === !!state.ssPhotoAnim));
-
-// Screensaver Video Presets (Fireplace, Aquarium, Ocean)
-const ssVpresetBtns = document.querySelectorAll('.ss-vpreset-btn');
-ssVpresetBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        ssVpresetBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const vtype = btn.getAttribute('data-type');
-        const vval = btn.getAttribute('data-val');
-
-        if (vtype === 'youtube') {
-            state.ssMediaType = 'youtube';
-            state.ssYoutubeId = vval;
-            try {
-                localStorage.setItem('hp_ss_mtype', 'youtube');
-                localStorage.setItem('hp_ss_ytid', state.ssYoutubeId);
-            } catch (err) {}
-        } else if (vtype === 'video') {
-            state.ssMediaType = 'video';
-            state.ssVideoUrl = vval;
-            try {
-                localStorage.setItem('hp_ss_mtype', 'video');
-                localStorage.setItem('hp_ss_vurl', state.ssVideoUrl);
-            } catch (err) {}
-        }
-
-        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
-        alert('Заставка переключена на видео!');
+        } catch (e) {}
     });
 });
 
-// Custom Video Input
-const btnApplyCustomVideo = document.getElementById('btnApplyCustomVideo');
-const inputCustomVideo = document.getElementById('inputCustomVideo');
-if (btnApplyCustomVideo && inputCustomVideo) {
-    btnApplyCustomVideo.addEventListener('click', (e) => {
-        e.preventDefault();
-        const val = inputCustomVideo.value.trim();
-        if (!val) {
-            alert('Введите ссылку на видео (MP4) или YouTube');
-            return;
-        }
-
-        if (/\.(mp4|webm|m3u8)(\?.*)?$/i.test(val)) {
-            state.ssMediaType = 'video';
-            state.ssVideoUrl = val;
-            try {
-                localStorage.setItem('hp_ss_mtype', 'video');
-                localStorage.setItem('hp_ss_vurl', val);
-            } catch (err) {}
-        } else {
-            const ytId = extractYouTubeId(val);
-            if (!ytId) {
-                alert('Не удалось распознать ссылку на YouTube или MP4.');
-                return;
-            }
-            state.ssMediaType = 'youtube';
-            state.ssYoutubeId = ytId;
-            try {
-                localStorage.setItem('hp_ss_mtype', 'youtube');
-                localStorage.setItem('hp_ss_ytid', ytId);
-            } catch (err) {}
-        }
-
-        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
-        alert('Видео сохранено для заставки!');
-    });
-}
-
-// Screensaver Opacity Selector
 const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
 ssOpacityBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    btn.addEventListener('click', () => {
         ssOpacityBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        state.ssWidgetOpacity = btn.getAttribute('data-opacity');
+        state.ssWidgetOpacity = btn.getAttribute('data-opacity') || 'ultra';
         applyScreensaverWidgetOpacity();
     });
 });
-ssOpacityBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-opacity') === state.ssWidgetOpacity));
-
-// Canvas Stars Particles for Screensaver
-const canvas = document.getElementById('ssStarsCanvas');
-if (canvas) {
-    const ctx = canvas.getContext('2d');
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    });
-
-    const particles = [];
-    for (let i = 0; i < 75; i++) {
-        particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            radius: Math.random() * 2 + 0.5,
-            alpha: Math.random() * 0.7 + 0.3,
-            dx: (Math.random() - 0.5) * 0.35,
-            dy: (Math.random() - 0.5) * 0.35
-        });
-    }
-
-    function renderParticles() {
-        ctx.clearRect(0, 0, width, height);
-        particles.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(180, 220, 255, ${p.alpha})`;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = state.themeColor;
-            ctx.fill();
-
-            p.x += p.dx;
-            p.y += p.dy;
-
-            if (p.x < 0) p.x = width;
-            if (p.x > width) p.x = 0;
-            if (p.y < 0) p.y = height;
-            if (p.y > height) p.y = 0;
-        });
-        requestAnimationFrame(renderParticles);
-    }
-    renderParticles();
-}
 
 // ---------------------------------------------------------------------------
 // 11. INITIALIZATION & INITIAL FOCUS ON LOAD
@@ -1422,7 +1250,6 @@ function initApp() {
     applySidebarPosition();
     switchTab(state.activeTab || 'widgets');
 
-    // CRITICAL FOR SMART TV: Set initial focus to active tab so remote control has anchor!
     setTimeout(() => {
         const activeTabBtn = document.querySelector('.menu-tab.active') || document.querySelector('.menu-tab');
         if (activeTabBtn) {
