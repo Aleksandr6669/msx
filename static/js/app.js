@@ -648,27 +648,71 @@ if (canvas) {
 }
 
 // ---------------------------------------------------------------------------
-// 10. TV REMOTE CONTROL NAVIGATION & D-PAD SPATIAL LOGIC
+// 10. TV REMOTE 2D SPATIAL NAVIGATION ENGINE
 // ---------------------------------------------------------------------------
-function handleTvBackButton(e) {
-    e.preventDefault();
 
-    if (screensaverLayer && screensaverLayer.classList.contains('active')) {
-        hideScreensaver();
-        return true;
-    }
+function getSpatialCandidate(currentEl, direction, container) {
+    if (!currentEl || !container) return null;
+    const focusable = Array.from(container.querySelectorAll('button, input, select, textarea, [tabindex="0"], .app-card, .ss-thumb-card, .preset-btn, .color-swatch-btn, .subtab-btn, .trans-option-btn, .sidebar-pos-btn, .anim-option-btn, .timeout-btn, .ss-media-btn, .ss-wtype-btn, .ss-anim-btn, .ss-pos-btn, .btn-launch-big, .btn-save-app, .btn-reset-all, .info-card, .glass-widget'))
+        .filter(el => {
+            if (el === currentEl) return false;
+            if (el.disabled || el.offsetParent === null) return false;
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+        });
 
-    if (closeAppViewer()) {
-        return true;
-    }
+    const cRect = currentEl.getBoundingClientRect();
+    const cX = cRect.left + cRect.width / 2;
+    const cY = cRect.top + cRect.height / 2;
 
-    if (state.activeTab !== 'widgets') {
-        switchTab('widgets');
-        focusCurrentTabContent();
-        return true;
-    }
+    let bestEl = null;
+    let bestDist = Infinity;
 
-    return true;
+    focusable.forEach(target => {
+        const tRect = target.getBoundingClientRect();
+        const tX = tRect.left + tRect.width / 2;
+        const tY = tRect.top + tRect.height / 2;
+
+        let isDir = false;
+        let pDist = 0;
+        let sDist = 0;
+
+        if (direction === 'right') {
+            if (tRect.left >= cRect.left + 5) {
+                isDir = true;
+                pDist = tX - cX;
+                sDist = Math.abs(tY - cY);
+            }
+        } else if (direction === 'left') {
+            if (tRect.right <= cRect.right - 5) {
+                isDir = true;
+                pDist = cX - tX;
+                sDist = Math.abs(tY - cY);
+            }
+        } else if (direction === 'down') {
+            if (tRect.top >= cRect.top + 5) {
+                isDir = true;
+                pDist = tY - cY;
+                sDist = Math.abs(tX - cX);
+            }
+        } else if (direction === 'up') {
+            if (tRect.bottom <= cRect.bottom - 5) {
+                isDir = true;
+                pDist = cY - tY;
+                sDist = Math.abs(tX - cX);
+            }
+        }
+
+        if (isDir) {
+            const score = pDist + sDist * 2.2;
+            if (score < bestDist) {
+                bestDist = score;
+                bestEl = target;
+            }
+        }
+    });
+
+    return bestEl;
 }
 
 window.addEventListener('keydown', (e) => {
@@ -691,170 +735,9 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    // APPS TAB D-PAD NAVIGATION
-    if (state.activeTab === 'apps' && !screensaverLayer?.classList.contains('active')) {
-        const el = document.activeElement;
-        const appCards = Array.from(appsGrid?.querySelectorAll('.app-card') || []);
-        const idx = appCards.indexOf(el);
-
-        if (idx !== -1) {
-            if (e.key === 'ArrowRight' || e.keyCode === 39) {
-                e.preventDefault();
-                if (idx < appCards.length - 1) {
-                    appCards[idx + 1].focus();
-                }
-                return;
-            }
-            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
-                e.preventDefault();
-                if (idx === 0) {
-                    const tabBtn = document.querySelector('.menu-tab[data-tab="apps"]');
-                    if (tabBtn) tabBtn.focus();
-                } else {
-                    appCards[idx - 1].focus();
-                }
-                return;
-            }
-            if (e.key === 'ArrowDown' || e.keyCode === 40) {
-                e.preventDefault();
-                const nextIdx = Math.min(appCards.length - 1, idx + 4);
-                appCards[nextIdx].focus();
-                return;
-            }
-            if (e.key === 'ArrowUp' || e.keyCode === 38) {
-                e.preventDefault();
-                if (idx < 4) {
-                    const tabBtn = document.querySelector('.menu-tab[data-tab="apps"]');
-                    if (tabBtn) tabBtn.focus();
-                } else {
-                    appCards[idx - 4].focus();
-                }
-                return;
-            }
-        }
-    }
-
-    // SETTINGS TAB D-PAD NAVIGATION
-    if (state.activeTab === 'settings' && !screensaverLayer?.classList.contains('active')) {
-        const el = document.activeElement;
-        const subtabBtnsArr = Array.from(document.querySelectorAll('.subtab-btn'));
-        const subtabIdx = subtabBtnsArr.indexOf(el);
-
-        if (subtabIdx !== -1) {
-            // Focused on subtab buttons row
-            if (e.key === 'ArrowRight' || e.keyCode === 39) {
-                e.preventDefault();
-                const nextIdx = (subtabIdx + 1) % subtabBtnsArr.length;
-                subtabBtnsArr[nextIdx].focus();
-                subtabBtnsArr[nextIdx].click();
-                return;
-            }
-            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
-                e.preventDefault();
-                if (subtabIdx === 0) {
-                    const tabBtn = document.querySelector('.menu-tab[data-tab="settings"]');
-                    if (tabBtn) tabBtn.focus();
-                } else {
-                    const prevIdx = subtabIdx - 1;
-                    subtabBtnsArr[prevIdx].focus();
-                    subtabBtnsArr[prevIdx].click();
-                }
-                return;
-            }
-            if (e.key === 'ArrowDown' || e.keyCode === 40) {
-                e.preventDefault();
-                const activePane = document.querySelector('.settings-subpane.active');
-                if (activePane) {
-                    const focusable = activePane.querySelectorAll('button, input, select, [tabindex="0"]');
-                    if (focusable.length > 0) focusable[0].focus();
-                }
-                return;
-            }
-        } else {
-            // Inside subpane controls
-            const activePane = document.querySelector('.settings-subpane.active');
-            if (activePane && activePane.contains(el)) {
-                const controls = Array.from(activePane.querySelectorAll('button, input, select, [tabindex="0"]'));
-                const cIdx = controls.indexOf(el);
-
-                if (cIdx !== -1) {
-                    if (e.key === 'ArrowRight' || e.keyCode === 39) {
-                        e.preventDefault();
-                        if (cIdx < controls.length - 1) {
-                            controls[cIdx + 1].focus();
-                        }
-                        return;
-                    }
-                    if (e.key === 'ArrowLeft' || e.keyCode === 37) {
-                        e.preventDefault();
-                        if (cIdx === 0) {
-                            const tabBtn = document.querySelector('.menu-tab[data-tab="settings"]');
-                            if (tabBtn) tabBtn.focus();
-                        } else {
-                            controls[cIdx - 1].focus();
-                        }
-                        return;
-                    }
-                    if (e.key === 'ArrowUp' || e.keyCode === 38) {
-                        e.preventDefault();
-                        if (cIdx === 0) {
-                            const activeSubtab = document.querySelector('.subtab-btn.active');
-                            if (activeSubtab) activeSubtab.focus();
-                        } else {
-                            controls[Math.max(0, cIdx - 1)].focus();
-                        }
-                        return;
-                    }
-                    if (e.key === 'ArrowDown' || e.keyCode === 40) {
-                        e.preventDefault();
-                        if (cIdx < controls.length - 1) {
-                            controls[cIdx + 1].focus();
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    // 2x2 Quadrant Grid Spatial Navigation for TV Remote
-    if (state.activeTab === 'widgets' && !screensaverLayer?.classList.contains('active')) {
-        const el = document.activeElement;
-        const w1 = document.getElementById('wClockDigital');
-        const w2 = document.getElementById('wClockAnalog');
-        const w3 = document.getElementById('wCalGrid');
-        const w4 = document.getElementById('wCalEvents');
-
-        if (el === w1) {
-            if (e.key === 'ArrowRight') { e.preventDefault(); w2?.focus(); return; }
-            if (e.key === 'ArrowDown')  { e.preventDefault(); w3?.focus(); return; }
-            if (e.key === 'ArrowLeft')  {
-                e.preventDefault();
-                const activeTab = document.querySelector('.menu-tab.active');
-                if (activeTab) activeTab.focus();
-                return;
-            }
-        } else if (el === w2) {
-            if (e.key === 'ArrowLeft') { e.preventDefault(); w1?.focus(); return; }
-            if (e.key === 'ArrowDown') { e.preventDefault(); w4?.focus(); return; }
-        } else if (el === w3) {
-            if (e.key === 'ArrowUp')    { e.preventDefault(); w1?.focus(); return; }
-            if (e.key === 'ArrowRight') { e.preventDefault(); w4?.focus(); return; }
-            if (e.key === 'ArrowLeft')  {
-                e.preventDefault();
-                const activeTab = document.querySelector('.menu-tab.active');
-                if (activeTab) activeTab.focus();
-                return;
-            }
-        } else if (el === w4) {
-            if (e.key === 'ArrowUp')   { e.preventDefault(); w2?.focus(); return; }
-            if (e.key === 'ArrowLeft') { e.preventDefault(); w3?.focus(); return; }
-        }
-    }
-
-    // Sidebar D-pad navigation with wrap-around (Up/Down) & Right to stage
     const inSidebar = tvSidebar && tvSidebar.contains(document.activeElement);
 
+    // 1. SIDEBAR D-PAD NAVIGATION
     if (inSidebar) {
         const sidebarNavItems = [
             document.querySelector('.menu-tab[data-tab="widgets"]'),
@@ -867,7 +750,7 @@ window.addEventListener('keydown', (e) => {
 
         const curIndex = sidebarNavItems.indexOf(document.activeElement);
 
-        if (e.key === 'ArrowDown' || e.keyCode === 40) {
+        if (key === 'ArrowDown' || keyCode === 40) {
             e.preventDefault();
             const nextIndex = curIndex === -1 ? 0 : (curIndex + 1) % sidebarNavItems.length;
             const targetEl = sidebarNavItems[nextIndex];
@@ -881,7 +764,7 @@ window.addEventListener('keydown', (e) => {
             return;
         }
 
-        if (e.key === 'ArrowUp' || e.keyCode === 38) {
+        if (key === 'ArrowUp' || keyCode === 38) {
             e.preventDefault();
             const prevIndex = curIndex === -1 ? 0 : (curIndex - 1 + sidebarNavItems.length) % sidebarNavItems.length;
             const targetEl = sidebarNavItems[prevIndex];
@@ -895,20 +778,72 @@ window.addEventListener('keydown', (e) => {
             return;
         }
 
-        if (e.key === 'ArrowRight' || e.keyCode === 39) {
+        if (key === 'ArrowRight' || keyCode === 39) {
             e.preventDefault();
             focusCurrentTabContent();
             return;
         }
-    } else if (e.key === 'ArrowLeft' && !screensaverLayer?.classList.contains('active')) {
-        const activeEl = document.activeElement;
-        const isFirstAppCard = activeEl && activeEl.classList.contains('app-card') && activeEl === appsGrid?.firstElementChild;
-        const isLeftWidget = activeEl && (activeEl === document.getElementById('wClockDigital') || activeEl === document.getElementById('wCalGrid'));
+        return;
+    }
 
-        if (isFirstAppCard || isLeftWidget || activeEl === document.body || !activeEl) {
+    // 2. MAIN STAGE 2D SPATIAL NAVIGATION (WIDGETS, APPS, SETTINGS, INFO)
+    if (!screensaverLayer?.classList.contains('active')) {
+        const currentEl = document.activeElement;
+        const activeStage = tabPanes[state.activeTab];
+
+        if (key === 'ArrowLeft' || keyCode === 37) {
+            // Try spatial move left within stage first
+            const nextLeft = getSpatialCandidate(currentEl, 'left', activeStage);
+            if (nextLeft) {
+                e.preventDefault();
+                nextLeft.focus();
+                return;
+            }
+            // If at the left boundary of stage, return focus to active sidebar tab
             e.preventDefault();
             const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`) || document.querySelector('.menu-tab');
             if (activeTabBtn) activeTabBtn.focus();
+            return;
+        }
+
+        if (key === 'ArrowRight' || keyCode === 39) {
+            const nextRight = getSpatialCandidate(currentEl, 'right', activeStage);
+            if (nextRight) {
+                e.preventDefault();
+                nextRight.focus();
+                if (nextRight.classList.contains('subtab-btn')) {
+                    nextRight.click();
+                }
+                return;
+            }
+            return;
+        }
+
+        if (key === 'ArrowDown' || keyCode === 40) {
+            const nextDown = getSpatialCandidate(currentEl, 'down', activeStage);
+            if (nextDown) {
+                e.preventDefault();
+                nextDown.focus();
+                return;
+            }
+            // At the bottom of the stage: stay on element, scroll if container has overflow
+            if (activeStage && activeStage.scrollHeight > activeStage.clientHeight) {
+                activeStage.scrollBy({ top: 80, behavior: 'smooth' });
+            }
+            return;
+        }
+
+        if (key === 'ArrowUp' || keyCode === 38) {
+            const nextUp = getSpatialCandidate(currentEl, 'up', activeStage);
+            if (nextUp) {
+                e.preventDefault();
+                nextUp.focus();
+                return;
+            }
+            if (activeStage && activeStage.scrollTop > 0) {
+                activeStage.scrollBy({ top: -80, behavior: 'smooth' });
+            }
+            return;
         }
     }
 });
@@ -933,26 +868,88 @@ window.addEventListener('popstate', (e) => {
     handleTvBackButton(e);
 });
 
+
 // ---------------------------------------------------------------------------
-// 11. INITIALIZATION & INITIAL FOCUS ON LOAD
+// 12. SCREENSAVER WALLPAPER & WIDGET SELECTOR (CLICK + ENTER D-PAD SUPPORT)
 // ---------------------------------------------------------------------------
-function initApp() {
-    applyThemeSettings();
-    applySidebarPosition();
-    switchTab('widgets');
+function setupScreensaverWallpaperPicker() {
+    const thumbCards = document.querySelectorAll('.ss-thumb-card');
+    const savedBgUrl = localStorage.getItem('hp_ss_bg_url') || '';
+    const savedBgId = localStorage.getItem('hp_ss_bg_id') || 'ss_mountains';
 
-    // Ensure background wallpaper is set immediately
-    if (bgWallpaper) {
-        bgWallpaper.style.backgroundImage = `url('${SECTION_WALLPAPERS.widgets}')`;
-        document.documentElement.style.setProperty('--current-wallpaper', `url('${SECTION_WALLPAPERS.widgets}')`);
-    }
+    thumbCards.forEach(card => {
+        const url = card.getAttribute('data-url');
+        const key = card.getAttribute('data-key') || card.getAttribute('data-id');
 
-    setTimeout(() => {
-        const w1 = document.getElementById('wClockDigital');
-        if (w1) w1.focus();
-    }, 150);
+        if (savedBgUrl && url === savedBgUrl) {
+            thumbCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+        } else if (!savedBgUrl && key === savedBgId) {
+            card.classList.add('selected');
+        }
 
-    resetIdleTimer();
+        function selectThisWallpaper(e) {
+            if (e) e.preventDefault();
+            thumbCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+
+            state.screensaverBg = key;
+            state.screensaverBgUrl = url;
+            localStorage.setItem('hp_ss_bg_id', key);
+            localStorage.setItem('hp_ss_bg_url', url);
+
+            // Update screensaver background immediately
+            const ssBg = document.getElementById('ssBgImage');
+            if (ssBg && url) {
+                ssBg.style.backgroundImage = `url('${url}')`;
+            }
+
+            // Also update main background wallpaper so user sees their chosen image!
+            if (bgWallpaper && url) {
+                bgWallpaper.style.backgroundImage = `url('${url}')`;
+                document.documentElement.style.setProperty('--current-wallpaper', `url('${url}')`);
+            }
+        }
+
+        card.addEventListener('click', selectThisWallpaper);
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                selectThisWallpaper(e);
+            }
+        });
+    });
 }
+setupScreensaverWallpaperPicker();
 
-window.addEventListener('DOMContentLoaded', initApp);
+function setupScreensaverWidgetSelector() {
+    const wTypeBtns = document.querySelectorAll('.ss-wtype-btn');
+    const savedWType = localStorage.getItem('hp_ss_wtype') || 'both';
+    state.ssWidgetType = savedWType;
+
+    wTypeBtns.forEach(btn => {
+        const type = btn.getAttribute('data-wtype');
+        btn.classList.toggle('active', type === state.ssWidgetType);
+
+        function selectWType(e) {
+            if (e) e.preventDefault();
+            wTypeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.ssWidgetType = type;
+            localStorage.setItem('hp_ss_wtype', type);
+
+            // Apply layout to screensaver widgets
+            const clockBlock = document.getElementById('ssWidgetBlock');
+            const calBlock = document.getElementById('ssCalendarBlock');
+            if (clockBlock) clockBlock.style.display = (type === 'both' || type === 'clock') ? 'inline-flex' : 'none';
+            if (calBlock) calBlock.style.display = (type === 'both' || type === 'calendar') ? 'inline-flex' : 'none';
+        }
+
+        btn.addEventListener('click', selectWType);
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                selectWType(e);
+            }
+        });
+    });
+}
+setupScreensaverWidgetSelector();
