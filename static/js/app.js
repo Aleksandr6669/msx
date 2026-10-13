@@ -715,6 +715,15 @@ function getSpatialCandidate(currentEl, direction, container) {
     return bestEl;
 }
 
+// Suppress virtual mouse cursor on Smart TV
+function suppressMousePointer() {
+    try {
+        if (document.body.requestPointerLock) {
+            document.body.requestPointerLock().catch(() => {});
+        }
+    } catch (err) {}
+}
+
 window.addEventListener('keydown', (e) => {
     const key = e.key;
     const keyCode = e.keyCode;
@@ -791,56 +800,48 @@ window.addEventListener('keydown', (e) => {
         const currentEl = document.activeElement;
         const activeStage = tabPanes[state.activeTab];
 
+        // Always preventDefault on arrow keys to stop Samsung TV browser from falling back to mouse cursor
         if (key === 'ArrowLeft' || keyCode === 37) {
-            // Try spatial move left within stage first
+            e.preventDefault();
             const nextLeft = getSpatialCandidate(currentEl, 'left', activeStage);
             if (nextLeft) {
-                e.preventDefault();
                 nextLeft.focus();
-                return;
+            } else {
+                const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`) || document.querySelector('.menu-tab');
+                if (activeTabBtn) activeTabBtn.focus();
             }
-            // If at the left boundary of stage, return focus to active sidebar tab
-            e.preventDefault();
-            const activeTabBtn = document.querySelector(`.menu-tab[data-tab="${state.activeTab}"]`) || document.querySelector('.menu-tab');
-            if (activeTabBtn) activeTabBtn.focus();
             return;
         }
 
         if (key === 'ArrowRight' || keyCode === 39) {
+            e.preventDefault();
             const nextRight = getSpatialCandidate(currentEl, 'right', activeStage);
             if (nextRight) {
-                e.preventDefault();
                 nextRight.focus();
                 if (nextRight.classList.contains('subtab-btn')) {
                     nextRight.click();
                 }
-                return;
             }
             return;
         }
 
         if (key === 'ArrowDown' || keyCode === 40) {
+            e.preventDefault();
             const nextDown = getSpatialCandidate(currentEl, 'down', activeStage);
             if (nextDown) {
-                e.preventDefault();
                 nextDown.focus();
-                return;
-            }
-            // At the bottom of the stage: stay on element, scroll if container has overflow
-            if (activeStage && activeStage.scrollHeight > activeStage.clientHeight) {
+            } else if (activeStage && activeStage.scrollHeight > activeStage.clientHeight) {
                 activeStage.scrollBy({ top: 80, behavior: 'smooth' });
             }
             return;
         }
 
         if (key === 'ArrowUp' || keyCode === 38) {
+            e.preventDefault();
             const nextUp = getSpatialCandidate(currentEl, 'up', activeStage);
             if (nextUp) {
-                e.preventDefault();
                 nextUp.focus();
-                return;
-            }
-            if (activeStage && activeStage.scrollTop > 0) {
+            } else if (activeStage && activeStage.scrollTop > 0) {
                 activeStage.scrollBy({ top: -80, behavior: 'smooth' });
             }
             return;
