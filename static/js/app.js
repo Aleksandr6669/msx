@@ -255,7 +255,7 @@ function applySidebarPosition() {
 }
 
 // ---------------------------------------------------------------------------
-// 2. SIDEBAR NAVIGATION & TAB SWITCHING
+// 2. SIDEBAR NAVIGATION & TAB SWITCHING (PERMANENT OPEN SIDEBAR)
 // ---------------------------------------------------------------------------
 const bgWallpaper = document.getElementById('bgWallpaper');
 const tvSidebar = document.getElementById('tvSidebar');
@@ -268,8 +268,9 @@ const tabPanes = {
 };
 
 function expandSidebar(expand) {
-    if (!tvSidebar) return;
-    tvSidebar.classList.toggle('collapsed', !expand);
+    if (tvSidebar) {
+        tvSidebar.classList.remove('collapsed');
+    }
 }
 
 function focusCurrentTabContent() {
@@ -314,11 +315,8 @@ menuTabs.forEach(tab => {
         e.preventDefault();
         const target = tab.getAttribute('data-tab');
         switchTab(target);
-        expandSidebar(false);
+        // sidebar permanently open
         focusCurrentTabContent();
-    });
-    tab.addEventListener('focus', () => {
-        expandSidebar(true);
     });
 });
 
@@ -1232,6 +1230,40 @@ ssAnimBtns.forEach(btn => {
     });
 });
 
+// User Custom Video (YouTube / MP4)
+const btnApplyCustomVideo = document.getElementById('btnApplyCustomVideo');
+const inputCustomVideo = document.getElementById('inputCustomVideo');
+if (btnApplyCustomVideo && inputCustomVideo) {
+    btnApplyCustomVideo.addEventListener('click', () => {
+        const val = inputCustomVideo.value.trim();
+        if (!val) {
+            alert('Пожалуйста, введите URL YouTube видео или прямой MP4 поток.');
+            return;
+        }
+
+        if (/\.mp4($|\?)/i.test(val)) {
+            state.ssMediaType = 'video';
+            state.ssVideoUrl = val;
+            localStorage.setItem('hp_ss_mtype', 'video');
+            localStorage.setItem('hp_ss_vurl', val);
+        } else {
+            const ytId = extractYouTubeId(val);
+            if (!ytId) {
+                alert('Не удалось распознать ID видео. Проверьте ссылку на YouTube.');
+                return;
+            }
+            state.ssMediaType = 'youtube';
+            state.ssYoutubeId = ytId;
+            localStorage.setItem('hp_ss_mtype', 'youtube');
+            localStorage.setItem('hp_ss_ytid', ytId);
+        }
+
+        ssMediaBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-media') === state.ssMediaType));
+        alert('Пользовательское видео успешно сохранено для заставки!');
+    });
+}
+
+// Screensaver Widget Transparency Selector
 const ssOpacityBtns = document.querySelectorAll('.ss-opacity-btn');
 ssOpacityBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1241,6 +1273,7 @@ ssOpacityBtns.forEach(btn => {
         applyScreensaverWidgetOpacity();
     });
 });
+ssOpacityBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-opacity') === state.ssWidgetOpacity));
 
 // ---------------------------------------------------------------------------
 // 11. INITIALIZATION & INITIAL FOCUS ON LOAD
@@ -1250,6 +1283,7 @@ function initApp() {
     applySidebarPosition();
     switchTab(state.activeTab || 'widgets');
 
+    // CRITICAL FOR SMART TV: Set initial focus to active tab so remote control has anchor!
     setTimeout(() => {
         const activeTabBtn = document.querySelector('.menu-tab.active') || document.querySelector('.menu-tab');
         if (activeTabBtn) {
