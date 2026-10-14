@@ -17,9 +17,8 @@
     --text-secondary: rgba(255, 255, 255, 0.65);
     --text-muted: rgba(255, 255, 255, 0.45);
     --blur-val: 20px;
-    --sidebar-width: 260px;
-    --sidebar-collapsed-width: 80px;
-    --anim-speed: 0.25s;
+    --sidebar-width: 220px;
+    --anim-speed: 0.2s;
 }
 
 *, *::before, *::after {
@@ -43,30 +42,25 @@ html, body {
 
 /* Dynamic Cross-Fading Background Layer */
 .bg-wallpaper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 0;
-    transition: background-image 0.8s ease-in-out, opacity 0.8s ease;
-    filter: brightness(0.4) saturate(1.2);
-    transform: scale(1.02);
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&auto=format&fit=crop&q=85') !important;
+    filter: brightness(0.55) saturate(1.2) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
 }
 
 .ambient-vignette {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: radial-gradient(circle at center, transparent 30%, rgba(5, 7, 12, 0.8) 100%),
-                linear-gradient(to bottom, rgba(5, 7, 12, 0.4) 0%, transparent 40%, rgba(5, 7, 12, 0.8) 100%);
-    pointer-events: none;
-    z-index: 1;
+    position: fixed !important;
+    inset: 0 !important;
+    background: radial-gradient(circle at center, transparent 35%, rgba(6, 9, 16, 0.65) 100%) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
 }
 
 /* Main App Shell Layout */
@@ -80,38 +74,52 @@ html, body {
 }
 
 /* ==========================================================================
-   1. COLLAPSIBLE / NARROW SIDEBAR
+   1. PERMANENT NON-COLLAPSING SIDEBAR (ALWAYS 220PX)
    ========================================================================== */
 .tv-sidebar {
-    width: var(--sidebar-collapsed-width);
-    height: 100vh;
-    background: rgba(10, 14, 22, 0.4);
-    backdrop-filter: blur(var(--blur-val));
-    -webkit-backdrop-filter: blur(var(--blur-val));
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 24px 12px;
-    z-index: 20;
-    transition: width var(--anim-speed) cubic-bezier(0.16, 1, 0.3, 1),
-                background var(--anim-speed) ease;
-    overflow: hidden;
-    white-space: nowrap;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    height: 100vh !important;
+    background: rgba(10, 14, 24, 0.75) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-left: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 20px 14px !important;
+    z-index: 50 !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+    transition: none !important;
 }
 
-.tv-sidebar.expanded,
-.tv-sidebar:focus-within {
-    width: var(--sidebar-width);
-    background: rgba(10, 14, 22, 0.75);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+.tv-sidebar.collapsed,
+.tv-sidebar.expanded {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    padding: 20px 14px !important;
+}
+
+.tv-sidebar.collapsed .tab-label,
+.tv-sidebar.collapsed .tab-badge,
+.tv-sidebar.collapsed .fs-text,
+.tv-sidebar.collapsed .quick-screensaver-btn span:last-child,
+.tv-sidebar.collapsed .quick-restart-btn span:last-child,
+.tv-sidebar.collapsed .sidebar-status span:last-child {
+    display: inline-block !important;
 }
 
 .sidebar-logo {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 4px 8px 24px 8px;
+    padding: 4px 8px 20px 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
 }
@@ -130,7 +138,7 @@ html, body {
 }
 
 .logo-brand {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 800;
     letter-spacing: 1px;
     color: #ffffff;
@@ -138,7 +146,7 @@ html, body {
 }
 
 .logo-sub {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-weight: 600;
     color: var(--accent-color);
     letter-spacing: 1.5px;
@@ -148,41 +156,41 @@ html, body {
 .sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 8px;
+    margin-top: 16px;
     flex-grow: 1;
 }
 
 .menu-tab {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     width: 100%;
-    padding: 14px 16px;
+    padding: 12px 14px;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 12px;
     color: var(--text-secondary);
     font-family: inherit;
-    font-size: 1.02rem;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     text-align: left;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     position: relative;
 }
 
 .menu-tab .material-icons {
-    font-size: 1.6rem;
-    min-width: 26px;
+    font-size: 1.45rem;
+    min-width: 24px;
     text-align: center;
     color: var(--text-muted);
-    transition: color 0.2s ease;
+    transition: color 0.15s ease;
 }
 
 .menu-tab.active {
-    background: rgba(var(--accent-rgb), 0.15);
-    border-color: rgba(var(--accent-rgb), 0.35);
+    background: rgba(var(--accent-rgb), 0.16);
+    border-color: rgba(var(--accent-rgb), 0.4);
     color: #ffffff;
 }
 
@@ -194,7 +202,7 @@ html, body {
     margin-left: auto;
     background: rgba(var(--accent-rgb), 0.25);
     color: var(--accent-color);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     padding: 2px 7px;
     border-radius: 20px;
@@ -203,41 +211,44 @@ html, body {
 .sidebar-bottom {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding-top: 18px;
+    gap: 8px;
+    padding-top: 14px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.quick-fullscreen-btn,
 .quick-screensaver-btn,
 .quick-restart-btn {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
-    padding: 12px 14px;
+    padding: 10px 12px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-secondary);
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
+.quick-fullscreen-btn .material-icons,
 .quick-screensaver-btn .material-icons,
 .quick-restart-btn .material-icons {
-    font-size: 1.35rem;
-    min-width: 24px;
+    font-size: 1.25rem;
+    min-width: 22px;
+    color: var(--accent-color);
 }
 
 .sidebar-status {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 12px;
-    font-size: 0.75rem;
+    padding: 6px 10px;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--text-muted);
 }
@@ -314,11 +325,11 @@ html, body {
 .span-4 { grid-column: span 4; }
 
 .glass-widget {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(var(--blur-val));
-    -webkit-backdrop-filter: blur(var(--blur-val));
-    border: 1px solid var(--card-border);
-    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 18px !important;
     padding: 18px 22px;
     display: flex;
     flex-direction: column;
@@ -326,17 +337,18 @@ html, body {
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.18s ease,
+                box-shadow 0.18s ease;
 }
 
 .w-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
 }
 
 .w-icon {
@@ -399,103 +411,139 @@ html, body {
     text-transform: capitalize;
 }
 
-/* Analog Clock Widget */
+/* ==========================================================================
+   PERFECT ROUND ANALOG CLOCK (IMMUNE TO SQUASHING/DISTORTION)
+   ========================================================================== */
+.analog-content-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 18px !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
 .analog-face-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    height: 100%;
-    gap: 16px;
+    width: 130px !important;
+    height: 130px !important;
+    min-width: 130px !important;
+    min-height: 130px !important;
+    max-width: 130px !important;
+    max-height: 130px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
 }
 
 .analog-face {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.25) 100%);
-    position: relative;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+    width: 130px !important;
+    height: 130px !important;
+    min-width: 130px !important;
+    min-height: 130px !important;
+    max-width: 130px !important;
+    max-height: 130px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    border: 2px solid rgba(255, 255, 255, 0.25) !important;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.35) 100%) !important;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 210, 255, 0.15) !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
 }
 
-.dial-num {
-    position: absolute;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-muted);
+.face-numbers span {
+    position: absolute !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: rgba(255, 255, 255, 0.65) !important;
 }
-.num-12 { top: 6px; left: 50%; transform: translateX(-50%); }
-.num-3 { right: 8px; top: 50%; transform: translateY(-50%); }
-.num-6 { bottom: 6px; left: 50%; transform: translateX(-50%); }
-.num-9 { left: 8px; top: 50%; transform: translateY(-50%); }
+.face-numbers .n12 { top: 6px !important; left: 50% !important; transform: translateX(-50%) !important; }
+.face-numbers .n3  { top: 50% !important; right: 8px !important; transform: translateY(-50%) !important; }
+.face-numbers .n6  { bottom: 6px !important; left: 50% !important; transform: translateX(-50%) !important; }
+.face-numbers .n9  { top: 50% !important; left: 8px !important; transform: translateY(-50%) !important; }
 
-.hand {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform-origin: bottom center;
-    border-radius: 4px;
-}
-
-.hour-hand {
-    width: 4px;
-    height: 38px;
-    background: #ffffff;
-    margin-left: -2px;
+.analog-face .hand {
+    position: absolute !important;
+    bottom: 50% !important;
+    left: 50% !important;
+    transform-origin: bottom center !important;
+    border-radius: 4px !important;
 }
 
-.minute-hand {
-    width: 3px;
-    height: 52px;
-    background: var(--text-secondary);
-    margin-left: -1.5px;
+.analog-face .hour-hand {
+    width: 3.5px !important;
+    height: 36px !important;
+    margin-left: -1.75px !important;
+    background: #ffffff !important;
+    z-index: 2 !important;
 }
 
-.second-hand {
-    width: 1.5px;
-    height: 60px;
-    background: var(--accent-color);
-    margin-left: -0.75px;
+.analog-face .min-hand {
+    width: 2.5px !important;
+    height: 50px !important;
+    margin-left: -1.25px !important;
+    background: #cbd5e1 !important;
+    z-index: 3 !important;
 }
 
-.center-cap {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    background: var(--accent-color);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 8px var(--accent-color);
+.analog-face .sec-hand {
+    width: 1.5px !important;
+    height: 56px !important;
+    margin-left: -0.75px !important;
+    background: var(--accent-color, #00d2ff) !important;
+    box-shadow: 0 0 8px var(--accent-color, #00d2ff) !important;
+    z-index: 4 !important;
+}
+
+.analog-face .center-pin {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: var(--accent-color, #00d2ff) !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    box-shadow: 0 0 10px var(--accent-color, #00d2ff) !important;
+    z-index: 5 !important;
 }
 
 .analog-wide-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
 }
 
-.analog-dig-time {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #ffffff;
+.analog-digital-time {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 2.4rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
 }
 
 .analog-date-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.5px;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    color: var(--accent-color, #00d2ff) !important;
+    letter-spacing: 0.5px !important;
+    white-space: nowrap !important;
 }
 
-.analog-sub-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    letter-spacing: 1px;
-    margin-top: 4px;
+.analog-city-badge {
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    letter-spacing: 1px !important;
+    white-space: nowrap !important;
 }
 
 /* Calendar Widget */
@@ -667,513 +715,8 @@ html, body {
 }
 
 /* ==========================================================================
-   5. SETTINGS SUBTABS & SYSTEM CONFIGURATION
+   FOCUS INDICATOR (NON-OVERLAPPING FOR SMART TV REMOTE)
    ========================================================================== */
-.settings-subtabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
-    overflow-x: auto;
-}
-
-.subtab-btn {
-    padding: 10px 18px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-secondary);
-    font-family: inherit;
-    font-size: 0.92rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.subtab-btn.active {
-    background: rgba(var(--accent-rgb), 0.18);
-    border-color: rgba(var(--accent-rgb), 0.45);
-    color: #ffffff;
-}
-
-.settings-subpane {
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.settings-subpane.active {
-    display: flex;
-}
-
-.setting-card {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(var(--blur-val));
-    -webkit-backdrop-filter: blur(var(--blur-val));
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 18px 22px;
-}
-
-.setting-card h3 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 4px;
-}
-
-.setting-desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.color-swatches-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
-    margin-top: 14px;
-}
-
-.color-swatch-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.color-swatch-btn.active {
-    border-color: var(--c);
-    background: rgba(255, 255, 255, 0.12);
-}
-
-.color-swatch-btn .dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-}
-
-.transparency-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 12px;
-}
-
-.trans-option-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 14px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.trans-option-btn.active {
-    background: rgba(var(--accent-rgb), 0.15);
-    border-color: var(--accent-color);
-}
-
-.trans-option-btn span {
-    font-size: 0.95rem;
-    font-weight: 700;
-}
-
-.trans-option-btn small {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    margin-top: 4px;
-}
-
-/* Screensaver Wallpapers Grid */
-.ss-wallpapers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
-    margin-top: 12px;
-}
-
-.ss-thumb-card {
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid transparent;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.ss-thumb-card.active {
-    border-color: var(--accent-color);
-}
-
-.ss-thumb-card img {
-    width: 100%;
-    height: 80px;
-    object-fit: cover;
-}
-
-.ss-thumb-card span {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 6px;
-    text-align: center;
-    color: var(--text-secondary);
-}
-
-.thumb-slideshow-icon {
-    width: 100%;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(var(--accent-rgb), 0.12);
-}
-
-.thumb-slideshow-icon .material-icons {
-    font-size: 2.2rem;
-    color: var(--accent-color);
-}
-
-.ss-widget-type-options,
-.ss-pos-options,
-.timeout-options {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-}
-
-.ss-wtype-btn,
-.ss-pos-btn,
-.timeout-btn {
-    padding: 10px 16px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.ss-wtype-btn.active,
-.ss-pos-btn.active,
-.timeout-btn.active {
-    background: rgba(var(--accent-rgb), 0.18);
-    border-color: var(--accent-color);
-    color: var(--accent-color);
-}
-
-.btn-launch-big {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent-color), #0070f3);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 18px rgba(var(--accent-rgb), 0.4);
-}
-
-/* ==========================================================================
-   6. 4K ULTRA HD SCREENSAVER OVERLAY
-   ========================================================================== */
-.screensaver-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.8s ease;
-    overflow: hidden;
-    background: #000000;
-}
-
-.screensaver-layer.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.ss-bg-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    transition: background-image 1s ease-in-out;
-}
-
-.ss-bg-image.animated {
-    animation: kenBurns 24s infinite alternate ease-in-out;
-}
-
-@keyframes kenBurns {
-    0% { transform: scale(1.0) translate(0, 0); }
-    100% { transform: scale(1.12) translate(-1%, -1%); }
-}
-
-.ss-ambient-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
-    pointer-events: none;
-}
-
-#ssStarsCanvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.ss-widgets-container {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 10;
-    transition: all 0.5s ease;
-}
-
-.ss-widgets-container.pos-center {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-
-.ss-widgets-container.pos-bottom-left {
-    bottom: 40px;
-    left: 50px;
-    align-items: flex-start;
-    text-align: left;
-}
-
-.ss-widgets-container.pos-bottom-right {
-    bottom: 40px;
-    right: 50px;
-    align-items: flex-end;
-    text-align: right;
-}
-
-.ss-widget-block {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    padding: 24px 40px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-}
-
-.ss-clock-time {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 5.5rem;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1;
-    letter-spacing: -2px;
-    text-shadow: 0 0 40px rgba(var(--accent-rgb), 0.5);
-}
-
-.ss-clock-date {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
-    margin-top: 10px;
-}
-
-.ss-mode-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 12px;
-    padding: 4px 10px;
-    background: rgba(var(--accent-rgb), 0.15);
-    color: var(--accent-color);
-    font-size: 0.72rem;
-    font-weight: 700;
-    border-radius: 20px;
-    letter-spacing: 1px;
-}
-
-.ss-bottom-hint {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.5);
-    background: rgba(0, 0, 0, 0.5);
-    padding: 6px 14px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-}
-
-/* App navigation loader */
-.app-nav-loader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(20px);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    z-index: 10000;
-}
-
-.app-nav-loader.active {
-    display: flex;
-}
-
-.loader-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(255, 255, 255, 0.15);
-    border-top-color: var(--accent-color);
-    border-radius: 50%;
-    animation: spin 1s infinite linear;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loader-text {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-/* ==========================================================================
-   FULLSCREEN TOGGLE BUTTON & FULLSCREEN MODE (SMART TV)
-   ========================================================================== */
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.btn-fullscreen-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-fullscreen-toggle .material-icons {
-    font-size: 1.25rem;
-    color: var(--accent-color, #00d2ff);
-    transition: transform 0.2s ease;
-}
-
-.btn-fullscreen-toggle:hover,
-.btn-fullscreen-toggle:focus,
-.btn-fullscreen-toggle.focused {
-    background: rgba(255, 255, 255, 0.16) !important;
-    border-color: #00f2fe !important;
-    outline: 3px solid #00f2fe !important;
-    outline-offset: 2px !important;
-    box-shadow: 0 0 24px rgba(0, 242, 254, 0.7) !important;
-    transform: scale(1.04);
-}
-
-.btn-fullscreen-toggle.active {
-    background: rgba(0, 210, 255, 0.2) !important;
-    border-color: rgba(0, 210, 255, 0.6) !important;
-    color: #00d2ff !important;
-}
-
-.quick-fullscreen-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 10px 14px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.quick-fullscreen-btn .material-icons {
-    font-size: 1.2rem;
-    color: var(--accent-color, #00d2ff);
-}
-
-.quick-fullscreen-btn:hover,
-.quick-fullscreen-btn:focus,
-.quick-fullscreen-btn.focused {
-    background: rgba(255, 255, 255, 0.14) !important;
-    border-color: #00f2fe !important;
-    outline: 3px solid #00f2fe !important;
-    outline-offset: 1px !important;
-    box-shadow: 0 0 18px rgba(0, 242, 254, 0.6) !important;
-}
-
-/* Fullscreen Active Body Mode */
-body.is-fullscreen-mode {
-    width: 100vw !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-}
-
-body.is-fullscreen-mode .tv-shell {
-    height: 100vh !important;
-    max-height: 100vh !important;
-}
-
-/* High-Visibility Focus Outline for TV Remote Navigation */
 *:focus,
 *.focused {
     outline: 3px solid #00f2fe !important;
@@ -1206,15 +749,6 @@ body.is-fullscreen-mode .tv-shell {
     outline-offset: 1px !important;
     box-shadow: 0 0 18px rgba(0, 242, 254, 0.6) !important;
     background: rgba(255, 255, 255, 0.16) !important;
-}
-
-.ss-thumb-card:focus,
-.ss-thumb-card.focused {
-    outline: 3px solid #00f2fe !important;
-    outline-offset: 2px !important;
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.7) !important;
-    transform: scale(1.06) translateZ(0) !important;
-    z-index: 20 !important;
 }
 
 /* Mouse pointer absolute suppression */
