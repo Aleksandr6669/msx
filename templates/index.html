@@ -20,7 +20,7 @@
 
     <!-- MAIN APP SHELL -->
     <div class="tv-shell" id="tvShell">
-        <!-- 1. SIDEBAR (NARROW, RIGHT-SIDE NAVIGATION) -->
+        <!-- 1. SIDEBAR (PERMANENT 220PX, NEVER COLLAPSES) -->
         <aside class="tv-sidebar" id="tvSidebar">
             <div class="sidebar-logo">
                 <img src="{{ base_url }}/static/images/logo.svg" alt="Home Portal TV" class="sidebar-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -109,13 +109,13 @@
                             <span class="w-sec-badge" id="wSecBadge">SEC</span>
                         </div>
                         <div class="w-digital-time">
-                            <span id="digH">18</span>
+                            <span id="digH">19</span>
                             <span class="colon">:</span>
-                            <span id="digM">45</span>
+                            <span id="digM">48</span>
                             <span class="sec-text" id="digS">30</span>
                         </div>
                         <div class="w-footer-date" id="digFullDate">
-                            Понедельник, 12 Октября 2026
+                            Среда, 14 Октября 2026
                         </div>
                     </div>
 
@@ -126,23 +126,25 @@
                             <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
                             <span class="w-sec-badge">SWISS</span>
                         </div>
-                        <div class="analog-face-wrap">
-                            <div class="analog-face">
-                                <div class="analog-dial">
-                                    <span class="dial-num num-12">12</span>
-                                    <span class="dial-num num-3">3</span>
-                                    <span class="dial-num num-6">6</span>
-                                    <span class="dial-num num-9">9</span>
+                        <div class="analog-content-row">
+                            <div class="analog-face-wrap">
+                                <div class="analog-face">
+                                    <div class="face-numbers">
+                                        <span class="n12">12</span>
+                                        <span class="n3">3</span>
+                                        <span class="n6">6</span>
+                                        <span class="n9">9</span>
+                                    </div>
+                                    <div class="hand hour-hand" id="analogHourHand"></div>
+                                    <div class="hand min-hand" id="analogMinHand"></div>
+                                    <div class="hand sec-hand" id="analogSecHand"></div>
+                                    <div class="center-pin"></div>
                                 </div>
-                                <div class="hand hour-hand" id="analogHourHand"></div>
-                                <div class="hand minute-hand" id="analogMinHand"></div>
-                                <div class="hand second-hand" id="analogSecHand"></div>
-                                <div class="center-cap"></div>
                             </div>
                             <div class="analog-wide-info" id="analogWideInfo">
-                                <div class="analog-dig-time" id="analogDigTime">18:45</div>
-                                <div class="analog-date-label" id="analogDateLabel">12 ОКТЯБРЯ 2026</div>
-                                <div class="analog-sub-badge">ШВЕЙЦАРСКИЙ</div>
+                                <div class="analog-digital-time" id="analogDigTime">19:48</div>
+                                <div class="analog-date-label" id="analogDateLabel">14 ОКТЯБРЯ 2026</div>
+                                <div class="analog-city-badge">ШВЕЙЦАРСКИЙ ХРОНОГРАФ</div>
                             </div>
                         </div>
                     </div>
@@ -155,8 +157,8 @@
                             <span class="w-sec-badge">MIN</span>
                         </div>
                         <div class="w-modern-display">
-                            <div class="modern-time-val" id="modernTime">18:45</div>
-                            <div class="modern-date-val" id="modernDate">12.10.2026</div>
+                            <div class="modern-time-val" id="modernTime">19:48</div>
+                            <div class="modern-date-val" id="modernDate">14.10.2026</div>
                         </div>
                     </div>
 
@@ -172,8 +174,41 @@
                                 <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="weekend">СБ</span><span class="weekend">ВС</span>
                             </div>
                             <div class="cal-grid-cells" id="calGridCells">
-                                <!-- Generated dynamically by JS -->
-                            </div>
+    <div class="cal-cell empty other-month"></div>
+    <div class="cal-cell empty other-month"></div>
+    <div class="cal-cell empty other-month"></div>
+    <div class="cal-cell">1</div>
+    <div class="cal-cell">2</div>
+    <div class="cal-cell weekend">3</div>
+    <div class="cal-cell weekend">4</div>
+    <div class="cal-cell">5</div>
+    <div class="cal-cell">6</div>
+    <div class="cal-cell">7</div>
+    <div class="cal-cell">8</div>
+    <div class="cal-cell">9</div>
+    <div class="cal-cell weekend">10</div>
+    <div class="cal-cell weekend">11</div>
+    <div class="cal-cell">12</div>
+    <div class="cal-cell">13</div>
+    <div class="cal-cell today">14</div>
+    <div class="cal-cell">15</div>
+    <div class="cal-cell">16</div>
+    <div class="cal-cell weekend">17</div>
+    <div class="cal-cell weekend">18</div>
+    <div class="cal-cell">19</div>
+    <div class="cal-cell">20</div>
+    <div class="cal-cell">21</div>
+    <div class="cal-cell">22</div>
+    <div class="cal-cell">23</div>
+    <div class="cal-cell weekend">24</div>
+    <div class="cal-cell weekend">25</div>
+    <div class="cal-cell">26</div>
+    <div class="cal-cell">27</div>
+    <div class="cal-cell">28</div>
+    <div class="cal-cell">29</div>
+    <div class="cal-cell">30</div>
+    <div class="cal-cell weekend">31</div>
+</div>
                         </div>
                     </div>
 
@@ -184,9 +219,9 @@
                             <span class="w-label">СЕГОДНЯ</span>
                         </div>
                         <div class="cal-compact-display">
-                            <div class="compact-day-num" id="compactDayNum">12</div>
+                            <div class="compact-day-num" id="compactDayNum">14</div>
                             <div class="compact-month-name" id="compactMonthName">ОКТЯБРЯ</div>
-                            <div class="compact-weekday-name" id="compactWeekdayName">ПОНЕДЕЛЬНИК</div>
+                            <div class="compact-weekday-name" id="compactWeekdayName">СРЕДА</div>
                         </div>
                     </div>
 
@@ -325,19 +360,6 @@
                             <button class="trans-option-btn" data-blur="solid" tabindex="0">
                                 <span>Контрастный</span>
                                 <small>Затемненная подложка для яркого ТВ</small>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="setting-card">
-                        <h3>Положение боковой панели навигации</h3>
-                        <p class="setting-desc">Выберите удобную сторону экрана для панели меню:</p>
-                        <div class="sidebar-pos-options" style="display:flex; gap:12px; margin-top:10px;">
-                            <button class="sidebar-pos-btn active" data-pos="left" tabindex="0" style="flex:1; padding:12px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; font-weight:600; cursor:pointer;">
-                                ◀ Слева (Классика)
-                            </button>
-                            <button class="sidebar-pos-btn" data-pos="right" tabindex="0" style="flex:1; padding:12px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; font-weight:600; cursor:pointer;">
-                                Справа (Фокус на контент) ▶
                             </button>
                         </div>
                     </div>
@@ -498,92 +520,20 @@
                                 <span>Динамическое слайдшоу</span>
                             </div>
                         </div>
-
-                        <div style="margin-top: 16px;">
-                            <h4>Анимация смены кадров (Эффект Кена Бернса):</h4>
-                            <div class="ss-anim-options" style="display:flex; gap:10px; margin-top:8px;">
-                                <button class="ss-anim-btn active" data-anim="kenburns" tabindex="0" style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">Плавный зум (Кен Бернс)</button>
-                                <button class="ss-anim-btn" data-anim="fade" tabindex="0" style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">Мягкое затухание</button>
-                                <button class="ss-anim-btn" data-anim="static" tabindex="0" style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">Статично</button>
-                            </div>
-                        </div>
                     </div>
+                </div>
 
-                    <div class="setting-card" id="ssVideoSettingsCard">
-                        <h3>Видео-заставки (Прямой эфир, Камин, Аквариум)</h3>
-                        <p class="setting-desc">Выберите готовый видео-пресет или укажите свою ссылку на YouTube или прямой MP4/HLS поток:</p>
-                        <div class="video-presets-grid" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
-                            <button class="ss-vpreset-btn active" data-type="youtube" data-val="L_LUpnjgPso" tabindex="0" style="padding:12px; text-align:left; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">🔥 Уютный 4K камин с потрескиванием дров (YouTube)</button>
-                            <button class="ss-vpreset-btn" data-type="youtube" data-val="61FM9m5yNzg" tabindex="0" style="padding:12px; text-align:left; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">🐠 4K Морской коралловый аквариум (YouTube)</button>
-                            <button class="ss-vpreset-btn" data-type="video" data-val="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" tabindex="0" style="padding:12px; text-align:left; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">🎥 Природа и анимация (Прямой видеопоток)</button>
-                        </div>
-
-                        <div style="margin-top:14px; display:flex; gap:10px;">
-                            <input type="text" class="ss-video-input" id="inputCustomVideoUrl" placeholder="Вставьте ссылку на YouTube (напр. youtube.com/watch?v=...) или MP4" style="flex:1; padding:10px 14px; border-radius:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff;">
-                            <button class="btn-apply-video" id="btnApplyCustomVideo" tabindex="0" style="padding:10px 18px; border-radius:8px; background:var(--accent-color); color:#000; font-weight:700; border:none; cursor:pointer;">Применить</button>
-                        </div>
-                    </div>
-
+                <!-- TAB 4: ИНФО О ПРИЛОЖЕНИИ -->
+                <div class="settings-subpane" id="sub-info">
                     <div class="setting-card">
-                        <h3>Виджеты на заставке</h3>
-                        <p class="setting-desc">Выберите, какая информация выводится поверх заставки:</p>
-                        <div class="ss-widget-type-options" id="ssWidgetTypeOptions">
-                            <button class="ss-wtype-btn active" data-type="both" tabindex="0">
-                                <span>Часы + Календарь</span>
-                            </button>
-                            <button class="ss-wtype-btn" data-type="clock" tabindex="0">
-                                <span>Только Большие Часы</span>
-                            </button>
-                            <button class="ss-wtype-btn" data-type="calendar" tabindex="0">
-                                <span>Только Календарь</span>
-                            </button>
-                            <button class="ss-wtype-btn" data-type="none" tabindex="0">
-                                <span>Чистый экран (Без виджетов)</span>
-                            </button>
-                        </div>
-
-                        <div style="margin-top: 14px;">
-                            <h4>Прозрачность виджетов на заставке:</h4>
-                            <div class="ss-opacity-options" style="display:flex; gap:10px; margin-top:8px;">
-                                <button class="ss-opacity-btn active" data-opacity="ultra" tabindex="0" style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">Ультра-прозрачные (Не заслоняют фон)</button>
-                                <button class="ss-opacity-btn" data-opacity="semi" tabindex="0" style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">Полупрозрачные</button>
-                                <button class="ss-opacity-btn" data-opacity="solid" tabindex="0" style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer;">Контрастная подложка</button>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 14px;">
-                            <h4>Расположение инфо-блоков на экране заставки:</h4>
-                            <div class="ss-pos-options" id="ssPosOptions">
-                                <button class="ss-pos-btn active" data-pos="center" tabindex="0">
-                                    <span>По центру</span>
-                                </button>
-                                <button class="ss-pos-btn" data-pos="bottom-left" tabindex="0">
-                                    <span>Внизу слева</span>
-                                </button>
-                                <button class="ss-pos-btn" data-pos="bottom-right" tabindex="0">
-                                    <span>Внизу справа</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="setting-card">
-                        <h3>Таймаут автоматического включения</h3>
-                        <p class="setting-desc">Через сколько минут бездействия пульта запускать заставку:</p>
-                        <div class="timeout-options" id="timeoutOptions">
-                            <button class="timeout-btn" data-sec="60" tabindex="0">1 мин</button>
-                            <button class="timeout-btn active" data-sec="180" tabindex="0">3 мин</button>
-                            <button class="timeout-btn" data-sec="300" tabindex="0">5 мин</button>
-                            <button class="timeout-btn" data-sec="600" tabindex="0">10 мин</button>
-                            <button class="timeout-btn" data-sec="0" tabindex="0">Отключено</button>
-                        </div>
-                        <button class="btn-launch-big" id="btnTestScreensaver" style="margin-top: 16px;" tabindex="0">▶ Проверить заставку прямо сейчас</button>
+                        <h3>О приложении Home Portal</h3>
+                        <p class="setting-desc">Универсальный портал для Smart TV и Media Station X (MSX).</p>
                     </div>
                 </div>
 
             </section>
 
-            <!-- TAB 4: ИНФО О ПРИЛОЖЕНИИ -->
+            <!-- TAB 4: ИНФО -->
             <section class="tab-pane" id="tabInfo">
                 <div class="tab-header">
                     <div class="header-left">
@@ -600,23 +550,13 @@
 
                 <div class="info-content-card">
                     <div class="info-badge-row">
-                        <span class="info-pill-badge">Версия 2.8.0 Release</span>
+                        <span class="info-pill-badge">Версия 2.9.0 Release</span>
                         <span class="info-pill-badge">Bento Box Modular UI</span>
                         <span class="info-pill-badge">Smart TV 4K Ultra HD</span>
                     </div>
                     <p class="info-text">
                         <strong>Home Portal TV</strong> — интерактивный персональный хаб для телевизоров Smart TV и медиаплееров.
-                        Разработан для работы под управлением платформы <em>Media Station X (MSX)</em>, веб-оболочек Android TV, Tizen и webOS.
                     </p>
-                    <div class="info-shortcuts-box">
-                        <h3>Управление пультом ДУ:</h3>
-                        <ul>
-                            <li><strong>Стрелки (Вверх/Вниз/Влево/Вправо)</strong> — навигация между блоками, виджетами и карточками</li>
-                            <li><strong>ОК / Enter</strong> — выбор программы, активация вкладки или действия</li>
-                            <li><strong>Синяя кнопка пульта (или F11 / 'F')</strong> — переключение полноэкранного режима (На весь экран / Свернуть)</li>
-                            <li><strong>Возврат / Back / Escape</strong> — возврат на панель виджетов или скрытие бокового меню</li>
-                        </ul>
-                    </div>
                 </div>
             </section>
 
@@ -641,8 +581,8 @@
 
         <div class="ss-widgets-container pos-center" id="ssWidgetsContainer">
             <div class="ss-widget-block" id="ssClockBlock">
-                <div class="ss-clock-time" id="ssClockTime">18:45</div>
-                <div class="ss-clock-date" id="ssClockDate">ПОНЕДЕЛЬНИК, 12 ОКТЯБРЯ 2026</div>
+                <div class="ss-clock-time" id="ssClockTime">19:48</div>
+                <div class="ss-clock-date" id="ssClockDate">СРЕДА, 14 ОКТЯБРЯ 2026</div>
                 <div class="ss-mode-badge">
                     <span class="material-icons" style="font-size: 14px;">spa</span>
                     <span>HOME PORTAL 4K • РЕЛАКС</span>
@@ -664,7 +604,83 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- INLINE BULLETPROOF REAL-TIME CLOCK & NAVIGATION GUARANTEE -->
+    <script>
+    (function() {
+        var ruMonths = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+        var ruWeekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+
+        function tick() {
+            var now = new Date();
+            var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            var hStr = (h < 10 ? '0' : '') + h;
+            var mStr = (m < 10 ? '0' : '') + m;
+            var sStr = (s < 10 ? '0' : '') + s;
+
+            var elH = document.getElementById('digH');
+            var elM = document.getElementById('digM');
+            var elS = document.getElementById('digS');
+            if (elH && elM && elS) {
+                elH.textContent = hStr;
+                elM.textContent = mStr;
+                elS.textContent = sStr;
+            }
+
+            var fullDate = ruWeekdays[(now.getDay() + 6) % 7] + ', ' + now.getDate() + ' ' + ruMonths[now.getMonth()] + ' ' + now.getFullYear();
+            var elDate = document.getElementById('digFullDate');
+            if (elDate) elDate.textContent = fullDate;
+
+            var aTime = document.getElementById('analogDigTime');
+            if (aTime) aTime.textContent = hStr + ':' + mStr;
+            var aDate = document.getElementById('analogDateLabel');
+            if (aDate) aDate.textContent = (now.getDate() + ' ' + ruMonths[now.getMonth()] + ' ' + now.getFullYear()).toUpperCase();
+
+            var hHand = document.getElementById('analogHourHand');
+            var mHand = document.getElementById('analogMinHand');
+            var sHand = document.getElementById('analogSecHand');
+            if (hHand && mHand && sHand) {
+                var sDeg = s * 6;
+                var mDeg = (m + s / 60) * 6;
+                var hDeg = ((h % 12) + m / 60) * 30;
+                sHand.style.transform = 'translateX(-50%) rotate(' + sDeg + 'deg)';
+                mHand.style.transform = 'translateX(-50%) rotate(' + mDeg + 'deg)';
+                hHand.style.transform = 'translateX(-50%) rotate(' + hDeg + 'deg)';
+            }
+        }
+
+        tick();
+        setInterval(tick, 500);
+
+        var hasEnteredFS = false;
+        function autoFS() {
+            if (hasEnteredFS) return;
+            hasEnteredFS = true;
+            var docEl = document.documentElement;
+            var req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+            if (req) {
+                try { req.call(docEl); } catch (e) {}
+            }
+        }
+        window.addEventListener('keydown', autoFS, { once: true });
+        window.addEventListener('click', autoFS, { once: true });
+
+        function setFocus() {
+            var el = document.getElementById('wClockDigital') || document.querySelector('.glass-widget');
+            if (el) {
+                try { el.focus(); el.classList.add('focused'); } catch (e) {}
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setFocus);
+        } else {
+            setFocus();
+        }
+        setTimeout(setFocus, 100);
+        setTimeout(setFocus, 400);
+    })();
+    </script>
+
+    <!-- Main JavaScript -->
     <script src="{{ base_url }}/static/js/app.js"></script>
 </body>
 </html>
