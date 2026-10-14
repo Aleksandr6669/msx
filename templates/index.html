@@ -44,7 +44,7 @@
                 <button class="menu-tab" data-tab="apps" tabindex="0">
                     <span class="material-icons">apps</span>
                     <span class="tab-label">Программы</span>
-                    <span class="tab-badge" id="appsCountBadge">7</span>
+                    <span class="tab-badge" id="appsCountBadge">8</span>
                 </button>
 
                 <!-- ITEM 3: НАСТРОЙКИ -->
@@ -61,10 +61,6 @@
             </nav>
 
             <div class="sidebar-bottom">
-                <button class="quick-fullscreen-btn btn-fullscreen-toggle" id="btnSidebarFullscreen" tabindex="0" title="На весь экран (Синяя кнопка пульта)">
-                    <span class="material-icons" id="iconSidebarFullscreen">fullscreen</span>
-                    <span class="fs-text" id="textSidebarFullscreen">Во весь экран</span>
-                </button>
                 <button class="quick-screensaver-btn" id="startScreensaverBtn" tabindex="0" title="Включить заставку сейчас">
                     <span class="material-icons">wallpaper</span>
                     <span>Заставка</span>
@@ -83,26 +79,20 @@
         <!-- 2. MAIN CONTENT STAGE -->
         <main class="tv-content-stage tv-stage" id="tvStage">
             
-            <!-- TAB 1: ВИДЖЕТЫ -->
+            <!-- TAB 1: ВИДЖЕТЫ (SYMMETRICAL 2x2 BENTO GRID) -->
             <section class="tab-pane active" id="tabWidgets">
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>Виджеты & Монитор</h2>
                         <span class="header-sub">Информационная панель реального времени</span>
                     </div>
-                    <div class="header-right">
-                        <button class="btn-fullscreen-toggle" id="btnToggleFullscreen" tabindex="0" title="На весь экран (Синяя кнопка пульта)">
-                            <span class="material-icons" id="iconToggleFullscreen">fullscreen</span>
-                            <span class="fs-label" id="textToggleFullscreen">На весь экран</span>
-                        </button>
-                    </div>
                 </div>
 
-                <!-- Bento Box Grid of Modular Widgets (1x1, 2x1, 2x2) -->
+                <!-- Bento Box Grid of Modular Widgets (2x2 Balanced Grid) -->
                 <div class="widgets-bento-grid" id="widgetsWrapper">
                     
-                    <!-- WIDGET: DIGITAL NEON CLOCK -->
-                    <div class="glass-widget widget-clock-digital span-2" id="wClockDigital" tabindex="0">
+                    <!-- WIDGET 1: DIGITAL NEON CLOCK (TOP-LEFT) -->
+                    <div class="glass-widget widget-clock-digital" id="wClockDigital" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">schedule</span>
                             <span class="w-label">ЦИФРОВЫЕ ЧАСЫ</span>
@@ -111,7 +101,7 @@
                         <div class="w-digital-time">
                             <span id="digH">19</span>
                             <span class="colon">:</span>
-                            <span id="digM">48</span>
+                            <span id="digM">54</span>
                             <span class="sec-text" id="digS">30</span>
                         </div>
                         <div class="w-footer-date" id="digFullDate">
@@ -119,8 +109,8 @@
                         </div>
                     </div>
 
-                    <!-- WIDGET: ANALOG LUXURY CLOCK -->
-                    <div class="glass-widget widget-clock-analog span-1" id="wClockAnalog" tabindex="0">
+                    <!-- WIDGET 2: ANALOG LUXURY CLOCK (TOP-RIGHT) -->
+                    <div class="glass-widget widget-clock-analog" id="wClockAnalog" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">watch_later</span>
                             <span class="w-label">АНАЛОГОВЫЕ ЧАСЫ</span>
@@ -142,28 +132,15 @@
                                 </div>
                             </div>
                             <div class="analog-wide-info" id="analogWideInfo">
-                                <div class="analog-digital-time" id="analogDigTime">19:48</div>
+                                <div class="analog-digital-time" id="analogDigTime">19:54</div>
                                 <div class="analog-date-label" id="analogDateLabel">14 ОКТЯБРЯ 2026</div>
                                 <div class="analog-city-badge">ШВЕЙЦАРСКИЙ ХРОНОГРАФ</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- WIDGET: MODERN MINIMAL CLOCK -->
-                    <div class="glass-widget widget-clock-modern span-1" id="wClockModern" style="display: none;" tabindex="0">
-                        <div class="w-header">
-                            <span class="material-icons w-icon">timer</span>
-                            <span class="w-label">МОДЕРН ЧАСЫ</span>
-                            <span class="w-sec-badge">MIN</span>
-                        </div>
-                        <div class="w-modern-display">
-                            <div class="modern-time-val" id="modernTime">19:48</div>
-                            <div class="modern-date-val" id="modernDate">14.10.2026</div>
-                        </div>
-                    </div>
-
-                    <!-- WIDGET: INTERACTIVE CALENDAR MONTH GRID -->
-                    <div class="glass-widget widget-cal-grid span-2" id="wCalGrid" tabindex="0">
+                    <!-- WIDGET 3: CALENDAR MONTH GRID (BOTTOM-LEFT) -->
+                    <div class="glass-widget widget-cal-grid" id="wCalGrid" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">calendar_month</span>
                             <span class="w-label" id="calMonthTitle">ОКТЯБРЬ 2026</span>
@@ -174,59 +151,46 @@
                                 <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span class="weekend">СБ</span><span class="weekend">ВС</span>
                             </div>
                             <div class="cal-grid-cells" id="calGridCells">
-    <div class="cal-cell empty other-month"></div>
-    <div class="cal-cell empty other-month"></div>
-    <div class="cal-cell empty other-month"></div>
-    <div class="cal-cell">1</div>
-    <div class="cal-cell">2</div>
-    <div class="cal-cell weekend">3</div>
-    <div class="cal-cell weekend">4</div>
-    <div class="cal-cell">5</div>
-    <div class="cal-cell">6</div>
-    <div class="cal-cell">7</div>
-    <div class="cal-cell">8</div>
-    <div class="cal-cell">9</div>
-    <div class="cal-cell weekend">10</div>
-    <div class="cal-cell weekend">11</div>
-    <div class="cal-cell">12</div>
-    <div class="cal-cell">13</div>
-    <div class="cal-cell today">14</div>
-    <div class="cal-cell">15</div>
-    <div class="cal-cell">16</div>
-    <div class="cal-cell weekend">17</div>
-    <div class="cal-cell weekend">18</div>
-    <div class="cal-cell">19</div>
-    <div class="cal-cell">20</div>
-    <div class="cal-cell">21</div>
-    <div class="cal-cell">22</div>
-    <div class="cal-cell">23</div>
-    <div class="cal-cell weekend">24</div>
-    <div class="cal-cell weekend">25</div>
-    <div class="cal-cell">26</div>
-    <div class="cal-cell">27</div>
-    <div class="cal-cell">28</div>
-    <div class="cal-cell">29</div>
-    <div class="cal-cell">30</div>
-    <div class="cal-cell weekend">31</div>
-</div>
+                                <div class="cal-cell empty other-month"></div>
+                                <div class="cal-cell empty other-month"></div>
+                                <div class="cal-cell empty other-month"></div>
+                                <div class="cal-cell">1</div>
+                                <div class="cal-cell">2</div>
+                                <div class="cal-cell weekend">3</div>
+                                <div class="cal-cell weekend">4</div>
+                                <div class="cal-cell">5</div>
+                                <div class="cal-cell">6</div>
+                                <div class="cal-cell">7</div>
+                                <div class="cal-cell">8</div>
+                                <div class="cal-cell">9</div>
+                                <div class="cal-cell weekend">10</div>
+                                <div class="cal-cell weekend">11</div>
+                                <div class="cal-cell">12</div>
+                                <div class="cal-cell">13</div>
+                                <div class="cal-cell today">14</div>
+                                <div class="cal-cell">15</div>
+                                <div class="cal-cell">16</div>
+                                <div class="cal-cell weekend">17</div>
+                                <div class="cal-cell weekend">18</div>
+                                <div class="cal-cell">19</div>
+                                <div class="cal-cell">20</div>
+                                <div class="cal-cell">21</div>
+                                <div class="cal-cell">22</div>
+                                <div class="cal-cell">23</div>
+                                <div class="cal-cell weekend">24</div>
+                                <div class="cal-cell weekend">25</div>
+                                <div class="cal-cell">26</div>
+                                <div class="cal-cell">27</div>
+                                <div class="cal-cell">28</div>
+                                <div class="cal-cell">29</div>
+                                <div class="cal-cell">30</div>
+                                <div class="cal-cell weekend">31</div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- WIDGET: COMPACT CALENDAR -->
-                    <div class="glass-widget widget-cal-compact span-1" id="wCalCompact" style="display: none;" tabindex="0">
-                        <div class="w-header">
-                            <span class="material-icons w-icon">today</span>
-                            <span class="w-label">СЕГОДНЯ</span>
-                        </div>
-                        <div class="cal-compact-display">
-                            <div class="compact-day-num" id="compactDayNum">14</div>
-                            <div class="compact-month-name" id="compactMonthName">ОКТЯБРЯ</div>
-                            <div class="compact-weekday-name" id="compactWeekdayName">СРЕДА</div>
-                        </div>
-                    </div>
-
-                    <!-- WIDGET: TV GUIDE / UPCOMING EVENTS -->
-                    <div class="glass-widget widget-cal-events span-2" id="wCalEvents" tabindex="0">
+                    <!-- WIDGET 4: TV GUIDE / UPCOMING EVENTS (BOTTOM-RIGHT) -->
+                    <div class="glass-widget widget-cal-events" id="wCalEvents" tabindex="0">
                         <div class="w-header">
                             <span class="material-icons w-icon">event_note</span>
                             <span class="w-label">ПЛАНИРОВЩИК ТВ</span>
@@ -253,18 +217,12 @@
                 </div>
             </section>
 
-            <!-- TAB 2: ПРОГРАММЫ (6-7 В РЯД, КОМПАКТНЫЕ ЯРЛЫКИ КАК НА СМАРТФОНЕ) -->
+            <!-- TAB 2: ПРОГРАММЫ (6-7 В РЯД, КОМПАКТНЫЕ ЯРЛЫКИ) -->
             <section class="tab-pane" id="tabApps">
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>Программы & Кинозалы</h2>
-                        <span class="header-sub">Быстрый запуск веб-сервисов и онлайн-кинотеатров на весь экран</span>
-                    </div>
-                    <div class="header-right">
-                        <button class="btn-fullscreen-toggle" id="btnToggleFullscreenApps" tabindex="0" title="На весь экран (Синяя кнопка пульта)">
-                            <span class="material-icons">fullscreen</span>
-                            <span class="fs-label">На весь экран</span>
-                        </button>
+                        <span class="header-sub">Быстрый запуск веб-сервисов и онлайн-кинотеатров на телевизоре</span>
                     </div>
                 </div>
 
@@ -273,18 +231,12 @@
                 </div>
             </section>
 
-            <!-- TAB 3: НАСТРОЙКИ СИСТЕМЫ (ПОДВКЛАДКИ) -->
+            <!-- TAB 3: НАСТРОЙКИ СИСТЕМЫ -->
             <section class="tab-pane" id="tabSettings">
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>Настройки системы</h2>
                         <span class="header-sub">Персонализация внешнего вида, виджетов, программ и заставки</span>
-                    </div>
-                    <div class="header-right">
-                        <button class="btn-fullscreen-toggle" id="btnToggleFullscreenSettings" tabindex="0" title="На весь экран (Синяя кнопка пульта)">
-                            <span class="material-icons">fullscreen</span>
-                            <span class="fs-label">На весь экран</span>
-                        </button>
                     </div>
                 </div>
 
@@ -297,23 +249,6 @@
 
                 <!-- SUBTAB 1: ВНЕШНИЙ ВИД -->
                 <div class="settings-subpane active" id="sub-appearance">
-                    <!-- FULLSCREEN SMART TV TOGGLE -->
-                    <div class="setting-card">
-                        <div class="setting-info">
-                            <div class="setting-title" style="display:flex; align-items:center; gap:8px;">
-                                <span class="material-icons" style="color:var(--accent-color);">fullscreen</span>
-                                <h3 style="margin:0;">Полноэкранный режим (Smart TV)</h3>
-                            </div>
-                            <p class="setting-desc">Развернуть портал на 100% площади экрана телевизора без системных рамок браузера. Повторное нажатие или синяя кнопка пульта возвращает обычный вид.</p>
-                        </div>
-                        <div class="setting-control" style="margin-top:12px;">
-                            <button class="btn-primary btn-fullscreen-toggle" id="btnSettingsFullscreen" tabindex="0">
-                                <span class="material-icons" id="iconSettingsFullscreen">fullscreen</span>
-                                <span id="textSettingsFullscreen">На весь экран</span>
-                            </button>
-                        </div>
-                    </div>
-
                     <div class="setting-card">
                         <h3>Цветовая тема (Неоновый акцент)</h3>
                         <p class="setting-desc">Выберите цвет для фокуса, неоновых линий и часов:</p>
@@ -367,74 +302,18 @@
 
                 <!-- SUBTAB 2: ВИДЖЕТЫ & СЕТКА -->
                 <div class="settings-subpane" id="sub-widgets">
-                    <!-- VIEW A: List of widgets to configure -->
                     <div id="widgetsListView">
                         <div class="setting-card">
-                            <h3>Размеры и видимость модулей на экране</h3>
-                            <p class="setting-desc">Выберите виджет из списка ниже, чтобы изменить его размер (1, 2 или 4 ячейки), стиль или скрыть его:</p>
+                            <h3>Размеры и модули на экране</h3>
+                            <p class="setting-desc">Список модулей информационной панели:</p>
                             <div class="widgets-manage-grid" id="widgetsManageGrid">
                                 <!-- Generated by JS -->
                             </div>
                         </div>
                     </div>
-
-                    <!-- VIEW B: Dedicated Widget Detail & Sizing Configurator -->
-                    <div id="widgetDetailView" style="display: none;">
-                        <div class="setting-card">
-                            <div class="detail-header-row">
-                                <button class="detail-back-btn" id="btnBackToWidgetsList" tabindex="0">
-                                    <span class="material-icons">arrow_back</span>
-                                    <span>Назад ко всем виджетам</span>
-                                </button>
-                                <span class="widget-type-badge" id="detailWidgetBadge">WIDGET</span>
-                            </div>
-
-                            <div class="detail-meta-box">
-                                <span class="material-icons detail-widget-icon" id="detailWidgetIcon">dashboard</span>
-                                <div>
-                                    <h3 id="detailWidgetTitle">Настройка виджета</h3>
-                                    <p class="setting-desc" id="detailWidgetDesc">Настройте ширину виджета в сетке Bento Box и его параметры отображения.</p>
-                                </div>
-                            </div>
-
-                            <div class="setting-section-divider"></div>
-
-                            <h4>Ширина виджета в модульной сетке (Bento Box):</h4>
-                            <div class="bento-size-selector" id="detailSizeSelector">
-                                <button class="bento-size-card" data-size="1" tabindex="0">
-                                    <div class="size-preview size-1"></div>
-                                    <span class="size-title">1 ячейка</span>
-                                    <span class="size-desc">Компактный квадрат (1×1)</span>
-                                </button>
-                                <button class="bento-size-card" data-size="2" tabindex="0">
-                                    <div class="size-preview size-2"></div>
-                                    <span class="size-title">2 ячейки</span>
-                                    <span class="size-desc">Широкий блок (2×1 • По горизонтали)</span>
-                                </button>
-                                <button class="bento-size-card" data-size="4" tabindex="0">
-                                    <div class="size-preview size-4"></div>
-                                    <span class="size-title">4 ячейки</span>
-                                    <span class="size-desc">Большой модуль (2×2 • 2 по верт. и 2 по гор.)</span>
-                                </button>
-                            </div>
-
-                            <div class="setting-section-divider"></div>
-
-                            <div class="detail-visibility-row">
-                                <div>
-                                    <span class="toggle-title">Отображать виджет на главной панели</span>
-                                    <p class="setting-desc">Если отключить, виджет исчезнет с экрана, освободив место для других карточек.</p>
-                                </div>
-                                <button class="toggle-pill active" id="detailWidgetToggle" tabindex="0">
-                                    <span class="pill-dot"></span>
-                                    <span class="pill-label">Включен</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- SUBTAB 3: ПРОГРАММЫ (КАТАЛОГ & ССЫЛКИ) -->
+                <!-- SUBTAB 3: ПРОГРАММЫ -->
                 <div class="settings-subpane" id="sub-apps">
                     <div class="setting-card">
                         <h3>Добавить программу вручную</h3>
@@ -477,7 +356,7 @@
                     </div>
                 </div>
 
-                <!-- SUBTAB 4: НАСТРОЙКА ЗАСТАВКИ (СКРИНСЕЙВЕРА) -->
+                <!-- SUBTAB 4: НАСТРОЙКА ЗАСТАВКИ -->
                 <div class="settings-subpane" id="sub-screensaver">
                     <div class="setting-card">
                         <h3>Тип медиа для заставки</h3>
@@ -489,7 +368,7 @@
                         </div>
                     </div>
 
-                    <div class="setting-card" id="ssPhotoSettingsCard">
+                    <div class="setting-card">
                         <h3>4K Фотообои для заставки</h3>
                         <p class="setting-desc">Выберите фоновое изображение или включите слайдшоу:</p>
                         <div class="ss-wallpapers-grid" id="ssWallpapersGrid">
@@ -523,40 +402,35 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: ИНФО О ПРИЛОЖЕНИИ -->
-                <div class="settings-subpane" id="sub-info">
-                    <div class="setting-card">
-                        <h3>О приложении Home Portal</h3>
-                        <p class="setting-desc">Универсальный портал для Smart TV и Media Station X (MSX).</p>
-                    </div>
-                </div>
-
             </section>
 
-            <!-- TAB 4: ИНФО -->
+            <!-- TAB 4: ИНФО О ПРИЛОЖЕНИИ -->
             <section class="tab-pane" id="tabInfo">
                 <div class="tab-header">
                     <div class="header-left">
                         <h2>О приложении Home Portal</h2>
                         <span class="header-sub">Информация о системе, хосте и пульт-навигации</span>
                     </div>
-                    <div class="header-right">
-                        <button class="btn-fullscreen-toggle" id="btnToggleFullscreenInfo" tabindex="0" title="На весь экран (Синяя кнопка пульта)">
-                            <span class="material-icons">fullscreen</span>
-                            <span class="fs-label">На весь экран</span>
-                        </button>
-                    </div>
                 </div>
 
                 <div class="info-content-card">
                     <div class="info-badge-row">
-                        <span class="info-pill-badge">Версия 2.9.0 Release</span>
+                        <span class="info-pill-badge">Версия 3.0.0 Stable</span>
                         <span class="info-pill-badge">Bento Box Modular UI</span>
                         <span class="info-pill-badge">Smart TV 4K Ultra HD</span>
                     </div>
                     <p class="info-text">
-                        <strong>Home Portal TV</strong> — интерактивный персональный хаб для телевизоров Smart TV и медиаплееров.
+                        <strong>Home Portal TV</strong> — интерактивный хаб для телевизоров Smart TV (Samsung Tizen, Android TV, LG webOS, Media Station X).
                     </p>
+                    <div class="info-shortcuts-box" style="margin-top: 16px;">
+                        <h3>Управление пультом ДУ (Android & Samsung TV):</h3>
+                        <ul style="margin-top: 8px; line-height: 1.8;">
+                            <li><strong>Стрелки (Вверх/Вниз/Влево/Вправо)</strong> — перемещение между виджетами и карточками</li>
+                            <li><strong>ОК / Enter</strong> — выбор программы или активация действия</li>
+                            <li><strong>Стрелка Влево</strong> у левого края экрана — быстрый переход в боковое меню</li>
+                            <li><strong>Возврат / Back / Escape</strong> — возврат на экран виджетов или закрытие заставки</li>
+                        </ul>
+                    </div>
                 </div>
             </section>
 
@@ -581,7 +455,7 @@
 
         <div class="ss-widgets-container pos-center" id="ssWidgetsContainer">
             <div class="ss-widget-block" id="ssClockBlock">
-                <div class="ss-clock-time" id="ssClockTime">19:48</div>
+                <div class="ss-clock-time" id="ssClockTime">19:54</div>
                 <div class="ss-clock-date" id="ssClockDate">СРЕДА, 14 ОКТЯБРЯ 2026</div>
                 <div class="ss-mode-badge">
                     <span class="material-icons" style="font-size: 14px;">spa</span>
@@ -604,7 +478,7 @@
         </div>
     </div>
 
-    <!-- INLINE BULLETPROOF REAL-TIME CLOCK & NAVIGATION GUARANTEE -->
+    <!-- INLINE AUTONOMOUS CLOCK TICKER (GUARANTEES IMMEDIATE REAL TIME) -->
     <script>
     (function() {
         var ruMonths = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
@@ -650,19 +524,6 @@
 
         tick();
         setInterval(tick, 500);
-
-        var hasEnteredFS = false;
-        function autoFS() {
-            if (hasEnteredFS) return;
-            hasEnteredFS = true;
-            var docEl = document.documentElement;
-            var req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-            if (req) {
-                try { req.call(docEl); } catch (e) {}
-            }
-        }
-        window.addEventListener('keydown', autoFS, { once: true });
-        window.addEventListener('click', autoFS, { once: true });
 
         function setFocus() {
             var el = document.getElementById('wClockDigital') || document.querySelector('.glass-widget');

@@ -1,6 +1,6 @@
 // ==========================================================================
 // HOME PORTAL TV — CLIENT ENGINE FOR SMART TV & MEDIA STATION X
-// Optimized for 60fps, TV Remote D-Pad Navigation, Bento 2x2 Grid
+// Universal Remote D-Pad Navigation (Samsung Tizen, Android TV, webOS)
 // ==========================================================================
 
 const SECTION_WALLPAPERS = {
@@ -101,45 +101,6 @@ const DEFAULT_APPS_LIST = [
     }
 ];
 
-const WIDGETS_METADATA = {
-    clock_digital: {
-        title: "Цифровые часы",
-        desc: "Крупные часы с секундами и датой",
-        icon: "schedule",
-        defaultSize: 2
-    },
-    clock_analog: {
-        title: "Аналоговые часы",
-        desc: "Стрелочный хронограф с секундной стрелкой",
-        icon: "watch_later",
-        defaultSize: 1
-    },
-    clock_modern: {
-        title: "Минимал часы",
-        desc: "Лаконичный циферблат и день недели",
-        icon: "av_timer",
-        defaultSize: 1
-    },
-    calendar_grid: {
-        title: "Календарь (Сетка месяца)",
-        desc: "Полная сетка дней текущего месяца",
-        icon: "calendar_month",
-        defaultSize: 2
-    },
-    calendar_compact: {
-        title: "Компактная дата",
-        desc: "Карточка сегодняшнего дня",
-        icon: "today",
-        defaultSize: 1
-    },
-    calendar_events: {
-        title: "Планировщик ТВ",
-        desc: "Список предстоящих передач и фильмов",
-        icon: "event_note",
-        defaultSize: 2
-    }
-};
-
 let state = {
     activeTab: "widgets",
     themeColor: localStorage.getItem('hp_theme_color') || "#00d2ff",
@@ -148,59 +109,34 @@ let state = {
     animations: localStorage.getItem('hp_animations') || "snappy",
     idleTimeoutSec: parseInt(localStorage.getItem('hp_idle_sec') || "120", 10),
     screensaverBg: localStorage.getItem('hp_ss_bg') || "ss_all",
-    sidebarPos: localStorage.getItem('hp_sidebar_pos') || "left",
-    ssMediaType: localStorage.getItem('hp_ss_mtype') || "photo",
-    ssYoutubeId: localStorage.getItem('hp_ss_ytid') || "L_LUpnjgPso",
-    ssVideoUrl: localStorage.getItem('hp_ss_vurl') || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    ssPhotoAnim: localStorage.getItem('hp_ss_photo_anim') !== 'false',
-    ssWidgetOpacity: localStorage.getItem('hp_ss_wopacity') || "ultra",
-    ssWidgetType: localStorage.getItem('hp_ss_wtype') || "both",
-    ssPosition: localStorage.getItem('hp_ss_pos') || "center",
-    widgets: JSON.parse(localStorage.getItem('hp_widgets') || JSON.stringify({
-        clock_digital: true,
-        clock_analog: true,
-        clock_modern: false,
-        calendar_grid: true,
-        calendar_compact: false,
-        calendar_events: true
-    })),
-    widgetSizes: JSON.parse(localStorage.getItem('hp_widget_sizes') || JSON.stringify({
-        clock_digital: 2,
-        clock_analog: 1,
-        clock_modern: 1,
-        calendar_grid: 4,
-        calendar_compact: 1,
-        calendar_events: 2
-    })),
-    apps: JSON.parse(localStorage.getItem('hp_apps') || JSON.stringify(DEFAULT_APPS_LIST)),
-    currentEditingWidget: null
+    apps: JSON.parse(localStorage.getItem('hp_apps') || JSON.stringify(DEFAULT_APPS_LIST))
 };
 
+function normalizeUrl(url) {
+    if (!url) return '';
+    url = url.trim();
+    if (/filmix/i.test(url)) return 'http://filmix.tv';
+    if (/lampa\.mx/i.test(url)) return 'http://lampa.mx';
+    if (/msx\.benzac\.de\/plugins\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
+    if (/msx\.benzac\.de\/plugins\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
+    if (/deeplex\.cc/i.test(url)) return 'http://deeplex.cc';
+    if (/obovse\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
+    if (!/^https?:\\/\\//i.test(url)) return 'http://' + url;
+    return url;
+}
+
 if (Array.isArray(state.apps)) {
-    if (!state.apps.some(a => a && (a.id === 'app_filmix' || (a.name && a.name.toLowerCase() === 'filmix')))) {
-        state.apps.unshift({
-            id: "app_filmix",
-            name: "Filmix",
-            url: "http://filmix.tv",
-            sub: "Онлайн-кинотеатр и сериалы",
-            icon: "movie_filter",
-            badge: "CINEMA",
-            image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=80"
-        });
-    }
-    let appsChanged = false;
+    let changed = false;
     state.apps.forEach(app => {
         if (!app || !app.url) return;
-        const normalized = normalizeUrl(app.url);
-        if (normalized !== app.url) {
-            app.url = normalized;
-            appsChanged = true;
+        const norm = normalizeUrl(app.url);
+        if (norm !== app.url) {
+            app.url = norm;
+            changed = true;
         }
     });
-    if (appsChanged) {
-        try {
-            localStorage.setItem('hp_apps', JSON.stringify(state.apps));
-        } catch (e) {}
+    if (changed) {
+        try { localStorage.setItem('hp_apps', JSON.stringify(state.apps)); } catch (e) {}
     }
 }
 
@@ -213,33 +149,15 @@ function applyThemeSettings() {
     const root = document.documentElement;
     root.style.setProperty('--accent-color', state.themeColor);
     root.style.setProperty('--accent-rgb', state.themeRgb);
-
-    document.body.classList.remove('trans-frosted', 'trans-transparent', 'trans-dark');
-    document.body.classList.add(`trans-${state.transparency}`);
-
-    document.body.classList.toggle('anim-fast', state.animations === 'fast');
-
     try {
         localStorage.setItem('hp_theme_color', state.themeColor);
         localStorage.setItem('hp_theme_rgb', state.themeRgb);
-        localStorage.setItem('hp_transparency', state.transparency);
-        localStorage.setItem('hp_animations', state.animations);
     } catch (e) {}
 }
 try { applyThemeSettings(); } catch (e) { console.error(e); }
 
-function applySidebarPosition() {
-    var shell = document.getElementById('tvShell');
-    if (!shell) return;
-    shell.classList.toggle('sidebar-right', state.sidebarPos === 'right');
-    try { localStorage.setItem('hp_sidebar_pos', state.sidebarPos); } catch (e) {}
-}
-
 const bgWallpaper = document.getElementById('bgWallpaper');
 const tvSidebar = document.getElementById('tvSidebar');
-const tvShell = document.getElementById('tvShell');
-applySidebarPosition();
-const tvStage = document.getElementById('tvStage');
 const menuTabs = document.querySelectorAll('.menu-tab');
 const tabPanes = {
     widgets: document.getElementById('tabWidgets'),
@@ -247,13 +165,6 @@ const tabPanes = {
     settings: document.getElementById('tabSettings'),
     info: document.getElementById('tabInfo')
 };
-
-// Permanent Sidebar: NEVER collapses!
-function expandSidebar(expand) {
-    if (!tvSidebar) return;
-    tvSidebar.classList.remove('collapsed');
-    if (tvShell) tvShell.classList.remove('sidebar-collapsed');
-}
 
 function focusCurrentTabContent() {
     const activePane = tabPanes[state.activeTab];
@@ -297,12 +208,14 @@ const urlParams = new URLSearchParams(window.location.search);
 const initialTab = urlParams.get('tab') || sessionStorage.getItem('hp_active_tab') || 'widgets';
 switchTab(initialTab);
 
+// ---------------------------------------------------------------------------
+// REAL-TIME CLOCKS ENGINE
+// ---------------------------------------------------------------------------
 function updateClocks() {
     const now = new Date();
     const h = now.getHours();
     const m = now.getMinutes();
     const s = now.getSeconds();
-    const ms = now.getMilliseconds();
 
     const hStr = String(h).padStart(2, '0');
     const mStr = String(m).padStart(2, '0');
@@ -321,7 +234,7 @@ function updateClocks() {
     const mHand = document.getElementById('analogMinHand');
     const sHand = document.getElementById('analogSecHand');
     if (hHand && mHand && sHand) {
-        const secDeg = (s + ms / 1000) * 6;
+        const secDeg = s * 6;
         const minDeg = (m + s / 60) * 6;
         const hourDeg = ((h % 12) + m / 60) * 30;
 
@@ -410,52 +323,6 @@ function renderCalendars() {
 }
 try { renderCalendars(); } catch (e) { console.error(e); }
 
-const widgetElements = {
-    clock_digital: document.getElementById('wClockDigital'),
-    clock_analog: document.getElementById('wClockAnalog'),
-    clock_modern: document.getElementById('wClockModern'),
-    calendar_grid: document.getElementById('wCalGrid'),
-    calendar_compact: document.getElementById('wCalCompact'),
-    calendar_events: document.getElementById('wCalEvents')
-};
-
-function applyWidgetSizesAndToggles() {
-    Object.keys(widgetElements).forEach(key => {
-        const el = widgetElements[key];
-        if (!el) return;
-
-        const isVisible = !!state.widgets[key];
-        el.style.display = isVisible ? 'flex' : 'none';
-
-        const size = state.widgetSizes[key] || 2;
-        el.classList.remove('span-1', 'span-2', 'span-4');
-        el.classList.add(`span-${size}`);
-    });
-
-    try {
-        localStorage.setItem('hp_widgets', JSON.stringify(state.widgets));
-        localStorage.setItem('hp_widget_sizes', JSON.stringify(state.widgetSizes));
-    } catch (e) {}
-}
-try { applyWidgetSizesAndToggles(); } catch (e) { console.error(e); }
-
-function normalizeUrl(url) {
-    if (!url) return '';
-    url = url.trim();
-
-    if (/filmix/i.test(url)) return 'http://filmix.tv';
-    if (/lampa\.mx/i.test(url)) return 'http://lampa.mx';
-    if (/msx\.benzac\.de\/plugins\/youtube/i.test(url)) return 'http://msx.benzac.de/plugins/youtube.html';
-    if (/msx\.benzac\.de\/plugins\/twitch/i.test(url)) return 'http://msx.benzac.de/plugins/twitch.html';
-    if (/deeplex\.cc/i.test(url)) return 'http://deeplex.cc';
-    if (/obovse\.ru/i.test(url)) return 'http://operats.obovse.ru/2.5/';
-
-    if (!/^https?:\/\//i.test(url)) {
-        return 'http://' + url;
-    }
-    return url;
-}
-
 function openApp(app) {
     if (!app || !app.url) return;
     const targetUrl = normalizeUrl(app.url);
@@ -468,18 +335,18 @@ function openApp(app) {
 
     const loader = document.getElementById('appNavLoader');
     const loaderText = document.getElementById('loaderText');
-    if (loaderText) {
-        loaderText.textContent = `Запуск: ${app.name || 'Веб-сайт'}...`;
-    }
-    if (loader) {
-        loader.classList.add('active');
-    }
+    if (loaderText) loaderText.textContent = `Запуск: ${app.name || 'Веб-сайт'}...`;
+    if (loader) loader.classList.add('active');
 
     setTimeout(() => {
         window.location.href = targetUrl;
     }, 120);
 }
 
+// ---------------------------------------------------------------------------
+// UNIVERSAL SMART TV REMOTE CONTROL ENGINE (D-PAD & BACK KEY)
+// Compatible with Android TV, Samsung Tizen, LG webOS, Media Station X
+// ---------------------------------------------------------------------------
 function handleTvBackButton(e) {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -545,7 +412,7 @@ function findSpatialCandidate(currentEl, direction) {
     const pane = tabPanes[state.activeTab];
     if (!pane) return null;
 
-    const candidates = Array.from(pane.querySelectorAll('button:not([disabled]), [tabindex="0"], input, select, .app-card, .glass-widget, .ss-thumb-card, .ss-wtype-btn, .ss-pos-btn, .color-swatch-btn, .subtab-btn, .bento-size-card, .widget-card-manage, .btn-fullscreen-toggle'))
+    const candidates = Array.from(pane.querySelectorAll('button:not([disabled]), [tabindex="0"], input, select, .app-card, .glass-widget, .ss-thumb-card, .ss-wtype-btn, .ss-pos-btn, .color-swatch-btn, .subtab-btn'))
         .filter(el => el !== currentEl && el.offsetParent !== null);
 
     if (candidates.length === 0) return null;
@@ -600,6 +467,7 @@ window.addEventListener('keydown', (e) => {
     const key = e.key;
     const keyCode = e.keyCode;
 
+    // 1. Screensaver dismiss
     if (screensaverLayer && screensaverLayer.classList.contains('active')) {
         e.preventDefault();
         hideScreensaver();
@@ -607,33 +475,29 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    if (keyCode === 406 || keyCode === 10188 || key === 'ColorF3Blue' || key === 'Blue' || keyCode === 122 || key === 'F11' || (key === 'f' && e.target.tagName !== 'INPUT')) {
-        e.preventDefault();
-        toggleFullscreen();
-        return;
-    }
-
+    // 2. Universal Remote Back Key
     const isBackKey = (
-        keyCode === 10009 ||
-        keyCode === 461 ||
-        keyCode === 4 ||
-        keyCode === 27 ||
+        keyCode === 10009 || // Samsung Tizen Return
+        keyCode === 461 ||   // LG webOS Back
+        keyCode === 4 ||     // Android D-pad Back
+        keyCode === 27 ||    // PC Escape
+        keyCode === 8 ||     // Backspace
         key === 'Escape' ||
         key === 'Back' ||
-        key === 'GoBack' ||
-        (keyCode === 8 && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')
-    );
+        key === 'GoBack'
+    ) && (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA');
 
     if (isBackKey) {
         handleTvBackButton(e);
         return;
     }
 
-    const isUp = key === 'ArrowUp' || keyCode === 38 || keyCode === 29460;
-    const isDown = key === 'ArrowDown' || keyCode === 40 || keyCode === 29461;
-    const isLeft = key === 'ArrowLeft' || keyCode === 37 || keyCode === 4;
-    const isRight = key === 'ArrowRight' || keyCode === 39 || keyCode === 5;
-    const isEnter = key === 'Enter' || keyCode === 13 || keyCode === 29443;
+    // 3. Directional Keys (Standard & Samsung & Android D-Pad)
+    const isUp = key === 'ArrowUp' || keyCode === 38 || keyCode === 29460 || keyCode === 19;
+    const isDown = key === 'ArrowDown' || keyCode === 40 || keyCode === 29461 || keyCode === 20;
+    const isLeft = key === 'ArrowLeft' || keyCode === 37 || keyCode === 4 || keyCode === 21;
+    const isRight = key === 'ArrowRight' || keyCode === 39 || keyCode === 5 || keyCode === 22;
+    const isEnter = key === 'Enter' || keyCode === 13 || keyCode === 29443 || keyCode === 23 || keyCode === 66;
 
     if (!isUp && !isDown && !isLeft && !isRight && !isEnter) {
         return;
@@ -646,6 +510,7 @@ window.addEventListener('keydown', (e) => {
         if (!active || active === document.body) return;
     }
 
+    // Enter / OK Action
     if (isEnter) {
         if (active.tagName !== 'INPUT' && active.tagName !== 'SELECT') {
             e.preventDefault();
@@ -656,8 +521,11 @@ window.addEventListener('keydown', (e) => {
 
     const inSidebar = tvSidebar && tvSidebar.contains(active);
 
+    // -----------------------------------------------------------------------
+    // A. SIDEBAR D-PAD NAVIGATION
+    // -----------------------------------------------------------------------
     if (inSidebar) {
-        const sidebarItems = Array.from(tvSidebar.querySelectorAll('.menu-tab, #btnSidebarFullscreen, #startScreensaverBtn, #restartPortalBtn'))
+        const sidebarItems = Array.from(tvSidebar.querySelectorAll('.menu-tab, #startScreensaverBtn, #restartPortalBtn'))
             .filter(el => el.offsetParent !== null);
         const idx = sidebarItems.indexOf(active);
 
@@ -682,36 +550,25 @@ window.addEventListener('keydown', (e) => {
         }
     }
 
+    // -----------------------------------------------------------------------
+    // B. BALANCED 2x2 WIDGETS GRID NAVIGATION
+    // -----------------------------------------------------------------------
     if (state.activeTab === 'widgets') {
-        const headerBtn = document.getElementById('btnToggleFullscreen');
         const wClockDigital = document.getElementById('wClockDigital');
         const wClockAnalog = document.getElementById('wClockAnalog');
         const wCalGrid = document.getElementById('wCalGrid');
         const wCalEvents = document.getElementById('wCalEvents');
 
-        if (active === headerBtn) {
-            if (isDown) {
-                e.preventDefault();
-                setFocusWithClass(wClockDigital || wClockAnalog);
-                return;
-            }
-            if (isLeft) {
-                e.preventDefault();
-                focusSidebarActiveTab();
-                return;
-            }
-        }
-
+        // From wClockDigital (Top-Left)
         if (active === wClockDigital) {
             if (isRight) {
                 e.preventDefault();
-                if (wClockAnalog && wClockAnalog.offsetParent !== null) setFocusWithClass(wClockAnalog);
+                if (wClockAnalog) setFocusWithClass(wClockAnalog);
                 return;
             }
             if (isDown) {
                 e.preventDefault();
-                if (wCalGrid && wCalGrid.offsetParent !== null) setFocusWithClass(wCalGrid);
-                else if (wCalEvents) setFocusWithClass(wCalEvents);
+                if (wCalGrid) setFocusWithClass(wCalGrid);
                 return;
             }
             if (isLeft) {
@@ -719,41 +576,32 @@ window.addEventListener('keydown', (e) => {
                 focusSidebarActiveTab();
                 return;
             }
-            if (isUp) {
-                e.preventDefault();
-                if (headerBtn && headerBtn.offsetParent !== null) setFocusWithClass(headerBtn);
-                return;
-            }
         }
 
+        // From wClockAnalog (Top-Right)
         if (active === wClockAnalog) {
             if (isLeft) {
                 e.preventDefault();
-                if (wClockDigital && wClockDigital.offsetParent !== null) setFocusWithClass(wClockDigital);
+                if (wClockDigital) setFocusWithClass(wClockDigital);
                 return;
             }
             if (isDown) {
                 e.preventDefault();
-                if (wCalEvents && wCalEvents.offsetParent !== null) setFocusWithClass(wCalEvents);
-                else if (wCalGrid) setFocusWithClass(wCalGrid);
-                return;
-            }
-            if (isUp) {
-                e.preventDefault();
-                if (headerBtn && headerBtn.offsetParent !== null) setFocusWithClass(headerBtn);
+                if (wCalEvents) setFocusWithClass(wCalEvents);
                 return;
             }
         }
 
+        // From wCalGrid (Bottom-Left)
         if (active === wCalGrid) {
             if (isUp) {
                 e.preventDefault();
-                if (wClockDigital && wClockDigital.offsetParent !== null) setFocusWithClass(wClockDigital);
+                if (wClockDigital) setFocusWithClass(wClockDigital);
                 return;
             }
             if (isRight) {
                 e.preventDefault();
-                if (wCalEvents && wCalEvents.offsetParent !== null) setFocusWithClass(wCalEvents);
+                if (wCalEvents) setFocusWithClass(wCalEvents);
                 return;
             }
             if (isLeft) {
@@ -763,21 +611,72 @@ window.addEventListener('keydown', (e) => {
             }
         }
 
+        // From wCalEvents (Bottom-Right)
         if (active === wCalEvents) {
             if (isUp) {
                 e.preventDefault();
-                if (wClockAnalog && wClockAnalog.offsetParent !== null) setFocusWithClass(wClockAnalog);
-                else if (wClockDigital) setFocusWithClass(wClockDigital);
+                if (wClockAnalog) setFocusWithClass(wClockAnalog);
                 return;
             }
             if (isLeft) {
                 e.preventDefault();
-                if (wCalGrid && wCalGrid.offsetParent !== null) setFocusWithClass(wCalGrid);
+                if (wCalGrid) setFocusWithClass(wCalGrid);
                 return;
             }
         }
     }
 
+    // -----------------------------------------------------------------------
+    // C. APPS TAB NAVIGATION
+    // -----------------------------------------------------------------------
+    if (state.activeTab === 'apps') {
+        const appsGridEl = document.getElementById('appsGrid');
+        const cards = Array.from((appsGridEl ? appsGridEl.querySelectorAll('.app-card') : []));
+        const idx = cards.indexOf(active);
+
+        if (idx !== -1) {
+            let cols = 1;
+            const firstTop = cards[0].offsetTop;
+            for (let i = 1; i < cards.length; i++) {
+                if (cards[i].offsetTop === firstTop) cols++;
+                else break;
+            }
+            cols = Math.max(1, cols);
+
+            if (isRight) {
+                e.preventDefault();
+                if (idx < cards.length - 1) setFocusWithClass(cards[idx + 1]);
+                return;
+            }
+            if (isLeft) {
+                e.preventDefault();
+                if (idx > 0 && cards[idx].offsetTop === cards[idx - 1].offsetTop) {
+                    setFocusWithClass(cards[idx - 1]);
+                } else {
+                    focusSidebarActiveTab();
+                }
+                return;
+            }
+            if (isDown) {
+                e.preventDefault();
+                if (idx + cols < cards.length) {
+                    setFocusWithClass(cards[idx + cols]);
+                }
+                return;
+            }
+            if (isUp) {
+                e.preventDefault();
+                if (idx - cols >= 0) {
+                    setFocusWithClass(cards[idx - cols]);
+                }
+                return;
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // D. GENERAL 2D SPATIAL FALLBACK (SETTINGS, SUBTABS, INFO)
+    // -----------------------------------------------------------------------
     const dirStr = isRight ? 'right' : isLeft ? 'left' : isDown ? 'down' : 'up';
     const candidate = findSpatialCandidate(active, dirStr);
 
@@ -823,106 +722,140 @@ window.addEventListener('popstate', (e) => {
     handleTvBackButton(e);
 });
 
-// Fullscreen API Engine
-function isFullscreenActive() {
-    return !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
-    );
-}
+// Render Apps Grid
+const appsGrid = document.getElementById('appsGrid');
+const appsCountBadge = document.getElementById('appsCountBadge');
+const installedAppsManageList = document.getElementById('installedAppsManageList') || document.getElementById('installedAppsList');
 
-let hasAttemptedAutoFullscreen = false;
-function triggerAutoFullscreenOnce() {
-    if (hasAttemptedAutoFullscreen) return;
-    hasAttemptedAutoFullscreen = true;
-    if (!isFullscreenActive()) {
-        try {
-            enterFullscreen();
-        } catch (e) {}
+function renderApps() {
+    if (appsCountBadge) appsCountBadge.textContent = state.apps.length;
+
+    if (appsGrid) {
+        appsGrid.innerHTML = '';
+        state.apps.forEach(app => {
+            const card = document.createElement('div');
+            card.className = 'app-card';
+            card.tabIndex = 0;
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', app.name);
+
+            const badgeHtml = app.badge ? `<span class="app-card-badge">${app.badge}</span>` : '';
+            const iconHtml = app.image 
+                ? `<img src="${app.image}" alt="${app.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                   <span class="material-icons" style="display:none;">${app.icon || 'tv'}</span>`
+                : `<span class="material-icons">${app.icon || 'tv'}</span>`;
+
+            card.innerHTML = `
+                <div class="app-card-icon-wrap">
+                    ${iconHtml}
+                    ${badgeHtml}
+                </div>
+                <div class="app-card-name">${app.name}</div>
+            `;
+
+            card.addEventListener('click', () => openApp(app));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    openApp(app);
+                }
+            });
+
+            appsGrid.appendChild(card);
+        });
+    }
+
+    if (installedAppsManageList) {
+        installedAppsManageList.innerHTML = '';
+        state.apps.forEach((app, index) => {
+            const item = document.createElement('div');
+            item.className = 'installed-item';
+            item.innerHTML = `
+                <span><strong>${app.name}</strong> (${app.url})</span>
+                <button class="btn-del-app" data-index="${index}" tabindex="0">Удалить</button>
+            `;
+            const delBtn = item.querySelector('.btn-del-app');
+            delBtn.addEventListener('click', () => {
+                state.apps.splice(index, 1);
+                try { localStorage.setItem('hp_apps', JSON.stringify(state.apps)); } catch (e) {}
+                renderApps();
+            });
+            installedAppsManageList.appendChild(item);
+        });
     }
 }
+try { renderApps(); } catch (e) { console.error(e); }
 
-['keydown', 'click', 'touchstart'].forEach(function(evt) {
-    window.addEventListener(evt, triggerAutoFullscreenOnce, { once: true, passive: true });
+// Settings Subtabs
+const subtabBtns = document.querySelectorAll('.subtab-btn');
+const subpanes = {
+    'appearance': document.getElementById('sub-appearance'),
+    'widgets': document.getElementById('sub-widgets'),
+    'apps': document.getElementById('sub-apps'),
+    'screensaver': document.getElementById('sub-screensaver')
+};
+
+subtabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        subtabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const target = btn.getAttribute('data-subtab');
+        Object.keys(subpanes).forEach(k => {
+            if (subpanes[k]) subpanes[k].classList.toggle('active', k === target);
+        });
+    });
 });
 
-function enterFullscreen() {
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen) {
-        docEl.requestFullscreen().catch(() => {});
-    } else if (docEl.webkitRequestFullscreen) {
-        docEl.webkitRequestFullscreen();
-    } else if (docEl.mozRequestFullScreen) {
-        docEl.mozRequestFullScreen();
-    } else if (docEl.msRequestFullscreen) {
-        docEl.msRequestFullscreen();
-    }
-}
-
-function exitFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-    } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-    }
-}
-
-function toggleFullscreen() {
-    if (isFullscreenActive()) {
-        exitFullscreen();
-    } else {
-        enterFullscreen();
-    }
-}
-
-function updateFullscreenUI() {
-    const isFS = isFullscreenActive();
-    document.body.classList.toggle('is-fullscreen-mode', isFS);
-
-    document.querySelectorAll('.btn-fullscreen-toggle').forEach(btn => {
-        btn.classList.toggle('active', isFS);
-        const icon = btn.querySelector('.material-icons');
-        if (icon) icon.textContent = isFS ? 'fullscreen_exit' : 'fullscreen';
-        
-        const label = btn.querySelector('.fs-label, .fs-text, #textSettingsFullscreen, span:not(.material-icons)');
-        if (label) {
-            if (btn.classList.contains('quick-fullscreen-btn')) {
-                label.textContent = isFS ? 'Свернуть' : 'Во весь экран';
-            } else if (btn.id === 'btnSettingsFullscreen') {
-                label.textContent = isFS ? 'Выйти из полноэкранного' : 'На весь экран';
-            } else {
-                label.textContent = isFS ? 'Свернуть' : 'На весь экран';
-            }
+// Quick Restart Button
+const restartPortalBtn = document.getElementById('restartPortalBtn');
+if (restartPortalBtn) {
+    const doExit = () => {
+        window.location.href = "http://msx.benzac.de/exit.html";
+    };
+    restartPortalBtn.addEventListener('click', doExit);
+    restartPortalBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            doExit();
         }
-        btn.setAttribute('title', isFS ? 'Выйти из полноэкранного режима' : 'На весь экран (Синяя кнопка пульта)');
     });
 }
 
-document.querySelectorAll('.btn-fullscreen-toggle').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleFullscreen();
-    });
-});
+// Screensaver engine
+const screensaverLayer = document.getElementById('screensaverLayer');
+const ssBgImage = document.getElementById('ssBgImage');
+const ssClockBlock = document.getElementById('ssClockBlock');
 
-['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
-    document.addEventListener(evt, updateFullscreenUI);
-});
+function showScreensaver() {
+    if (!screensaverLayer) return;
+    if (ssBgImage) {
+        ssBgImage.style.backgroundImage = `url('${SCREENSAVER_IMAGES.ss_mountains}')`;
+    }
+    screensaverLayer.classList.add('active');
+}
+
+function hideScreensaver() {
+    if (!screensaverLayer) return;
+    screensaverLayer.classList.remove('active');
+}
+
+const startScreensaverBtn = document.getElementById('startScreensaverBtn');
+if (startScreensaverBtn) startScreensaverBtn.addEventListener('click', showScreensaver);
+
+if (screensaverLayer) {
+    screensaverLayer.addEventListener('click', () => {
+        hideScreensaver();
+        switchTab('widgets');
+    });
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     ensureInitialFocus();
     setTimeout(ensureInitialFocus, 100);
     setTimeout(ensureInitialFocus, 400);
-    setTimeout(ensureInitialFocus, 1000);
 });
 
 window.addEventListener('load', () => {
     ensureInitialFocus();
-    try { enterFullscreen(); } catch (e) {}
 });
